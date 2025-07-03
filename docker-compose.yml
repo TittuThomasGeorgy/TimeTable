@@ -1,0 +1,34 @@
+version: '3.8'
+services:
+  client:
+    build: ./client
+    ports:
+      - '3000:5173'
+    depends_on:
+      - server
+    volumes:
+      - ./client:/app
+
+
+  server:
+    build: ./server
+    ports:
+      - '5000:5000'
+    depends_on:
+      - mongo
+    env_file:
+      - ./server/.env
+    volumes:
+      - ./server:/app
+
+
+  mongo:
+    image: mongo:latest
+    restart: always
+    ports:
+      - '27017:27017'
+    volumes:
+      - mongo-data:/data/db
+
+volumes:
+  mongo-data:
