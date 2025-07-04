@@ -1,4 +1,3 @@
-version: '3.8'
 services:
   client:
     build: ./client
@@ -9,13 +8,15 @@ services:
     volumes:
       - ./client:/app
 
-
   server:
-    build: ./server
-    ports:
-      - '5000:5000'
+    build:
+      context: ./server
+      dockerfile: Dockerfile
+    container_name: timetable-server
     depends_on:
       - mongo
+    ports:
+      - "5000:5000"
     env_file:
       - ./server/.env
     volumes:

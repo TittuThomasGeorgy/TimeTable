@@ -22,7 +22,7 @@
   "compounds": [
     {
       "name": "start MERN app",
-      "configurations": ["Start backend"]
+      "configurations": ["Start server","Start client"]
     }
   ]
 }

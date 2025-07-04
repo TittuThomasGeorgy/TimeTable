@@ -1,14 +1,21 @@
-FROM node:18-alpine
+# Use an official Node image
+FROM node:18 AS builder
 
+# Set working directory
 WORKDIR /app
 
+# Copy dependency files and install
 COPY package.json pnpm-lock.yaml ./
 RUN npm install -g pnpm && pnpm install
 
+# Copy the rest of the client files
 COPY . .
 
-# RUN pnpm run build
+# Build the app
+RUN pnpm run build
 
-EXPOSE 5173
-
-CMD ["pnpm", "run", "dev"]
+# Serve with a simple static server
+FROM nginx:alpine
+COPY --from=builder /app/dist /usr/share/nginx/html
+EXPOSE 80
+CMD ["nginx", "-g", "daemon off;"]
