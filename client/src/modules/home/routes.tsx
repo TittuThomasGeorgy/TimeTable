@@ -1,13 +1,21 @@
 import { lazy } from 'react';
-import type { RouteObject } from 'react-router-dom';
+import type { ModuleRoute } from '../../types/CommonTypes';
+import { Home as HomeIcon } from '@mui/icons-material';
 
 const HomePage = lazy(() => import('./pages/HomePage'));
 
-const HomeRoutes: RouteObject[] = [
-  {
-    path: '/',
-    element: <HomePage />,
-  },
-];
+const HomePageRoutes: ModuleRoute = {
+    base: '',
+    pages: [
+        {
+            title: 'Home',
+            path: '/',
+            element: <HomePage />,
+            showInDrawer: true,
+            icon: <HomeIcon />,
+        },
+        
+    ],
+};
 
-export default HomeRoutes;
+export default HomePageRoutes;

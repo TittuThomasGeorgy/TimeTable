@@ -1,5 +1,5 @@
-import HomeRoutes from "../modules/home/routes";
+import HomePageRoutes from "../modules/home/routes";
 export const allModuleRoutes = [
-    ...HomeRoutes
+    HomePageRoutes
 
 ];

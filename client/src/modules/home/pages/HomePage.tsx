@@ -1,23 +1,24 @@
-import React from 'react'
-import NavBar from '../../../layouts/NavBar'
+// import React from 'react'
+import CommonPageLayout from '../../../layouts/CommonPageLayout'
 
 const HomePage = () => {
 
     return (
 
         <>
-            <div>HomePage</div>
-            <div>HomePage</div>
-            <div>HomePage</div>
-            <div>HomePage</div>
-            <div>HomePage</div>
-            <div>HomePage</div>
-            <div>HomePage</div>
-            <div>HomePage</div>
-            <div>HomePage</div>
-            <div>HomePage</div>
-            <div>HomePage</div>
-            <NavBar value={0}/>
+            <CommonPageLayout>
+                <div>HomePage</div>
+                <div>HomePage</div>
+                <div>HomePage</div>
+                <div>HomePage</div>
+                <div>HomePage</div>
+                <div>HomePage</div>
+                <div>HomePage</div>
+                <div>HomePage</div>
+                <div>HomePage</div>
+                <div>HomePage</div>
+                <div>HomePage</div>
+            </CommonPageLayout>
         </>
     )
 }
