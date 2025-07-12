@@ -25,20 +25,19 @@ import React, { useEffect, useState } from 'react';
 import { Link, NavLink, useNavigate } from 'react-router-dom';
 import { allModuleRoutes } from '../routes/routes';
 
-const drawerWidth = 240;
 
 const CommonPageLayout = (props: { children: React.ReactNode; title?: string; hidePageHeader?: boolean; searchOptions?: { value: string; onChange: (keyword: string) => void } }) => {
   const theme = useTheme();
   const isDark = theme.palette.mode === 'dark';
-
-  const [mobileOpen, setMobileOpen] = React.useState(false);
-
+  
+  const [isCollapsed, setIsCollapsed] = useState<boolean>(true);
   const handleDrawerToggle = () => {
-    setMobileOpen(!mobileOpen);
+    setIsCollapsed(!isCollapsed)
   };
-
+  const drawerWidth = isCollapsed?70:240;
+  
   const [anchorElUser, setAnchorElUser] = useState<null | HTMLElement>(null);
-
+  
   const handleOpenUserMenu = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorElUser(event.currentTarget);
   };
@@ -48,53 +47,82 @@ const CommonPageLayout = (props: { children: React.ReactNode; title?: string; hi
   }, []);
 
   const drawer = (
-    <div>
-      {/* <Toolbar /> */}
-      <Grid sx={{ height: 155 }}>
-        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '100%' }}>
-          <img src="/logo.png" alt="" style={{ height: 80, marginTop: 20 }} />
-          <br />
-          {/* <b></b> */}
-        </div>
-      </Grid>
-      <Divider />
-      <List>
-        {allModuleRoutes
-          .map((moduleRoute, index) =>
-            moduleRoute.pages.map((page) =>
-              !page.showInDrawer ? null : (
+    <Box
+      sx={{
+        height: '100%',
+        display: 'flex',
+        flexDirection: 'column',
+        overflowX: 'hidden',
+        width:  drawerWidth,
+        transition: 'width 0.3s',
+      }}
+    >
+      <Box
+        sx={{
+          display: 'flex',
+          justifyContent: 'center',
+          py: 2,
+        }}
+      >
+        <img src="/logo.png" alt="Logo" style={{ height: 40 }} />
+      </Box>
 
-                <NavLink
-                  to={moduleRoute.base + page.path}
-                  style={({ isActive }) =>
-                    !isActive ?
-                      {
-                        color: theme.palette.text.secondary,
-                        textDecoration: 'none',
-                      } :
-                      {
-                        color: isDark ? 'black' : 'white',
-                        textDecoration: 'none',
-                        backgroundColor: theme.palette.primary.main,
-                      }
-                  }
-                  key={index}
-                >
-                  <ListItem disablePadding sx={{ backgroundColor: 'inherit' }}>
-                    <ListItemButton>
-                      {<ListItemIcon sx={{ color: 'inherit' }}>{page.icon}</ListItemIcon>}
-                      <ListItemText primary={page.title} />
-                    </ListItemButton>
-                  </ListItem>
-                </NavLink>
-
-              ),
-            ),
-          )
-          .flat()}
-      </List>
       <Divider />
-    </div>
+
+      <Box sx={{ flexGrow: 1, overflowY: 'auto' }}>
+        <Box textAlign="right" p={1}>
+          <IconButton onClick={() => { setIsCollapsed(!isCollapsed); }}>
+            <MenuIcon />
+          </IconButton>
+        </Box>
+        <List>
+          {allModuleRoutes.map((moduleRoute, idx) => (
+            <Box key={idx}>
+              {/* {moduleRoute.title && !isCollapsed && (
+                <Typography variant="caption" sx={{ pl: 2, mt: 2, fontWeight: 600 }}>
+                  {moduleRoute.title}
+                </Typography>
+              )} */}
+
+              {moduleRoute.pages.map((page, index) =>
+                page.showInDrawer ? (
+                  <Tooltip key={index} title={isCollapsed ? page.title : ''} placement="right">
+                    <NavLink
+                      to={moduleRoute.base + page.path}
+                      style={({ isActive }) => ({
+                        textDecoration: 'none',
+                        color: isActive
+                          ? theme.palette.primary.contrastText
+                          : theme.palette.text.secondary,
+                        backgroundColor: isActive ? theme.palette.primary.main : 'transparent',
+                        borderRadius: '0 20px 20px 0',
+                        transition: 'all 0.3s',
+                        display: 'block',
+                        margin: '4px 8px',
+                      })}
+                    >
+                      <ListItem disablePadding>
+                        <ListItemButton
+                          sx={{
+                            borderRadius: '0 20px 20px 0',
+                            justifyContent: isCollapsed ? 'center' : 'flex-start',
+                          }}
+                        >
+                          <ListItemIcon sx={{ color: 'inherit', minWidth: 0, mr: isCollapsed ? 0 : 2 }}>
+                            {page.icon}
+                          </ListItemIcon>
+                          {!isCollapsed && <ListItemText primary={page.title} />}
+                        </ListItemButton>
+                      </ListItem>
+                    </NavLink>
+                  </Tooltip>
+                ) : null
+              )}
+            </Box>
+          ))}
+        </List>
+      </Box>
+    </Box>
   );
 
 
@@ -108,6 +136,7 @@ const CommonPageLayout = (props: { children: React.ReactNode; title?: string; hi
         sx={{
           width: { sm: `calc(100% - ${drawerWidth}px)` },
           ml: { sm: `${drawerWidth}px` },
+          transition: 'width 0.3s ease',
         }}
       >
         <Toolbar>
@@ -191,7 +220,7 @@ const CommonPageLayout = (props: { children: React.ReactNode; title?: string; hi
         {/* The implementation can be swapped with js to avoid SEO duplication of links. */}
         <Drawer
           variant="temporary"
-          open={mobileOpen}
+          open={!isCollapsed}
           onClose={handleDrawerToggle}
           ModalProps={{
             keepMounted: true, // Better open performance on mobile.
@@ -211,8 +240,10 @@ const CommonPageLayout = (props: { children: React.ReactNode; title?: string; hi
           sx={{
             'display': { xs: 'none', sm: 'block' },
             '& .MuiDrawer-paper': {
+              width: isCollapsed ? 70 : drawerWidth,
+              transition: 'width 0.3s ease',
+              overflowX: 'hidden',
               boxSizing: 'border-box',
-              width: drawerWidth,
             },
           }}
           open
@@ -226,6 +257,7 @@ const CommonPageLayout = (props: { children: React.ReactNode; title?: string; hi
           flexGrow: 1,
           p: 3,
           width: { sm: `calc(100% - ${drawerWidth}px)` },
+             transition: 'width 0.3s ease',
         }}
       >
         <Toolbar />
