@@ -1,5 +1,5 @@
 import { lazy } from 'react';
-import type { ModuleRoute } from '../../types/CommonTypes';
+import type { ModuleRoute } from '../../types/ModuleRoute';
 import { Person as TeacherIcon } from '@mui/icons-material';
 
 const TeacherPage = lazy(() => import('./pages/TeacherPage'));
@@ -14,7 +14,7 @@ const TeacherPageRoutes: ModuleRoute = {
             showInDrawer: true,
             icon: <TeacherIcon />,
         },
-        
+
     ],
 };
 

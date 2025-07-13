@@ -1,5 +1,5 @@
 import { lazy } from 'react';
-import type { ModuleRoute } from '../../types/CommonTypes';
+import type { ModuleRoute } from '../../types/ModuleRoute';
 import { TableBar as TimeTableIcon } from '@mui/icons-material';
 
 const TimeTablePage = lazy(() => import('./pages/TimeTablePage'));

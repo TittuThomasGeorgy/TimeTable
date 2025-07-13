@@ -1,5 +1,5 @@
 import { createContext, useContext } from 'react';
-import type { LoaderContextType } from '../types/CommonTypes';
+import type { LoaderContextType } from '../types/LoaderContextType';
 
 export const LoaderContext = createContext<LoaderContextType | undefined>(undefined);
 

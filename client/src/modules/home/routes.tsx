@@ -1,5 +1,5 @@
 import { lazy } from 'react';
-import type { ModuleRoute } from '../../types/CommonTypes';
+import type { ModuleRoute } from '../../types/LoaderContextType';
 import { Home as HomeIcon } from '@mui/icons-material';
 
 const HomePage = lazy(() => import('./pages/HomePage'));

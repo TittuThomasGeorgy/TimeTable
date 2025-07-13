@@ -1,5 +1,5 @@
 import React, { useCallback, useState } from 'react';
-import type { LoaderContextType } from '../../types/CommonTypes';
+import type { LoaderContextType } from '../../types/LoaderContextType';
 import { Box } from '@mui/material';
 import Animations from '../../animations';
 import Lottie from 'react-lottie';

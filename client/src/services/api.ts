@@ -1,6 +1,7 @@
 import type { EnqueueSnackbar } from "notistack";
 import type { AxiosResponse } from "axios";
-import type { ServerResponse, LoaderContextType } from "../types/CommonTypes";
+import type { LoaderContextType } from "../types/LoaderContextType";
+import type { ServerResponse } from "../types/ServerResponse";
 import axios from "axios";
 
 let loader: LoaderContextType;
