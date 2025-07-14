@@ -1,28 +1,48 @@
 import { Dialog, DialogTitle, DialogContent, Container, Grid, TextField, DialogActions, Button, IconButton, InputAdornment } from '@mui/material';
 import { enqueueSnackbar } from 'notistack';
 import React, { useEffect, useState } from 'react'
-import ImageUploader from '../../../components/ImageUploader';
-import { ICreatableSchool, ISchool } from '../types/SchoolTypes';
-import { ICreatableEvent } from '../../events/types/EventTypes';
-import useSchool from '../services/SchoolService';
 import { Visibility as VisibilityIcon, VisibilityOff as VisibilityOffIcon } from '@mui/icons-material';
-const defSchool = {
-    _id: '',
-    name: '',
-    address: '',
-    code: '',
-    logo: '',
-    username: '',
-    password: '',
-    isAdmin: false
+import type { ITeacher } from '../types/Teacher';
+import { defTeacher } from '../constants/Teacher.default';
+import ImageUploader from '../../../components/ImageUploader';
+import { useCreateTeacher } from '../hooks/useTeacher';
+
+interface Props {
+    open: boolean;
+    onClose: () => void;
+    onSubmit: (value: ITeacher) => void;
+    value?: ITeacher
 }
-const AddTeacherDialog = (props: { open: boolean; onClose: () => void; onSubmit: (value: ISchool) => void; action: 'add' | 'edit'; value: ISchool }) => {
-    const [creatableSchool, setCreatableSchool] = useState<ISchool>(defSchool);
+
+const AddTeacherDialog = (props: Props) => {
+    const isEdit = !!props.value;
+    const [form, setForm] = useState<ITeacher>(defTeacher);
+    const { mutate, isPending: isCreating } = useCreateTeacher();
+    // const { mutate: update, isPending: updating } = useUpdateUser();
     const [file1, setFile1] = useState<File>();
     const [showPassword, setShowPassword] = useState(false);
     const [usernameError, setUsernameError] = useState('');
     const [passwordError, setPasswordError] = useState('');
 
+    const handleSubmit = () => {
+        const userError = validateUsername(form.username);
+        const passError = validatePassword(form.password);
+        if (userError) {
+            setUsernameError(userError);
+            return;
+        }
+        else {
+            setUsernameError('')
+        }
+        if (passError) {
+            setPasswordError(passError);
+            return;
+        }
+        else {
+            setPasswordError('')
+        }
+        mutate(form, { onSuccess: () => { props.onClose(); props.onSubmit(form); } });
+    };
     const validateUsername = (username: string) => {
         // Example: Username should be at least 4 characters long
         if (username.length < 4) {
@@ -44,146 +64,95 @@ const AddTeacherDialog = (props: { open: boolean; onClose: () => void; onSubmit:
 
     useEffect(() => {
         if (props.value)
-            setCreatableSchool(props.value)
+            setForm(props.value)
+        else
+            setForm(defTeacher)
     }, [props.value])
 
     return (
         <Dialog open={props.open} onClose={() => props.onClose()}>
             <form onSubmit={(e) => {
                 e.preventDefault();
-                const userError = validateUsername(creatableSchool.username);
-                const passError = validatePassword(creatableSchool.password);
-                if (userError) {
-                    setUsernameError(userError);
-                    return;
-                }
-                else {
-                    setUsernameError('')
-                }
-                if (passError) {
-                    setPasswordError(passError);
-                    return;
-                }
-                else {
-                    setPasswordError('')
-                }
 
-                if (props.action === 'add' && !file1) {
-                    enqueueSnackbar({
-                        variant: "error",
-                        message: `File missing`
-                    });
-                    return;
-                }
-                props.action === 'edit' ?
-                    schoolServ.update(creatableSchool, file1).then((res) => {
-                        if (res.success) {
-                            // setSchools((schools) => schools.map(scl => scl._id === creatableSchool._id ? creatableSchool : scl))
-                            props.onSubmit({ ...creatableSchool, score: 0 })
-                            enqueueSnackbar({
-                                variant: "success",
-                                message: res.message
-                            })
-                        }
-                        else
-                            enqueueSnackbar({
-                                variant: "error",
-                                message: `Editing Failed`
-                            })
-                    }) :
-                    schoolServ.create(creatableSchool, file1).then((res) => {
-                        if (res.success) {
-                            props.onSubmit({ ...creatableSchool, score: 0 })
-                            enqueueSnackbar({
-                                variant: "success",
-                                message: res.message
-                            })
-                        }
-                        else
-                            enqueueSnackbar({
-                                variant: "error",
-                                message: `Adding Failed`
-                            })
-                    });
-                props.onClose();
+                handleSubmit();
             }}>
-                <DialogTitle>{(props.action === 'edit' ? 'Edit ' : 'Add ') + 'School'}</DialogTitle>
+                <DialogTitle>{(isEdit ? 'Edit ' : 'Add ') + 'Teacher'}</DialogTitle>
                 <DialogContent>
                     <Container>
-                        <Grid container spacing={2}>
-                            <Grid item xs={12}>
-                                <ImageUploader value={creatableSchool.logo} onChange={(newVal) => {
-                                    setCreatableSchool(school => ({ ...school, logo: newVal }))
+                        <Grid container spacing={1}>
+                            <Grid size={{ xs: 12 }}>
+                                <ImageUploader value={form.image} onChange={(newVal) => {
+                                    setForm(Teacher => ({ ...Teacher, logo: newVal }))
                                 }}
                                     onFileUpload={(fil) => {
                                         setFile1(fil)
                                     }} />
                             </Grid>
-                            <Grid item xs={12}>
-                                &ensp;
+                            <Grid size={{ xs: 12 }}>
+                                {/* &ensp; */}
                                 <TextField
                                     label="Name"
-                                    value={creatableSchool.name}
+                                    value={form.name}
                                     onChange={(e) => {
-                                        setCreatableSchool(school => ({ ...school, name: e.target.value }))
+                                        setForm(Teacher => ({ ...Teacher, name: e.target.value }))
                                     }}
                                     fullWidth
                                     required
                                 />
                             </Grid>
-                            <Grid item xs={12}>
-                                &ensp;
+                            <Grid size={{ xs: 12 }}>
+                                {/* &ensp; */}
                                 <TextField
                                     label="Code"
-                                    value={creatableSchool.code}
+                                    value={form.code}
                                     onChange={(e) => {
-                                        setCreatableSchool(school => ({ ...school, code: e.target.value }))
+                                        setForm(Teacher => ({ ...Teacher, code: e.target.value }))
                                     }}
                                     fullWidth
                                     required
                                 />
                             </Grid>
-                            <Grid item xs={12}>
-                                &ensp;
+                            <Grid size={{ xs: 12 }}>
+                                {/* &ensp; */}
                                 <TextField
-                                    label="Address"
-                                    value={creatableSchool.address}
+                                    label="Experience"
+                                    type='tel'
+                                    value={form.exp}
                                     onChange={(e) => {
-                                        setCreatableSchool(school => ({ ...school, address: e.target.value }))
+                                        setForm(Teacher => ({ ...Teacher, exp: Number(e.target.value) }))
                                     }}
                                     fullWidth
                                     required
-                                    multiline
-                                    minRows={3}
+
                                 />
                             </Grid>
 
-                            <Grid item xs={12}>
-                                &ensp;
+                            <Grid size={{ xs: 12 }}>
+                                {/* &ensp; */}
                                 <TextField
                                     label="Username"
-                                    value={creatableSchool.username}
+                                    value={form.username}
                                     onChange={(e) => {
-                                        setCreatableSchool(school => ({ ...school, username: e.target.value }))
+                                        setForm(Teacher => ({ ...Teacher, username: e.target.value }))
                                     }}
                                     fullWidth
                                     required
                                     error={!!usernameError}
                                     helperText={usernameError}
-                                    disabled={props.action === 'edit'}
+                                    disabled={isEdit}
                                 />
                             </Grid>
-                            <Grid item xs={12}>
-                                &ensp;
+                            <Grid size={{ xs: 12 }}>
+                                {/* &ensp; */}
                                 <TextField
                                     label="Password"
                                     type={showPassword ? 'text' : 'password'}
-                                    value={creatableSchool.password}
+                                    value={form.password}
                                     onChange={(e) => {
-                                        setCreatableSchool(school => ({ ...school, password: e.target.value }));
+                                        setForm(Teacher => ({ ...Teacher, password: e.target.value }));
                                     }}
                                     fullWidth
-                                    required={props.action != 'edit'}
+                                    required={!isEdit}
                                     InputProps={{
                                         endAdornment: (
                                             <InputAdornment position="end">
@@ -205,12 +174,12 @@ const AddTeacherDialog = (props: { open: boolean; onClose: () => void; onSubmit:
                     </Container>
                 </DialogContent>
                 <DialogActions>
-                    <Button onClick={() => props.onClose()}>Cancel</Button>
-                    <Button type="submit"> {props.action === 'edit' ? 'Edit' : 'Add'}</Button>
+                    <Button onClick={() => props.onClose()} disabled={isCreating}>Cancel</Button>
+                    <Button type="submit" disabled={isCreating}> {isEdit ? 'Edit' : 'Add'}</Button>
                 </DialogActions>
             </form>
         </Dialog>
     )
 }
 
-export default AddSchoolDialog
+export default AddTeacherDialog

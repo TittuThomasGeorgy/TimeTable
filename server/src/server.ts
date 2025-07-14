@@ -1,23 +1,16 @@
-import express from 'express';
-import cors from 'cors';
+import colors from 'colors';
+colors.enable();
 import mongoose from 'mongoose';
-import dotenv from 'dotenv';
-
-dotenv.config();
-
-const app = express();
+import app from './app';
 const PORT = process.env.PORT || 5000;
 
-app.use(cors());
-app.use(express.json());
-
-app.get('/', (_req, res) => {
-  res.send('API is running 🚀');
+app.listen(PORT, () => {
+  console.log(`🚀 Server running on port ${PORT}`);
 });
 
 mongoose
   .connect(process.env.MONGO_URI!)
   .then(() => {
-    app.listen(PORT, () => console.log(`Server running on http://localhost:${PORT}`));
+    app.listen(PORT, () => console.log(`Server running on http://localhost:${PORT}`.blue));
   })
   .catch(err => console.error('DB Connection Failed', err));
