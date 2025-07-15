@@ -70,7 +70,7 @@ const CommonPageLayout = (props: { children: React.ReactNode; title?: string; hi
       <Divider />
 
       <Box sx={{ flexGrow: 1, overflowY: 'auto' }}>
-        <Box textAlign="right" p={1}>
+        <Box textAlign="left" p={1}>
           <IconButton onClick={() => { setIsCollapsed(!isCollapsed); }}>
             <MenuIcon />
           </IconButton>
@@ -216,7 +216,7 @@ const CommonPageLayout = (props: { children: React.ReactNode; title?: string; hi
         </Toolbar>
         {/* {loader.count != undefined && loader.count > 0 && <LinearProgress />} */}
       </AppBar>
-      <Box component="nav" sx={{ width: { sm: drawerWidth }, flexShrink: { sm: 0 } }} aria-label="mailbox folders">
+      <Box component="nav" sx={{ width: { sm: drawerWidth }, flexShrink: 0 }} >
         {/* The implementation can be swapped with js to avoid SEO duplication of links. */}
         <Drawer
           variant="temporary"
@@ -255,7 +255,7 @@ const CommonPageLayout = (props: { children: React.ReactNode; title?: string; hi
         component="main"
         sx={{
           flexGrow: 1,
-          p: 3,
+          // p: 3,
           width: { sm: `calc(100% - ${drawerWidth}px)` },
              transition: 'width 0.3s ease',
         }}

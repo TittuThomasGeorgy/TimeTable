@@ -5,3 +5,5 @@ import http from "../../../services/http";
 
 export const createTeacher = async (data: ITeacher) =>
     getResponse<ITeacher>(http.post(`/teachers/`, { ...data }))
+export const getTeachers = async () =>
+    getResponse<ITeacher[]>(http.get(`/teachers/`))

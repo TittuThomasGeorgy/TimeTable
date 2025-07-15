@@ -1,11 +1,10 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { createTeacher } from '../services/teacher.api';
-import type { ITeacher } from '../types/Teacher';
+import { createTeacher, getTeachers } from '../services/teacher.api';
 
 
-// export const useTeachers = () => {
-//     return useQuery({ queryKey: ['Teachers'], queryFn: getTeachers });
-// };
+export const useTeachers = () => {
+    return useQuery({ queryKey: ['Teachers'], queryFn: getTeachers });
+};
 
 export const useCreateTeacher = () => {
     const queryClient = useQueryClient();

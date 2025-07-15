@@ -14,14 +14,13 @@ const CommonServices = {
 
 const getResponse = async <T>(
     axiosCall: Promise<AxiosResponse<unknown>>,
-    responseFormatter?: (res: any) => T
 ): Promise<ServerResponse<T>> => {
     loader?.onLoad();
     try {
         const res = await axiosCall;
-        let result: ServerResponse<T> = res.data as ServerResponse<T>;
-        const parsed = responseFormatter?.((res.data as ServerResponse<T>).data);
-        if (parsed) result = { ...result, data: parsed };
+        const result: ServerResponse<T> = res.data as ServerResponse<T>;
+        // const parsed = responseFormatter?.((res.data as ServerResponse<T>).data);
+        // if (parsed) result = { ...result, data: parsed };
         return result;
     } catch (err: unknown) {
         let message = "Something went wrong";
