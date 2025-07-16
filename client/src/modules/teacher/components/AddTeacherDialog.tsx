@@ -5,7 +5,7 @@ import { Visibility as VisibilityIcon, VisibilityOff as VisibilityOffIcon } from
 import type { ITeacher } from '../types/Teacher';
 import { defTeacher } from '../constants/Teacher.default';
 import ImageUploader from '../../../components/ImageUploader';
-import { useCreateTeacher } from '../hooks/useTeacher';
+import { useCreateTeacher, useUpdateTeacher } from '../hooks/useTeacher';
 
 interface Props {
     open: boolean;
@@ -18,7 +18,7 @@ const AddTeacherDialog = (props: Props) => {
     const isEdit = !!props.value;
     const [form, setForm] = useState<ITeacher>(defTeacher);
     const { mutate, isPending: isCreating } = useCreateTeacher();
-    // const { mutate: update, isPending: updating } = useUpdateUser();
+    const { mutate: update, isPending: updating } = useUpdateTeacher();
     const [file1, setFile1] = useState<File>();
     const [showPassword, setShowPassword] = useState(false);
     const [usernameError, setUsernameError] = useState('');
@@ -41,7 +41,10 @@ const AddTeacherDialog = (props: Props) => {
         else {
             setPasswordError('')
         }
-        mutate(form, { onSuccess: () => { props.onClose(); props.onSubmit(form); } });
+        if (isEdit)
+            update(form, { onSuccess: () => { props.onClose(); props.onSubmit(form); } });
+        else
+            mutate(form, { onSuccess: () => { props.onClose(); props.onSubmit(form); } });
     };
     const validateUsername = (username: string) => {
         // Example: Username should be at least 4 characters long
@@ -52,6 +55,8 @@ const AddTeacherDialog = (props: Props) => {
     };
 
     const validatePassword = (password: string) => {
+        if (isEdit && !password)
+            return '';
         // Example: Password should have at least 8 characters, including letters and numbers
         if (password.length < 8) {
             return "Password must be at least 8 characters long";
@@ -174,8 +179,8 @@ const AddTeacherDialog = (props: Props) => {
                     </Container>
                 </DialogContent>
                 <DialogActions>
-                    <Button onClick={() => props.onClose()} disabled={isCreating}>Cancel</Button>
-                    <Button type="submit" disabled={isCreating}> {isEdit ? 'Edit' : 'Add'}</Button>
+                    <Button onClick={() => props.onClose()} disabled={isCreating || updating}>Cancel</Button>
+                    <Button type="submit" disabled={isCreating || updating}> {isEdit ? 'Edit' : 'Add'}</Button>
                 </DialogActions>
             </form>
         </Dialog>

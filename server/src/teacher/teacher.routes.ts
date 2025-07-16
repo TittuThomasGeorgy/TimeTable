@@ -1,10 +1,11 @@
 import { Router } from 'express';
-import { createTeacher, getTeacherByIdReq, getTeachers } from './teacher.controller';
+import { createTeacher, getTeacherByIdReq, getTeachers, updateTeacher } from './teacher.controller';
 
 const teacherRoutes = Router();
 
-teacherRoutes.post('/', createTeacher);
 teacherRoutes.get('/', getTeachers);
+teacherRoutes.post('/', createTeacher);
 teacherRoutes.get('/:id', getTeacherByIdReq);
+teacherRoutes.patch('/:id', updateTeacher);
 
 export default teacherRoutes;

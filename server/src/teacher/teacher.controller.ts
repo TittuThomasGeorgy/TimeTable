@@ -122,3 +122,66 @@ export const getTeacherById = async (id: string | Types.ObjectId): Promise<ITeac
     delete data.password;
     return data; // Return the data to the controller function
 };
+
+export const updateTeacher = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        const _updatedTeacher = req.body;
+        const prevTeacher = await Teacher.findById(req.params.id)
+        // .populate('logo').populate('manager.img');
+        if (!prevTeacher) {
+            return sendApiResponse(res, 'NOT FOUND', null, 'Teacher Not Found');
+        }
+        // const files = req.files as { [fieldname: string]: Express.Multer.File[] };
+
+        // const prevTeacherLogo = (prevTeacher?.logo as unknown as IFileModel);
+        // const isSameLogo = prevTeacherLogo.downloadURL === _updatedTeacher.logo;
+        // console.log(prevTeacherLogo.downloadURL, _updatedTeacher.logo);
+        // let _file: IFileModel | null = null;
+        // const file1 = files?.file1?.[0];
+        // if (!isSameLogo && file1) {
+        //     _file = (await uploadFiles(req.body.name, file1, process.env.CLUB_FOLDER ?? '', prevTeacherLogo.fileId));
+        //     if (_file) {
+        //         _updatedTeacher.logo = _file?._id
+        //     }
+        //     else {
+        //         return sendApiResponse(res, 'SERVICE UNAVAILABLE', null,
+        //             `File upload Failed`);
+        //     }
+        // }
+        // else {
+        //     _updatedTeacher.logo = prevTeacher?.logo
+        // }
+
+        // const prevManImg = (prevTeacher?.manager.img as unknown as IFileModel);
+        // const isSameManImg = prevManImg.downloadURL === _updatedTeacher.manager.img;
+        // const file2 = files?.file2?.[0];
+        // if (!isSameManImg && file2) {
+        //     _file = (await uploadFiles(req.body.name, file2, process.env.MANAGER_FOLDER ?? '', prevTeacherLogo.fileId));
+        //     if (_file) {
+        //         _updatedTeacher.manager.img = _file?._id
+        //     }
+        //     else {
+        //         return sendApiResponse(res, 'SERVICE UNAVAILABLE', null,
+        //             `File upload Failed`);
+        //     }
+        // }
+        // else {
+        //     _updatedTeacher.manager.img = prevTeacher?.manager.img
+        // }
+
+        if (req.body.password === '')
+            _updatedTeacher.password = prevTeacher?.password
+
+        const updatedTeacher = await Teacher.findByIdAndUpdate(req.params.id, _updatedTeacher);
+        if (!updatedTeacher) {
+            return sendApiResponse(res, 'CONFLICT', null, 'Teacher Not Updated');
+        }
+        delete _updatedTeacher.password;
+
+        sendApiResponse(res, 'OK', _updatedTeacher,
+            `Teacher updated successfully`);
+    } catch (error) {
+        next(error);
+    }
+}
+

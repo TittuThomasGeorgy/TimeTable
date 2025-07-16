@@ -7,5 +7,7 @@ export const createTeacher = async (data: ITeacher) =>
     getResponse<ITeacher>(http.post(`/teachers/`, { ...data }))
 export const getTeachers = async () =>
     getResponse<ITeacher[]>(http.get(`/teachers/`))
-export const getTeacherById = async (id:string) =>
+export const getTeacherById = async (id: string) =>
     getResponse<ITeacher>(http.get(`/teachers/${id}`))
+export const updateTeacher = async (data: ITeacher) =>
+    getResponse<ITeacher>(http.patch(`/teachers/${data._id}`, data))

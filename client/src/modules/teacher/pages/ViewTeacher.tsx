@@ -1,12 +1,15 @@
-import React from 'react'
+import React, { useState } from 'react'
 import CommonPageLayout from '../../../layouts/CommonPageLayout'
 import { useGetTeacherById } from '../hooks/useTeacher';
 import { useParams } from 'react-router-dom';
 import { Container, Card, CardHeader, Typography, Avatar, CardContent, Grid, Chip, Divider, Box, Button } from '@mui/material';
 import { Person } from '@mui/icons-material';
+import AddTeacherDialog from '../components/AddTeacherDialog';
+import type { ITeacher } from '../types/Teacher';
 
 const ViewTeacherPage = () => {
     const { id } = useParams<{ id: string }>(); // Specify the type for useParams
+    const [open, setOpen] = useState(false);
 
     // Ensure id is present before making the API call
     const { data: res, isLoading, isError, error } = useGetTeacherById(id || ''); // Pass an empty string if id is undefined to satisfy type, or handle in hook
@@ -17,6 +20,7 @@ const ViewTeacherPage = () => {
         // If the ID is truly missing from the URL, you handle it here.
         return <div>Error: Teacher ID not found in URL. Please check the URL.</div>;
     }
+
 
 
     return (
@@ -91,7 +95,7 @@ const ViewTeacherPage = () => {
                         </Grid> */}
                     </CardContent>
                     <Box sx={{ p: 2, display: 'flex', justifyContent: 'flex-end', gap: 1 }}>
-                        <Button variant="outlined" color="primary" onClick={() => console.log('Edit clicked')}>
+                        <Button variant="outlined" color="primary" onClick={() => setOpen(true)}>
                             Edit
                         </Button>
                         <Button variant="outlined" color="error" onClick={() => console.log('Delete clicked')}>
@@ -100,7 +104,13 @@ const ViewTeacherPage = () => {
                     </Box>
                 </Card>
             </Container>
+            <AddTeacherDialog open={open} onClose={() => setOpen(false)}
+                value={teacher}
+                onSubmit={function (value: ITeacher): void {
+                    console.log("Submited");
 
+                }}
+            />
 
         </CommonPageLayout>
     )
