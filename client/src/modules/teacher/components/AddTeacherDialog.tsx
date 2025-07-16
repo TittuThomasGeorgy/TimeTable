@@ -1,6 +1,6 @@
 import { Dialog, DialogTitle, DialogContent, Container, Grid, TextField, DialogActions, Button, IconButton, InputAdornment } from '@mui/material';
-import { enqueueSnackbar } from 'notistack';
-import React, { useEffect, useState } from 'react'
+// import { enqueueSnackbar } from 'notistack';
+import  { useEffect, useState } from 'react'
 import { Visibility as VisibilityIcon, VisibilityOff as VisibilityOffIcon } from '@mui/icons-material';
 import type { ITeacher } from '../types/Teacher';
 import { defTeacher } from '../constants/Teacher.default';
@@ -19,7 +19,7 @@ const AddTeacherDialog = (props: Props) => {
     const [form, setForm] = useState<ITeacher>(defTeacher);
     const { mutate, isPending: isCreating } = useCreateTeacher();
     const { mutate: update, isPending: updating } = useUpdateTeacher();
-    const [file1, setFile1] = useState<File>();
+    // const [file1, setFile1] = useState<File>();
     const [showPassword, setShowPassword] = useState(false);
     const [usernameError, setUsernameError] = useState('');
     const [passwordError, setPasswordError] = useState('');
@@ -90,7 +90,9 @@ const AddTeacherDialog = (props: Props) => {
                                     setForm(Teacher => ({ ...Teacher, logo: newVal }))
                                 }}
                                     onFileUpload={(fil) => {
-                                        setFile1(fil)
+                                        console.log(fil);
+                                        
+                                        // setFile1(fil)
                                     }} />
                             </Grid>
                             <Grid size={{ xs: 12 }}>

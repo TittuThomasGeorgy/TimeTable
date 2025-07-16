@@ -1,8 +1,8 @@
-import React, { useState } from 'react'
+import { useState } from 'react'
 import CommonPageLayout from '../../../layouts/CommonPageLayout'
 import { useGetTeacherById } from '../hooks/useTeacher';
 import { useParams } from 'react-router-dom';
-import { Container, Card, CardHeader, Typography, Avatar, CardContent, Grid, Chip, Divider, Box, Button } from '@mui/material';
+import { Container, Card, CardHeader, Typography, Avatar, CardContent, Grid, Chip, Box, Button } from '@mui/material';
 import { Person } from '@mui/icons-material';
 import AddTeacherDialog from '../components/AddTeacherDialog';
 import type { ITeacher } from '../types/Teacher';
@@ -107,7 +107,7 @@ const ViewTeacherPage = () => {
             <AddTeacherDialog open={open} onClose={() => setOpen(false)}
                 value={teacher}
                 onSubmit={function (value: ITeacher): void {
-                    console.log("Submited");
+                    console.log(value);
 
                 }}
             />

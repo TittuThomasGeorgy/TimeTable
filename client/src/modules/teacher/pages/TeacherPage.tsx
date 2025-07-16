@@ -39,7 +39,7 @@ const TeacherPage = () => {
             )}
             <AddTeacherDialog open={open} onClose={() => setOpen(false)}
                 onSubmit={function (value: ITeacher): void {
-                    console.log("Submited");
+                    console.log(value);
 
                 }}
             />
