@@ -1,5 +1,5 @@
 import { NextFunction, Request, Response } from "express";
-import mongoose from "mongoose";
+import mongoose, { Types } from "mongoose";
 import sendApiResponse from "../utils/sendApiResponse";
 import Teacher from "./teacher.model";
 import { ITeacher } from "./teacher.types";
@@ -72,13 +72,13 @@ export const getTeachers = async (req: Request, res: Response, next: NextFunctio
         })
             .sort({ 'name': 1 });
         // If your logo is being populated correctly, we need to handle it properly in the map function
-        const data: ITeacher[] = _data.map((club) => {
-            // const logoObj = (club.logo as unknown as IFileModel).downloadURL; // Ensure that club.logo is properly typed
-            // const logoObj2 = (club.manager.img as unknown as IFileModel).downloadURL; // Ensure that club.logo is properly typed
-            // delete club.password;
+        const data: ITeacher[] = _data.map((teacher) => {
+            // const logoObj = (teacher.logo as unknown as IFileModel).downloadURL; // Ensure that teacher.logo is properly typed
+            // const logoObj2 = (teacher.manager.img as unknown as IFileModel).downloadURL; // Ensure that teacher.logo is properly typed
+            // delete teacher.password;
 
             return {
-                ...club.toObject(),  // Convert mongoose document to a plain object
+                ...teacher.toObject(),  // Convert mongoose document to a plain object
 
             };
         });
@@ -88,3 +88,37 @@ export const getTeachers = async (req: Request, res: Response, next: NextFunctio
         next(error);
     }
 }
+
+export const getTeacherByIdReq = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        const data: ITeacher = await getTeacherById(req.params.id);
+        sendApiResponse(res, 'OK', data, 'Successfully fetched teacher');
+    } catch (error) {
+        if ((error as any).message === 'TeacherNotFound') {
+            sendApiResponse(res, 'NOT FOUND', null, 'teacher Not Found');
+        } else {
+            next(error); // Pass the error to the error-handling middleware for unexpected errors
+        }
+    }
+};
+export const getTeacherById = async (id: string | Types.ObjectId): Promise<ITeacher> => {
+    const _data = await Teacher.findById(id)
+        // .populate('logo')
+        // .populate('manager.img')
+        .sort({ 'name': 1 });
+
+    if (!_data) {
+        throw new Error('TeacherNotFound'); // Throw an error if the teacher is not found
+    }
+
+    // const logoObj = (_data.logo as unknown as IFileModel).downloadURL;
+    // const logoObj2 = (_data.manager.img as unknown as IFileModel).downloadURL; // Ensure that teacher.logo is properly typed
+
+    const data: ITeacher = {
+        ..._data.toObject(),
+       
+    };
+
+    delete data.password;
+    return data; // Return the data to the controller function
+};

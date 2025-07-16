@@ -8,6 +8,6 @@ export interface ITeacher {
     image: string;
     isAdmin: boolean;
     username: string;
-    password: string;
+    password?: string;
     code: string
 }

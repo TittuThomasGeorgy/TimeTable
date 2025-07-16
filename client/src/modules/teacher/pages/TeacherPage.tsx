@@ -5,11 +5,13 @@ import { Add as AddIcon } from '@mui/icons-material';
 import { useState } from 'react';
 import AddTeacherDialog from '../components/AddTeacherDialog';
 import type { ITeacher } from '../types/Teacher';
-import { useTeachers } from '../hooks/useTeacher';
+import { useGetTeachers } from '../hooks/useTeacher';
+import { useNavigate } from 'react-router-dom';
 
 const TeacherPage = () => {
+    const navigate = useNavigate()
     const [open, setOpen] = useState(false);
-    const { data: res, isLoading } = useTeachers();
+    const { data: res, isLoading } = useGetTeachers();
     const teachers = res?.data;
     return (
 
@@ -28,7 +30,10 @@ const TeacherPage = () => {
             ) : (
                 <List>
                     {teachers?.map((teacher) => (
-                        <ListItem key={teacher._id}>{teacher.name} - {teacher.code}</ListItem>
+                        <ListItem key={teacher._id}
+                            onClick={() => navigate(`/teacher/${teacher._id}`)}
+                        >
+                            {teacher.name} - {teacher.code}</ListItem>
                     ))}
                 </List>
             )}
