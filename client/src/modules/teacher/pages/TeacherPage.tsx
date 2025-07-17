@@ -37,7 +37,8 @@ const TeacherPage = () => {
                     ))}
                 </List>
             )}
-            <AddTeacherDialog open={open} onClose={() => setOpen(false)}
+            <AddTeacherDialog open={open}
+                onClose={() => setOpen(false)}
                 onSubmit={function (value: ITeacher): void {
                     console.log(value);
 
