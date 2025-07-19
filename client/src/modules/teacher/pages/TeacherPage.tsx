@@ -21,22 +21,28 @@ const TeacherPage = () => {
                 color="primary"
                 sx={{ textTransform: 'none', float: 'right' }}
                 startIcon={<AddIcon />}
-                onClick={() => setOpen(true)}
-            >
-                ADD
+                onClick={() => {
+                    console.log("clicked");
+                    setOpen(true)
+                }
+                }
+            >                ADD
             </Button>
-            {isLoading ? (
-                <Typography>Loading teachers...</Typography>
-            ) : (
-                <List>
-                    {teachers?.map((teacher) => (
-                        <ListItem key={teacher._id}
-                            onClick={() => navigate(`/teacher/${teacher._id}`)}
-                        >
-                            {teacher.name} - {teacher.code}</ListItem>
-                    ))}
-                </List>
-            )}
+            <br />
+            {
+                isLoading ? (
+                    <Typography>Loading teachers...</Typography>
+                ) : (
+                    <List>
+                        {teachers?.map((teacher) => (
+                            <ListItem key={teacher._id}
+                                onClick={() => navigate(`/teacher/${teacher._id}`)}
+                            >
+                                {teacher.name} - {teacher.code}</ListItem>
+                        ))}
+                    </List>
+                )
+            }
             <AddTeacherDialog open={open}
                 onClose={() => setOpen(false)}
                 onSubmit={function (value: ITeacher): void {
@@ -44,7 +50,7 @@ const TeacherPage = () => {
 
                 }}
             />
-        </CommonPageLayout>
+        </CommonPageLayout >
     )
 }
 

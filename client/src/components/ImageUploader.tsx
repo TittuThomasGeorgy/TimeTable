@@ -2,14 +2,15 @@ import { Avatar, type SxProps } from '@mui/material';
 import { Image as ImageIcon } from '@mui/icons-material';
 import type { Theme } from '@emotion/react';
 import { enqueueSnackbar } from 'notistack';
-
+import { getDownloadURL, ref, uploadBytes } from 'firebase/storage'
+import { storage } from '../firebase/firebase';
 interface ImageUploaderProps {
     id?: string;
     value: string;
     onChange: (newVal: string) => void;
-    onFileUpload: (file: File) => void;
     sx?: SxProps<Theme>;
-    variant?: "rounded" | "circular" | "square"
+    variant?: "rounded" | "circular" | "square";
+    destination: "teachers"
 }
 const ImageUploader = (props: ImageUploaderProps) => {
     return (
@@ -34,7 +35,7 @@ const ImageUploader = (props: ImageUploaderProps) => {
                 accept="image/*"
                 id={props.id ?? "imagePicker"}
                 style={{ display: 'none' }}
-                onChange={(e) => {
+                onChange={async (e) => {
                     e.preventDefault(); // Prevent the default behavior of the file input
 
                     if (e.target.files) {
@@ -45,10 +46,9 @@ const ImageUploader = (props: ImageUploaderProps) => {
                                 variant: 'error',
                             });
                         } else {
-                            props.onFileUpload(e.target.files[0])
-                            const url = URL.createObjectURL(e.target.files[0]);
-                            console.log(url);
-
+                            const fileRef = ref(storage, `${props.destination}/${Date.now()}-${e.target.files[0].name}`)
+                            await uploadBytes(fileRef, e.target.files[0])
+                            const url = await getDownloadURL(fileRef)
                             props.onChange(url);
                         }
                     }
