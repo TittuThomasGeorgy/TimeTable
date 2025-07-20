@@ -28,7 +28,6 @@ import { allModuleRoutes } from '../routes/routes';
 
 const CommonPageLayout = (props: { children: React.ReactNode; title?: string; hidePageHeader?: boolean; searchOptions?: { value: string; onChange: (keyword: string) => void } }) => {
   const theme = useTheme();
-  const isDark = theme.palette.mode === 'dark';
 
   const [isCollapsed, setIsCollapsed] = useState<boolean>(true);
   const handleDrawerToggle = () => {
