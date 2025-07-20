@@ -10,7 +10,7 @@ import { getStorage } from "firebase/storage";
 const firebaseConfig = {
   apiKey:import.meta.env.VITE_FRB_API_KEY,
   authDomain:import.meta.env.VITE_FRB_AUTH_DOMAIN,
-  projectID: import.meta.env.VITE_FRB_PROJ_ID,
+  projectId: import.meta.env.VITE_FRB_PROJ_ID,
   storageBucket:import.meta.env.VITE_FRB_STOR_BKT,
   messagingSenderId:import.meta.env.VITE_FRB_SENDER_ID,
   appId:import.meta.env.VITE_FRB_APP_ID, 
