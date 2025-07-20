@@ -29,15 +29,15 @@ import { allModuleRoutes } from '../routes/routes';
 const CommonPageLayout = (props: { children: React.ReactNode; title?: string; hidePageHeader?: boolean; searchOptions?: { value: string; onChange: (keyword: string) => void } }) => {
   const theme = useTheme();
   const isDark = theme.palette.mode === 'dark';
-  
+
   const [isCollapsed, setIsCollapsed] = useState<boolean>(true);
   const handleDrawerToggle = () => {
     setIsCollapsed(!isCollapsed)
   };
-  const drawerWidth = isCollapsed?70:240;
-  
+  const drawerWidth = isCollapsed ? 70 : 240;
+
   const [anchorElUser, setAnchorElUser] = useState<null | HTMLElement>(null);
-  
+
   const handleOpenUserMenu = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorElUser(event.currentTarget);
   };
@@ -53,7 +53,7 @@ const CommonPageLayout = (props: { children: React.ReactNode; title?: string; hi
         display: 'flex',
         flexDirection: 'column',
         overflowX: 'hidden',
-        width:  drawerWidth,
+        width: drawerWidth,
         transition: 'width 0.3s',
       }}
     >
@@ -92,28 +92,41 @@ const CommonPageLayout = (props: { children: React.ReactNode; title?: string; hi
                       style={({ isActive }) => ({
                         textDecoration: 'none',
                         color: isActive
-                          ? theme.palette.primary.contrastText
+                          ? theme.palette.primary.main
                           : theme.palette.text.secondary,
-                        backgroundColor: isActive ? theme.palette.primary.main : 'transparent',
+                        backgroundColor: 'transparent',
                         borderRadius: '0 20px 20px 0',
                         transition: 'all 0.3s',
                         display: 'block',
                         margin: '4px 8px',
                       })}
                     >
-                      <ListItem disablePadding>
-                        <ListItemButton
-                          sx={{
-                            borderRadius: '0 20px 20px 0',
-                            justifyContent: isCollapsed ? 'center' : 'flex-start',
-                          }}
-                        >
-                          <ListItemIcon sx={{ color: 'inherit', minWidth: 0, mr: isCollapsed ? 0 : 2 }}>
-                            {page.icon}
-                          </ListItemIcon>
-                          {!isCollapsed && <ListItemText primary={page.title} />}
-                        </ListItemButton>
-                      </ListItem>
+                      {({ isActive }) => ( // Access isActive here
+                        <ListItem disablePadding>
+                          <ListItemButton
+                            sx={{
+                              borderRadius: '20px ',
+                              justifyContent: isCollapsed ? 'center' : 'flex-start',
+                              borderBottom: isActive ?'2px solid ':'none', // Thickness (5px), style (solid), color (black)
+                              borderColor:isActive ? theme.palette.primary.main : theme.palette.text.secondary,
+                              pb: 1, // Optional: Add some padding-bottom so content doesn't touch the border
+
+                            }}
+                          >
+                            <ListItemIcon
+                              sx={{
+                                // Now isActive is available here
+                                color: isActive ? theme.palette.primary.main : theme.palette.text.secondary,
+                                minWidth: 0,
+                                mr: isCollapsed ? 0 : 2,
+                              }}
+                            >
+                              {page.icon}
+                            </ListItemIcon>
+                            {!isCollapsed && <ListItemText primary={page.title} />}
+                          </ListItemButton>
+                        </ListItem>
+                      )}
                     </NavLink>
                   </Tooltip>
                 ) : null
@@ -257,7 +270,7 @@ const CommonPageLayout = (props: { children: React.ReactNode; title?: string; hi
           flexGrow: 1,
           // p: 3,
           width: { sm: `calc(100% - ${drawerWidth}px)` },
-             transition: 'width 0.3s ease',
+          transition: 'width 0.3s ease',
         }}
       >
         <Toolbar />
