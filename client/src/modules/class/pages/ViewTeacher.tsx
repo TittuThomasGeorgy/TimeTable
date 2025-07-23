@@ -1,31 +1,30 @@
 import { useState } from 'react'
 import CommonPageLayout from '../../../layouts/CommonPageLayout'
-import { useGetTeacherById } from '../hooks/useTeacher';
 import { useParams } from 'react-router-dom';
 import { Container, Card, CardHeader, Typography, Avatar, CardContent, Grid, Chip, Box, Button } from '@mui/material';
 import { Person } from '@mui/icons-material';
 import AddClassDialog from '../components/AddClassDialog';
-import type { ITeacher } from '../types/Class';
+import type { IClass } from '../types/Class';
 
 const ViewTeacherPage = () => {
     const { id } = useParams<{ id: string }>(); // Specify the type for useParams
     const [open, setOpen] = useState(false);
 
-    // Ensure id is present before making the API call
-    const { data: res, isLoading, isError, error } = useGetTeacherById(id || ''); // Pass an empty string if id is undefined to satisfy type, or handle in hook
-    const teacher = res?.data;
-    // 3. Now, use the values from the hooks in your conditional rendering
-    if (!id) {
-        // This condition checks the ID *after* the hooks are called.
-        // If the ID is truly missing from the URL, you handle it here.
-        return <div>Error: Teacher ID not found in URL. Please check the URL.</div>;
-    }
+    // // Ensure id is present before making the API call
+    // // const { data: res, isLoading, isError, error } = useGetTeacherById(id || ''); // Pass an empty string if id is undefined to satisfy type, or handle in hook
+    // const teacher = res?.data;
+    // // 3. Now, use the values from the hooks in your conditional rendering
+    // if (!id) {
+    //     // This condition checks the ID *after* the hooks are called.
+    //     // If the ID is truly missing from the URL, you handle it here.
+    //     return <div>Error: Teacher ID not found in URL. Please check the URL.</div>;
+    // }
 
 
 
     return (
         <CommonPageLayout>
-            {isLoading &&
+            {/* {isLoading &&
                 <div>Loading teacher? details...</div>
             }
             {isError &&
@@ -33,7 +32,7 @@ const ViewTeacherPage = () => {
             }
             {!teacher &&
                 <div>No teacher? found with ID: {id}</div>
-            }
+            } */}
             <Container maxWidth="md" sx={{ mt: 4 }}>
                 <Card sx={{ boxShadow: 3 }}>
                     <CardHeader
@@ -42,19 +41,19 @@ const ViewTeacherPage = () => {
                                 Teacher Details
                             </Typography>
                         }
-                        avatar={
-                            teacher?.image ? (
-                                <Avatar alt={teacher?.name} src={teacher?.image} sx={{ width: 56, height: 56 }} />
-                            ) : (
-                                <Avatar sx={{ bgcolor: 'primary.main', width: 56, height: 56 }}>
-                                    <Person fontSize="large" />
-                                </Avatar>
-                            )
-                        }
+                        // avatar={
+                        //     teacher?.image ? (
+                        //         <Avatar alt={teacher?.name} src={teacher?.image} sx={{ width: 56, height: 56 }} />
+                        //     ) : (
+                        //         <Avatar sx={{ bgcolor: 'primary.main', width: 56, height: 56 }}>
+                        //             <Person fontSize="large" />
+                        //         </Avatar>
+                        //     )
+                        // }
                         sx={{ bgcolor: 'primary.main', color: 'white' }}
                     />
                     <CardContent>
-                        <Grid container spacing={2}>
+                        {/* <Grid container spacing={2}>
                             <Grid size={{ xs: 12, md: 6 }}>
                                 <Typography variant="subtitle1" color="text.secondary">Name:</Typography>
                                 <Typography variant="body1">{teacher?.name}</Typography>
@@ -79,7 +78,7 @@ const ViewTeacherPage = () => {
                                 <Typography variant="subtitle1" color="text.secondary">Experience (Exp):</Typography>
                                 <Typography variant="body1">{teacher?.exp && teacher.exp > 0 ? `${teacher?.exp} years` : 'N/A'}</Typography>
                             </Grid>
-                        </Grid>
+                        </Grid> */}
 
                         {/* <Divider sx={{ my: 3 }} />
 
@@ -104,13 +103,13 @@ const ViewTeacherPage = () => {
                     </Box>
                 </Card>
             </Container>
-            <AddClassDialog open={open} onClose={() => setOpen(false)}
+            {/* <AddClassDialog open={open} onClose={() => setOpen(false)}
                 value={teacher}
                 onSubmit={function (value: ITeacher): void {
                     console.log(value);
 
                 }}
-            />
+            /> */}
 
         </CommonPageLayout>
     )

@@ -1,26 +1,27 @@
 import { lazy } from 'react';
 import type { ModuleRoute } from '../../types/ModuleRoute';
-import { Person as TeacherIcon } from '@mui/icons-material';
-import ViewClassPage from './pages/ViewTeacher';
+import { School as ClassIcon } from '@mui/icons-material';
+// import ViewClassPage from './pages/ViewClass';
 
 const ClassPage = lazy(() => import('./pages/ClassPage'));
+// const ViewClassPage = lazy(() => import('./pages/ViewClass'));
 
 const ClassPageRoutes: ModuleRoute = {
     base: '/class',
     pages: [
         {
-            title: 'Teacher',
+            title: 'Class',
             path: '/',
             element: <ClassPage />,
             showInDrawer: true,
-            icon: <TeacherIcon />,
+            icon: <ClassIcon />,
         },
-        {
-            title: 'View Teacher',
-            path: '/:id',
-            element: <ViewClassPage />,
+        // {
+        //     title: 'View Class',
+        //     path: '/:id',
+        //     element: <ViewClassPage />,
 
-        },
+        // },
 
     ],
 };

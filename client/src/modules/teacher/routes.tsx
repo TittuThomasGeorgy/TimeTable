@@ -1,9 +1,9 @@
 import { lazy } from 'react';
 import type { ModuleRoute } from '../../types/ModuleRoute';
 import { Person as TeacherIcon } from '@mui/icons-material';
-import ViewTeacherPage from './pages/ViewTeacher';
 
 const TeacherPage = lazy(() => import('./pages/TeacherPage'));
+const ViewTeacherPage = lazy(() => import('./pages/ViewTeacher'));
 
 const TeacherPageRoutes: ModuleRoute = {
     base: '/teacher',

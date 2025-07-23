@@ -3,7 +3,6 @@ import { Dialog, DialogTitle, DialogContent, Container, Grid, TextField, DialogA
 import { useEffect, useState } from 'react'
 import type { IClass } from '../types/Class';
 import { defClass } from '../constants/Class.default';
-import { useCreateTeacher, useUpdateTeacher } from '../hooks/useTeacher';
 
 interface Props {
     open: boolean;
@@ -15,8 +14,8 @@ interface Props {
 const AddClassDialog = (props: Props) => {
     const isEdit = !!props.value;
     const [form, setForm] = useState<IClass>(defClass);
-    const { mutate, isPending: isCreating } = useCreateTeacher();
-    const { mutate: update, isPending: updating } = useUpdateTeacher();
+    // const { mutate, isPending: isCreating } = useCreateTeacher();
+    // const { mutate: update, isPending: updating } = useUpdateTeacher();
     // const [file1, setFile1] = useState<File>();
     const [showPassword, setShowPassword] = useState(false);
 
@@ -64,8 +63,8 @@ const AddClassDialog = (props: Props) => {
                     </Container>
                 </DialogContent>
                 <DialogActions>
-                    <Button onClick={() => props.onClose()} disabled={isCreating || updating}>Cancel</Button>
-                    <Button type="submit" disabled={isCreating || updating}> {isEdit ? 'Edit' : 'Add'}</Button>
+                    {/* <Button onClick={() => props.onClose()} disabled={isCreating || updating}>Cancel</Button>
+                    <Button type="submit" disabled={isCreating || updating}> {isEdit ? 'Edit' : 'Add'}</Button> */}
                 </DialogActions>
             </form>
         </Dialog>

@@ -5,8 +5,7 @@ import { Add as AddIcon } from '@mui/icons-material';
 import { useState } from 'react';
 import AddClassDialog from '../components/AddClassDialog';
 import type { IClass } from '../types/Class';
-import { useGetTeachers } from '../hooks/useTeacher';
-import TeacherCard from '../components/TeacherCard';
+
 
 const ClassPage = () => {
     const [open, setOpen] = useState(false);
@@ -14,7 +13,7 @@ const ClassPage = () => {
     // const teachers = res?.data;
     return (
 
-        <CommonPageLayout title='Teachers'>
+        <CommonPageLayout title='Class'>
             <Button
                 variant="contained"
                 color="primary"
@@ -47,13 +46,13 @@ const ClassPage = () => {
                     )
                 }
             </Grid> */}
-            <AddClassDialog open={open}
+            {/* <AddClassDialog open={open}
                 onClose={() => setOpen(false)}
                 onSubmit={function (value: IClass): void {
                     console.log(value);
 
                 }}
-            />
+            /> */}
         </CommonPageLayout >
     )
 }
