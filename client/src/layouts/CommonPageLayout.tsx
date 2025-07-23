@@ -29,7 +29,17 @@ import { allModuleRoutes } from '../routes/routes';
 const CommonPageLayout = (props: { children: React.ReactNode; title?: string; hidePageHeader?: boolean; searchOptions?: { value: string; onChange: (keyword: string) => void } }) => {
   const theme = useTheme();
 
-  const [isCollapsed, setIsCollapsed] = useState<boolean>(true);
+  // Initialize isCollapsed state from localStorage, defaulting to true if not found
+  const [isCollapsed, setIsCollapsed] = useState<boolean>(() => {
+    const savedState = localStorage.getItem('isDrawerCollapsed');
+    return savedState !== null ? JSON.parse(savedState) : true; // Default to true (collapsed)
+  });
+
+  // Save isCollapsed state to localStorage whenever it changes
+  useEffect(() => {
+    localStorage.setItem('isDrawerCollapsed', JSON.stringify(isCollapsed));
+  }, [isCollapsed]);
+
   const handleDrawerToggle = () => {
     setIsCollapsed(!isCollapsed)
   };
@@ -106,8 +116,8 @@ const CommonPageLayout = (props: { children: React.ReactNode; title?: string; hi
                             sx={{
                               borderRadius: '20px ',
                               justifyContent: isCollapsed ? 'center' : 'flex-start',
-                              borderBottom: isActive ?'2px solid ':'none', // Thickness (5px), style (solid), color (black)
-                              borderColor:isActive ? theme.palette.primary.main : theme.palette.text.secondary,
+                              borderBottom: isActive ? '2px solid ' : 'none', // Thickness (5px), style (solid), color (black)
+                              borderColor: isActive ? theme.palette.primary.main : theme.palette.text.secondary,
                               pb: 1, // Optional: Add some padding-bottom so content doesn't touch the border
 
                             }}
