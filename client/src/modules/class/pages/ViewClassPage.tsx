@@ -2,7 +2,6 @@ import { useState } from 'react'
 import CommonPageLayout from '../../../layouts/CommonPageLayout'
 import { useNavigate, useParams } from 'react-router-dom';
 import { Container, Card, CardHeader, Typography, Avatar, CardContent, Grid, Chip, Box, Button } from '@mui/material';
-import { Person } from '@mui/icons-material';
 import AddClassDialog from '../components/AddClassDialog';
 import type { IClass } from '../types/Class';
 import { useGetClassById } from '../hooks/useClass';

@@ -1,4 +1,4 @@
-import { Dialog, DialogTitle, DialogContent, Container, Grid, TextField, DialogActions, Button, Autocomplete, Box, Avatar } from '@mui/material';
+import { Dialog, DialogTitle, DialogContent, Container, Grid, TextField, DialogActions, Button, Autocomplete, Box, Avatar, Typography } from '@mui/material';
 // import { enqueueSnackbar } from 'notistack';
 import { useEffect, useState } from 'react'
 import type { IClass } from '../types/Class';
@@ -20,7 +20,6 @@ const AddClassDialog = (props: Props) => {
     const teachers = res?.data;
     const { mutate, isPending: isCreating } = useCreateClass();
     const { mutate: update, isPending: updating } = useUpdateClass();
-    const [showPassword, setShowPassword] = useState(false);
 
     const handleSubmit = () => {
 
@@ -70,15 +69,16 @@ const AddClassDialog = (props: Props) => {
                                     renderOption={(props, option) => {
                                         const { key, ...optionProps } = props;
                                         return (
-                                            <Box
-                                                key={key}
-                                                component="li"
-                                                sx={{ '& > img': { mr: 2, flexShrink: 0 } }}
-                                                {...optionProps}
-                                            >
-                                                <Avatar aria-label="" src={option.image} />&nbsp;
-                                                {option.name}
-                                            </Box>
+                                            isLoading ? <Typography variant="body1" color="initial">Loading...</Typography> :
+                                                <Box
+                                                    key={key}
+                                                    component="li"
+                                                    sx={{ '& > img': { mr: 2, flexShrink: 0 } }}
+                                                    {...optionProps}
+                                                >
+                                                    <Avatar aria-label="" src={option.image} />&nbsp;
+                                                    {option.name}
+                                                </Box>
                                         );
                                     }}
                                     renderInput={(params) => (
@@ -89,7 +89,7 @@ const AddClassDialog = (props: Props) => {
                                         />
                                     )}
                                     value={teachers?.find(teacher => teacher._id === form.classTeacher)}
-                                    onChange={(e, newValue) => {
+                                    onChange={(_, newValue) => {
                                         if (newValue)
                                             setForm(_class => ({ ..._class, classTeacher: newValue?._id }))
 

@@ -1,7 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { createTeacher, getTeacherById, getTeachers, updateTeacher } from '../services/teacher.api';
-import type { ITeacher } from '../types/Teacher';
-
 
 export const useGetTeachers = () => {
     return useQuery({

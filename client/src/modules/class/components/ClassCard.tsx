@@ -1,4 +1,3 @@
-import Avatar from '@mui/material/Avatar'
 import { Card, CardContent, Stack, Typography } from '@mui/material'
 import { useNavigate } from 'react-router-dom'
 import type { IClass } from '../types/Class';
