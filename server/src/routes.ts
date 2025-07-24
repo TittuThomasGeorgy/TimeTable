@@ -1,8 +1,10 @@
 import { Router } from 'express';
-import teacherRoutes from './teacher/teacher.routes';
+import teacherRoutes from './modules/teacher/teacher.routes';
+import classRoutes from './modules/class/class.routes';
 
 const router = Router();
 
 router.use('/teachers', teacherRoutes);
+router.use('/classes', classRoutes);
 
 export default router;

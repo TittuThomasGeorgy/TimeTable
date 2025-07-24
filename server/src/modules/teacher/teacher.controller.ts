@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response } from "express";
 import mongoose, { Types } from "mongoose";
-import sendApiResponse from "../utils/sendApiResponse";
+import sendApiResponse from "../../utils/sendApiResponse";
 import Teacher from "./teacher.model";
 import { ITeacher } from "./teacher.types";
 

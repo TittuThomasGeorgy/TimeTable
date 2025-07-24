@@ -46,13 +46,13 @@ const ClassPage = () => {
                     )
                 }
             </Grid> */}
-            {/* <AddClassDialog open={open}
+            <AddClassDialog open={open}
                 onClose={() => setOpen(false)}
                 onSubmit={function (value: IClass): void {
                     console.log(value);
 
                 }}
-            /> */}
+            />
         </CommonPageLayout >
     )
 }
