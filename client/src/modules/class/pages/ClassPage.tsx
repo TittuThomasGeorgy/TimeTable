@@ -5,12 +5,14 @@ import { Add as AddIcon } from '@mui/icons-material';
 import { useState } from 'react';
 import AddClassDialog from '../components/AddClassDialog';
 import type { IClass } from '../types/Class';
+import { useGetClasses } from '../hooks/useClass';
+import ClassCard from '../components/ClassCard';
 
 
 const ClassPage = () => {
     const [open, setOpen] = useState(false);
-    // const { data: res, isLoading } = useGetTeachers();
-    // const teachers = res?.data;
+    const { data: res, isLoading } = useGetClasses();
+    const classes = res?.data;
     return (
 
         <CommonPageLayout title='Class'>
@@ -26,18 +28,18 @@ const ClassPage = () => {
             >                ADD
             </Button>
             <br />
-            {/* <Grid container spacing={1}>
+            <Grid container spacing={1}>
 
                 {
                     isLoading ? (
                         <Typography>Loading teachers...</Typography>
                     ) : (
-                        teachers?.map((teacher, index) => (
+                        classes?.map((_class, index) => (
                             <Grid
                                 size={{ xs: 12, md: 3 }}
 
                             >
-                                <TeacherCard value={teacher} key={index} />
+                                <ClassCard value={_class} key={index} />
 
                             </Grid>
 
@@ -45,7 +47,7 @@ const ClassPage = () => {
 
                     )
                 }
-            </Grid> */}
+            </Grid>
             <AddClassDialog open={open}
                 onClose={() => setOpen(false)}
                 onSubmit={function (value: IClass): void {

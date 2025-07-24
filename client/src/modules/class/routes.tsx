@@ -4,7 +4,7 @@ import { School as ClassIcon } from '@mui/icons-material';
 // import ViewClassPage from './pages/ViewClass';
 
 const ClassPage = lazy(() => import('./pages/ClassPage'));
-// const ViewClassPage = lazy(() => import('./pages/ViewClass'));
+const ViewClassPage = lazy(() => import('./pages/ViewClassPage'));
 
 const ClassPageRoutes: ModuleRoute = {
     base: '/class',
@@ -16,12 +16,12 @@ const ClassPageRoutes: ModuleRoute = {
             showInDrawer: true,
             icon: <ClassIcon />,
         },
-        // {
-        //     title: 'View Class',
-        //     path: '/:id',
-        //     element: <ViewClassPage />,
+        {
+            title: 'View Class',
+            path: '/:id',
+            element: <ViewClassPage />,
 
-        // },
+        },
 
     ],
 };
