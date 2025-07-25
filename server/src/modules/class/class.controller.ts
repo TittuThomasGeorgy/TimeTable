@@ -13,7 +13,8 @@ export const createClass = async (req: Request, res: Response, next: NextFunctio
             return sendApiResponse(res, 'CONFLICT', null, 'Class Not Created');
         }
 
-        sendApiResponse(res, 'CREATED', newClass,
+        sendApiResponse(res, 'CREATED', 
+            newClass,
             `Added Class successfully`);
     } catch (error) {
         next(error);
