@@ -1,3 +1,4 @@
+import SubjectPageRoutes from "../modules/class copy/routes";
 import ClassPageRoutes from "../modules/class/routes";
 import HomePageRoutes from "../modules/home/routes";
 import TeacherPageRoutes from "../modules/teacher/routes";
@@ -9,5 +10,6 @@ export const allModuleRoutes:ModuleRoute[] = [
     TeacherPageRoutes,
     ClassPageRoutes,
     TimeTablePageRoutes,
+    SubjectPageRoutes
 
 ];
