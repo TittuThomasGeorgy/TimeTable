@@ -36,7 +36,7 @@ const ClassPage = () => {
                     ) : (
                         classes?.map((_class, index) => (
                             <Grid
-                                size={{ xs: 12, md: 3 }}
+                                size={{ xs: 6, md: 2 }}
 
                             >
                                 <ClassCard value={_class} key={index} />
