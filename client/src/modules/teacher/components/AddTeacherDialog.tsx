@@ -1,4 +1,4 @@
-import { Dialog, DialogTitle, DialogContent, Container, Grid, TextField, DialogActions, Button, IconButton, InputAdornment } from '@mui/material';
+import { Dialog, DialogTitle, DialogContent, Container, Grid, TextField, DialogActions, Button, IconButton, InputAdornment, Autocomplete, Typography, Avatar, Box } from '@mui/material';
 // import { enqueueSnackbar } from 'notistack';
 import { useEffect, useState } from 'react'
 import { Visibility as VisibilityIcon, VisibilityOff as VisibilityOffIcon } from '@mui/icons-material';
@@ -6,6 +6,7 @@ import type { ITeacher } from '../types/Teacher';
 import { defTeacher } from '../constants/Teacher.default';
 import ImageUploader from '../../../components/ImageUploader';
 import { useCreateTeacher, useUpdateTeacher } from '../hooks/useTeacher';
+import { useGetSubjects } from '../../class copy/hooks/useSubject';
 
 interface Props {
     open: boolean;
@@ -20,6 +21,8 @@ const AddTeacherDialog = (props: Props) => {
     const { mutate, isPending: isCreating } = useCreateTeacher();
     const { mutate: update, isPending: updating } = useUpdateTeacher();
     // const [file1, setFile1] = useState<File>();
+    const { data: res, isLoading } = useGetSubjects();
+    const subjects = res?.data;
     const [showPassword, setShowPassword] = useState(false);
     const [usernameError, setUsernameError] = useState('');
     const [passwordError, setPasswordError] = useState('');
@@ -89,7 +92,7 @@ const AddTeacherDialog = (props: Props) => {
                                 <ImageUploader value={form.image} onChange={(newVal) => {
                                     setForm(Teacher => ({ ...Teacher, image: newVal }))
                                 }}
-                                destination='teachers'
+                                    destination='teachers'
                                 />
                             </Grid>
                             <Grid size={{ xs: 12 }}>
@@ -172,6 +175,27 @@ const AddTeacherDialog = (props: Props) => {
                                     error={!!passwordError}
                                     helperText={passwordError}
 
+                                />
+                            </Grid>
+                            <Grid size={{ xs: 12 }}>
+                                <Autocomplete
+                                    options={subjects ?? []}
+                                    autoHighlight
+                                    fullWidth
+                                    getOptionLabel={(option) => option.name}
+                                    renderInput={(params) => (
+                                        <TextField
+                                            {...params}
+                                            label="Select a Subject"
+
+                                        />
+                                    )}
+                                    value={subjects?.find(sub => sub._id === form.subject)}
+                                    onChange={(_, newValue) => {
+                                        if (newValue)
+                                            setForm(_class => ({ ..._class, subject: newValue?._id }))
+
+                                    }}
                                 />
                             </Grid>
                         </Grid>

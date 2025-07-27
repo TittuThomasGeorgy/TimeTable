@@ -11,6 +11,8 @@ export const TeacherSchema = new Schema<ITeacher>({
     isAdmin: { type: Boolean, default: false },
     exp: { type: Number, required: true },
     image:{ type: String },
+    subject: { type: Schema.Types.ObjectId, ref: "subjects" }
+
 }, {
     timestamps: true,
 });

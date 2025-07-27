@@ -3,6 +3,7 @@ import mongoose, { Types } from "mongoose";
 import sendApiResponse from "../../utils/sendApiResponse";
 import Teacher from "./teacher.model";
 import { ITeacher } from "./teacher.types";
+import { getSubjectName } from "../subject/subject.controller";
 
 const userNameExist = async (username: string) => {
     const teacher = await Teacher.find({ username: username });
@@ -71,17 +72,17 @@ export const getTeachers = async (req: Request, res: Response, next: NextFunctio
 
         })
             .sort({ 'name': 1 });
+
         // If your logo is being populated correctly, we need to handle it properly in the map function
-        const data: ITeacher[] = _data.map((teacher) => {
+        const data: ITeacher[] = await Promise.all(_data.map(async (teacher) => {
             // const logoObj = (teacher.logo as unknown as IFileModel).downloadURL; // Ensure that teacher.logo is properly typed
             // const logoObj2 = (teacher.manager.img as unknown as IFileModel).downloadURL; // Ensure that teacher.logo is properly typed
             // delete teacher.password;
-
             return {
                 ...teacher.toObject(),  // Convert mongoose document to a plain object
-
+                subject: teacher.subject ? await getSubjectName(teacher.subject) : ''
             };
-        });
+        }));
 
         sendApiResponse(res, 'OK', data, 'Successfully fetched list of Teachers');
     } catch (error) {
@@ -92,6 +93,7 @@ export const getTeachers = async (req: Request, res: Response, next: NextFunctio
 export const getTeacherByIdReq = async (req: Request, res: Response, next: NextFunction) => {
     try {
         const data: ITeacher = await getTeacherById(req.params.id);
+        data.subject = data.subject ? await getSubjectName(data.subject) : ''
         sendApiResponse(res, 'OK', data, 'Successfully fetched teacher');
     } catch (error) {
         if ((error as any).message === 'TeacherNotFound') {
@@ -116,7 +118,7 @@ export const getTeacherById = async (id: string | Types.ObjectId): Promise<ITeac
 
     const data: ITeacher = {
         ..._data.toObject(),
-       
+
     };
 
     delete data.password;

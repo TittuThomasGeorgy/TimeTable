@@ -7,5 +7,6 @@ export interface ITeacher {
     isAdmin: boolean;
     username: string;
     password: string;
-    code: string
+    code: string;
+    subject: string;
 }

@@ -13,7 +13,7 @@ export const createSubject = async (req: Request, res: Response, next: NextFunct
             return sendApiResponse(res, 'CONFLICT', null, 'Subject Not Created');
         }
 
-        sendApiResponse(res, 'CREATED', 
+        sendApiResponse(res, 'CREATED',
             newSubject,
             `Added Subject successfully`);
     } catch (error) {
@@ -79,6 +79,12 @@ export const getSubjectById = async (id: string | Types.ObjectId): Promise<ISubj
     };
 
     return data; // Return the data to the controller function
+};
+export const getSubjectName = async (id: string | Types.ObjectId): Promise<string> => {
+    const _data = await getSubjectById(id);
+
+    return _data.name
+        ; // Return the data to the controller function
 };
 
 export const updateSubject = async (req: Request, res: Response, next: NextFunction) => {

@@ -17,7 +17,7 @@ const TeacherCard = (props: { value: ITeacher }) => {
                         <Typography variant="body1" color="initial">
                             {props.value.name}
                         </Typography>
-                        <Typography variant="caption" color="initial">{props.value.code}</Typography>
+                        <Typography variant="caption" color="initial">{props.value.subject}</Typography>
                     </Stack>
                 </Stack>
             </CardContent>

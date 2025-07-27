@@ -8,5 +8,6 @@ export const defTeacher: ITeacher = {
     username: '',
     password: '',
     code: '',
-    image: ''
+    image: '',
+    subject: ''
 }
