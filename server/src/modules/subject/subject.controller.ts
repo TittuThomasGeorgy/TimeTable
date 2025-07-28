@@ -59,7 +59,7 @@ export const getSubjectByIdReq = async (req: Request, res: Response, next: NextF
         sendApiResponse(res, 'OK', data, 'Successfully fetched class');
     } catch (error) {
         if ((error as any).message === 'SubjectNotFound') {
-            sendApiResponse(res, 'NOT FOUND', null, 'class Not Found');
+            sendApiResponse(res, 'NOT FOUND', null, 'Subject Not Found');
         } else {
             next(error); // Pass the error to the error-handling middleware for unexpected errors
         }

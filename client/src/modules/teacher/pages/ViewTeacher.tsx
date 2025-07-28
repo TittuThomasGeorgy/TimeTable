@@ -3,9 +3,10 @@ import CommonPageLayout from '../../../layouts/CommonPageLayout'
 import { useGetTeacherById } from '../hooks/useTeacher';
 import { useParams } from 'react-router-dom';
 import { Container, Card, CardHeader, Typography, Avatar, CardContent, Grid, Chip, Box, Button } from '@mui/material';
-import { Person } from '@mui/icons-material';
+import { Person, Subject } from '@mui/icons-material';
 import AddTeacherDialog from '../components/AddTeacherDialog';
 import type { ITeacher } from '../types/Teacher';
+import { useGetSubjectById } from '../../class copy/hooks/useSubject';
 
 const ViewTeacherPage = () => {
     const { id } = useParams<{ id: string }>(); // Specify the type for useParams
@@ -14,6 +15,8 @@ const ViewTeacherPage = () => {
     // Ensure id is present before making the API call
     const { data: res, isLoading, isError, error } = useGetTeacherById(id || ''); // Pass an empty string if id is undefined to satisfy type, or handle in hook
     const teacher = res?.data;
+    const { data: resSub, isLoading: iSLoadingSub, isError: isErrorSub, error: errorSub } = useGetSubjectById(teacher?.subject || ''); // Pass an empty string if id is undefined to satisfy type, or handle in hook
+    const subject = resSub?.data;
     // 3. Now, use the values from the hooks in your conditional rendering
     if (!id) {
         // This condition checks the ID *after* the hooks are called.
@@ -66,6 +69,10 @@ const ViewTeacherPage = () => {
                             <Grid size={{ xs: 12, md: 6 }}>
                                 <Typography variant="subtitle1" color="text.secondary">Code:</Typography>
                                 <Typography variant="body1">{teacher?.code}</Typography>
+                            </Grid>
+                            <Grid size={{ xs: 12, md: 6 }}>
+                                <Typography variant="subtitle1" color="text.secondary">Subject:</Typography>
+                                <Typography variant="body1">{iSLoadingSub||isErrorSub ? "..." : subject?.name}</Typography>
                             </Grid>
                             <Grid size={{ xs: 12, md: 6 }}>
                                 <Typography variant="subtitle1" color="text.secondary">Admin Status:</Typography>

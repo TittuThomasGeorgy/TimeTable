@@ -93,7 +93,7 @@ export const getTeachers = async (req: Request, res: Response, next: NextFunctio
 export const getTeacherByIdReq = async (req: Request, res: Response, next: NextFunction) => {
     try {
         const data: ITeacher = await getTeacherById(req.params.id);
-        data.subject = data.subject ? await getSubjectName(data.subject) : ''
+        // data.subject = data.subject ? await getSubjectName(data.subject) : ''
         sendApiResponse(res, 'OK', data, 'Successfully fetched teacher');
     } catch (error) {
         if ((error as any).message === 'TeacherNotFound') {
