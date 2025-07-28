@@ -1,4 +1,4 @@
-import SubjectPageRoutes from "../modules/class copy/routes";
+import SubjectPageRoutes from "../modules/subject/routes";
 import ClassPageRoutes from "../modules/class/routes";
 import HomePageRoutes from "../modules/home/routes";
 import TeacherPageRoutes from "../modules/teacher/routes";

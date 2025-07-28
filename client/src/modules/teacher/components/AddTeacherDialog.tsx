@@ -6,7 +6,7 @@ import type { ITeacher } from '../types/Teacher';
 import { defTeacher } from '../constants/Teacher.default';
 import ImageUploader from '../../../components/ImageUploader';
 import { useCreateTeacher, useUpdateTeacher } from '../hooks/useTeacher';
-import { useGetSubjects } from '../../class copy/hooks/useSubject';
+import { useGetSubjects } from '../../subject/hooks/useSubject';
 
 interface Props {
     open: boolean;

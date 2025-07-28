@@ -6,7 +6,7 @@ import { Container, Card, CardHeader, Typography, Avatar, CardContent, Grid, Chi
 import { Person, Subject } from '@mui/icons-material';
 import AddTeacherDialog from '../components/AddTeacherDialog';
 import type { ITeacher } from '../types/Teacher';
-import { useGetSubjectById } from '../../class copy/hooks/useSubject';
+import { useGetSubjectById } from '../../subject/hooks/useSubject';
 
 const ViewTeacherPage = () => {
     const { id } = useParams<{ id: string }>(); // Specify the type for useParams
