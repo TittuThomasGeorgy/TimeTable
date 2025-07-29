@@ -41,7 +41,7 @@ const CommonPageLayout = (props: { children: React.ReactNode; title?: string; hi
   }, [isCollapsed]);
 
   const handleDrawerToggle = () => {
-    setIsCollapsed(!isCollapsed)
+    setIsCollapsed((isCollapsed) => !isCollapsed);
   };
   const drawerWidth = isCollapsed ? 70 : 240;
 
@@ -66,27 +66,31 @@ const CommonPageLayout = (props: { children: React.ReactNode; title?: string; hi
         transition: 'width 0.3s',
       }}
     >
-      <Box
-        sx={{
-          display: 'flex',
-          justifyContent: 'center',
-          py: 2,
-        }}
-      >
-        <img src="/logo.png" alt="Logo" style={{ height: 40 }} />
-      </Box>
 
-      <Divider />
 
       <Box sx={{ flexGrow: 1, overflowY: 'auto' }}>
-        <Box textAlign="left" p={1}>
-          <IconButton onClick={() => { setIsCollapsed(!isCollapsed); }}>
-            <MenuIcon />
-          </IconButton>
-        </Box>
         <List>
+          <Box key={0}>
+            <ListItem >
+              <ListItemButton
+                sx={{
+                  borderRadius: '20px ',
+                  justifyContent: 'center'
+                }}>
+
+                <ListItemIcon onClick={handleDrawerToggle}
+                  sx={{
+                    minWidth: 0,
+                    mr: isCollapsed ? 0 : 2,
+                  }}>
+                  <MenuIcon />
+                </ListItemIcon>
+              </ListItemButton>
+            </ListItem>
+          </Box>
+
           {allModuleRoutes.map((moduleRoute, idx) => (
-            <Box key={idx}>
+            <Box key={idx + 1}>
               {/* {moduleRoute.title && !isCollapsed && (
                 <Typography variant="caption" sx={{ pl: 2, mt: 2, fontWeight: 600 }}>
                   {moduleRoute.title}

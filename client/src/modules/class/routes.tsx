@@ -1,6 +1,6 @@
 import { lazy } from 'react';
 import type { ModuleRoute } from '../../types/ModuleRoute';
-import { School as ClassIcon } from '@mui/icons-material';
+import { Groups as ClassIcon } from '@mui/icons-material';
 // import ViewClassPage from './pages/ViewClass';
 
 const ClassPage = lazy(() => import('./pages/ClassPage'));
