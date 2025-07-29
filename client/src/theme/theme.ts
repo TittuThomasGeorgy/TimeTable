@@ -117,6 +117,13 @@ const useCustomTheme = (): Theme => {
               },
             },
           },
+          MuiTab: {
+            styleOverrides: {
+              root: {
+                textTransform: "capitalize"
+              }
+            }
+          }
         },
       }),
     [prefersDarkMode]
