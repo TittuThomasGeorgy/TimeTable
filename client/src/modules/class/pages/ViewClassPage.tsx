@@ -8,6 +8,7 @@ import { useGetClassById } from '../hooks/useClass';
 import { useGetTeacherById } from '../../teacher/hooks/useTeacher';
 import { Delete as DeleteIcon, Edit as EditIcon } from '@mui/icons-material';
 import SubjectTab from '../components/SubjectTab';
+import TeacherChip from '../../teacher/components/TeacherChip';
 
 const ViewClassPage = () => {
     const navigate = useNavigate();
@@ -69,13 +70,7 @@ const ViewClassPage = () => {
                     {teacher &&
                         <Box sx={{ display: 'flex', flexDirection: 'row' }}>
                             <Typography variant="subtitle1" color="text.secondary">Class Teacher:</Typography>
-                            <Chip avatar={<Avatar aria-label="" src={teacher?.image} sx={{ height: 30, width: 30 }} />}
-                                onClick={(e) => {
-                                    e.stopPropagation();
-                                    navigate(`/teacher/${teacher?._id}`)
-                                }}
-                                label={<Typography variant="body1">{teacher?.name}</Typography>} />
-
+                            <TeacherChip value={teacher} />
                         </Box>}
                 </Grid>
                 <Grid size={{ xs: 12, md: 6 }} sx={{ p: 2, display: 'flex', justifyContent: 'flex-end', gap: 1 }}>
@@ -95,7 +90,7 @@ const ViewClassPage = () => {
                         <Tab label="Subjects" {...a11yProps(0)} />
                         <Tab label="Timetable" {...a11yProps(1)} />
                     </Tabs>
-                   {value==0&&<SubjectTab classId={id} />}
+                    {value == 0 && <SubjectTab classId={id} />}
 
                 </Box>
 

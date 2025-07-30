@@ -11,9 +11,9 @@ export const createClassSubject = async (req: Request, res: Response, next: Next
         const newClassSub = new ClassSubject({
             ...req.body,
             _id: new mongoose.Types.ObjectId(),
-            class: new mongoose.Types.ObjectId(req.body.class),
-            teacher: new mongoose.Types.ObjectId(req.body.teacher),
-            subject: new mongoose.Types.ObjectId(req.body.subject),
+            class: new mongoose.Types.ObjectId(req.body.class as string),
+            teacher: new mongoose.Types.ObjectId(req.body.teacher as string),
+            subject: new mongoose.Types.ObjectId(req.body.subject as string),
         });
         newClassSub.save();
         if (!newClassSub) {
@@ -31,9 +31,10 @@ export const createClassSubject = async (req: Request, res: Response, next: Next
 export const getClassSubjects = async (req: Request, res: Response, next: NextFunction) => {
     try {
 
-        const _data = await Class.find({
+        const _data = await ClassSubject.find({
             class: req.params.id
-        }).populate('subject', 'teacher')
+        }).populate(['subject', 'teacher'])
+        
         // If your logo is being populated correctly, we need to handle it properly in the map function
         const data: IClassSubject[] = _data.map((_class) => {
 
@@ -61,7 +62,7 @@ export const updateClassSubject = async (req: Request, res: Response, next: Next
         }
 
 
-        const updatedClass = await Class.findByIdAndUpdate(req.params.id, _updatedClass);
+        const updatedClass = await ClassSubject.findByIdAndUpdate(req.params.id, _updatedClass);
         if (!updatedClass) {
             return sendApiResponse(res, 'CONFLICT', null, 'Class Subject Not Updated');
         }

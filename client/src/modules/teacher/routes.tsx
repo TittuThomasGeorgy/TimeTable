@@ -1,6 +1,6 @@
 import { lazy } from 'react';
 import type { ModuleRoute } from '../../types/ModuleRoute';
-import { Person as TeacherIcon } from '@mui/icons-material';
+import { Badge as TeacherIcon } from '@mui/icons-material';
 
 const TeacherPage = lazy(() => import('./pages/TeacherPage'));
 const ViewTeacherPage = lazy(() => import('./pages/ViewTeacher'));
