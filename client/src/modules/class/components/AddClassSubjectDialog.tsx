@@ -14,16 +14,16 @@ interface Props {
     open: boolean;
     onClose: () => void;
     onSubmit: (value: IClassSubject) => void;
-    value?: IClassSubject|null;
-    classId:string;
+    value?: IClassSubject | null;
+    classId: string;
 }
 
 const AddClassSubjectDialog = (props: Props) => {
     const isEdit = !!props.value;
-    const [form, setForm] = useState<IClassSubject>({...defClassSubject,class:props.classId});
-    const { data: teacherRes, isLoading:isTeachersLoading } = useGetTeachers();
+    const [form, setForm] = useState<IClassSubject>({ ...defClassSubject, class: props.classId });
+    const { data: teacherRes, isLoading: isTeachersLoading } = useGetTeachers();
     const teachers = teacherRes?.data;
-    const { data: subRes, isLoading:isSubjectssLoading } = useGetSubjects();
+    const { data: subRes, isLoading: isSubjectssLoading } = useGetSubjects();
     const subjects = subRes?.data;
     const { mutate, isPending: isCreating } = useCreateClassSubject();
     const { mutate: update, isPending: updating } = useUpdateClassSubject();
@@ -39,7 +39,7 @@ const AddClassSubjectDialog = (props: Props) => {
         if (props.value)
             setForm(props.value)
         else
-            setForm({...defClassSubject,class:props.classId})
+            setForm({ ...defClassSubject, class: props.classId })
     }, [props.classId, props.value])
 
     return (
@@ -54,14 +54,14 @@ const AddClassSubjectDialog = (props: Props) => {
                     <Container>
                         <Grid container spacing={1}>
 
-                           
+
                             <Grid size={{ xs: 12 }}>
                                 <Autocomplete
                                     options={subjects ?? []}
                                     autoHighlight
                                     fullWidth
                                     getOptionLabel={(option) => option.name}
-                                  
+
                                     renderInput={(params) => (
                                         <TextField
                                             {...params}
@@ -113,7 +113,19 @@ const AddClassSubjectDialog = (props: Props) => {
                                     }}
                                 />
                             </Grid>
+                            <Grid size={{ xs: 12 }}>
+                                <TextField
+                                    label="Number of hours"
+                                    type='tel'
+                                    value={form.noOfHours}
+                                    onChange={(e) => {
+                                        setForm(Teacher => ({ ...Teacher, noOfHours: Number(e.target.value) }))
+                                    }}
+                                    fullWidth
+                                    required
 
+                                />
+                            </Grid>
                         </Grid>
                     </Container>
                 </DialogContent>

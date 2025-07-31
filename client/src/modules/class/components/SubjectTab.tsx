@@ -4,7 +4,9 @@ import { Add as AddIcon } from '@mui/icons-material';
 import AddClassSubjectDialog from './AddClassSubjectDialog';
 import type { IClassSubject } from '../types/ClassSubject';
 import { useGetClassSubjects } from '../hooks/useClassSubject';
-import ClassSubCard from './classSubCard';
+import ClassSubCard from './ClassSubCard';
+import type { ISubject } from '../../subject/types/Subject';
+import type { ITeacher } from '../../teacher/types/Teacher';
 
 interface Props {
     classId: string;
@@ -15,11 +17,11 @@ const SubjectTab = (props: Props) => {
     const classSubjects = res?.data;
 
     const [openAddSubjects, setOpenAddSubjects] = useState<{
-        action: 'add' | 'edit',
         open: boolean
+        value: null | IClassSubject
     }>({
-        action: 'add',
         open: false,
+        value: null,
     });
 
 
@@ -33,8 +35,7 @@ const SubjectTab = (props: Props) => {
                 startIcon={<AddIcon />}
                 onClick={() => {
                     setOpenAddSubjects({
-                        action: 'add',
-                        open: true
+                        open: true, value: null
                     })
                 }
                 }
@@ -52,7 +53,9 @@ const SubjectTab = (props: Props) => {
                                 size={{ xs: 6, md: 2 }}
 
                             >
-                                <ClassSubCard value={sub} key={index} />
+                                <ClassSubCard value={sub} key={index} onEdit={() => setOpenAddSubjects({
+                                    value: {...sub,subject:(sub.subject as ISubject)._id,teacher:(sub.teacher as ITeacher)._id}, open: true
+                                })} />
 
                             </Grid>
 
@@ -64,13 +67,14 @@ const SubjectTab = (props: Props) => {
             <AddClassSubjectDialog classId={props.classId}
                 open={openAddSubjects.open}
                 onClose={() => setOpenAddSubjects({
-                    action: 'add',
+                    value:null,
                     open: false,
                 })}
                 onSubmit={function (value: IClassSubject): void {
                     console.log(value);
 
                 }}
+                value={openAddSubjects.value}
             />
         </>
     )

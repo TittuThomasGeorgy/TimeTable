@@ -123,6 +123,13 @@ const useCustomTheme = (): Theme => {
                 textTransform: "capitalize"
               }
             }
+          },
+          MuiIcon: {
+            styleOverrides: {
+              root: {
+                color:'#009688',
+              }
+            }
           }
         },
       }),
