@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import CommonPageLayout from '../../../layouts/CommonPageLayout'
-import { useNavigate, useParams } from 'react-router-dom';
-import { Container, Card, CardHeader, Typography, Avatar, CardContent, Grid, Chip, Box, Button, Divider, Tabs, Tab } from '@mui/material';
+import {  useParams } from 'react-router-dom';
+import { Typography,Grid, Box, Button, Divider, Tabs, Tab } from '@mui/material';
 import AddClassDialog from '../components/AddClassDialog';
 import type { IClass } from '../types/Class';
 import { useGetClassById } from '../hooks/useClass';
@@ -11,7 +11,6 @@ import SubjectTab from '../components/SubjectTab';
 import TeacherChip from '../../teacher/components/TeacherChip';
 
 const ViewClassPage = () => {
-    const navigate = useNavigate();
 
     const { id } = useParams<{ id: string }>(); // Specify the type for useParams
     const [openEditClass, setOpenEditClass] = useState(false);
@@ -23,11 +22,10 @@ const ViewClassPage = () => {
     const _class = res?.data;
 
 
-    // eslint-disable-next-line react-hooks/rules-of-hooks
     const { data: res1, isLoading: isLoading1, isError: isError1, error: error1 } = useGetTeacherById(_class?.classTeacher || ''); // Pass an empty string if id is undefined to satisfy type, or handle in hook
     const teacher = res1?.data;
 
-    const handleChange = (event: React.SyntheticEvent, newValue: number) => {
+    const handleChange = (_: React.SyntheticEvent, newValue: number) => {
         setValue(newValue);
     };
     function a11yProps(index: number) {

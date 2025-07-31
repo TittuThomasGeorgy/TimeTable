@@ -1,10 +1,7 @@
 import { Dialog, DialogTitle, DialogContent, Container, Grid, TextField, DialogActions, Button, Autocomplete, Box, Avatar, Typography } from '@mui/material';
 // import { enqueueSnackbar } from 'notistack';
 import { useEffect, useState } from 'react'
-import type { IClass } from '../types/Class';
-import { defClass } from '../constants/Class.default';
 import { useGetTeachers } from '../../teacher/hooks/useTeacher';
-import { useCreateClass, useUpdateClass } from '../hooks/useClass';
 import type { IClassSubject } from '../types/ClassSubject';
 import { defClassSubject } from '../constants/ClassSubject.default';
 import { useGetSubjects } from '../../subject/hooks/useSubject';
@@ -23,7 +20,7 @@ const AddClassSubjectDialog = (props: Props) => {
     const [form, setForm] = useState<IClassSubject>({ ...defClassSubject, class: props.classId });
     const { data: teacherRes, isLoading: isTeachersLoading } = useGetTeachers();
     const teachers = teacherRes?.data;
-    const { data: subRes, isLoading: isSubjectssLoading } = useGetSubjects();
+    const { data: subRes, isLoading: isSubjectsLoading } = useGetSubjects();
     const subjects = subRes?.data;
     const { mutate, isPending: isCreating } = useCreateClassSubject();
     const { mutate: update, isPending: updating } = useUpdateClassSubject();
@@ -61,7 +58,20 @@ const AddClassSubjectDialog = (props: Props) => {
                                     autoHighlight
                                     fullWidth
                                     getOptionLabel={(option) => option.name}
-
+                                    renderOption={(props, option) => {
+                                        const { key, ...optionProps } = props;
+                                        return (
+                                            isSubjectsLoading ? <Typography variant="body1" color="initial">Loading...</Typography> :
+                                                <Box
+                                                    key={key}
+                                                    component="li"
+                                                   
+                                                    {...optionProps}
+                                                >
+                                                    {option.name}
+                                                </Box>
+                                        );
+                                    }}
                                     renderInput={(params) => (
                                         <TextField
                                             {...params}
