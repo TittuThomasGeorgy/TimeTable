@@ -45,9 +45,9 @@ const AddTeacherDialog = (props: Props) => {
             setPasswordError('')
         }
         if (isEdit)
-            update(form, { onSuccess: () => { props.onClose(); props.onSubmit(form); } });
+            update(form, { onSuccess: () => { props.onClose(); props.onSubmit(form);setForm(defTeacher) } });
         else
-            mutate(form, { onSuccess: () => { props.onClose(); props.onSubmit(form); } });
+            mutate(form, { onSuccess: () => { props.onClose(); props.onSubmit(form);setForm(defTeacher) } });
     };
     const validateUsername = (username: string) => {
         // Example: Username should be at least 4 characters long

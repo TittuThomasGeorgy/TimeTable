@@ -7,6 +7,8 @@ import { useGetClassSubjects } from '../hooks/useClassSubject';
 import ClassSubCard from './ClassSubCard';
 import type { ISubject } from '../../subject/types/Subject';
 import type { ITeacher } from '../../teacher/types/Teacher';
+import AddSubjectDialog from '../../subject/components/AddSubjectDialog';
+import AddTeacherDialog from '../../teacher/components/AddTeacherDialog';
 
 interface Props {
     classId: string;
@@ -16,6 +18,8 @@ const SubjectTab = (props: Props) => {
     const { data: res, isLoading } = useGetClassSubjects(props.classId);
     const classSubjects = res?.data;
 
+    const [openAddTeacher, setOpenAddTeacher] = useState(false);
+    const [openAddSubject, setOpenAddSubject] = useState(false);
     const [openAddSubjects, setOpenAddSubjects] = useState<{
         open: boolean
         value: null | IClassSubject
@@ -74,7 +78,22 @@ const SubjectTab = (props: Props) => {
                     console.log(value);
 
                 }}
+                onAddSubject={()=>setOpenAddSubject(true)}
+                onAddTeacher={()=>setOpenAddTeacher(true)}
                 value={openAddSubjects.value}
+            />
+            <AddSubjectDialog open={openAddSubject}
+                onClose={() => setOpenAddSubject(false)}
+                onSubmit={function (value: ISubject): void {
+                    console.log(value);
+                }}
+            />
+             <AddTeacherDialog open={openAddTeacher}
+                onClose={() => setOpenAddTeacher(false)}
+                onSubmit={function (value: ITeacher): void {
+                    console.log(value);
+
+                }}
             />
         </>
     )

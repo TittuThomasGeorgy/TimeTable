@@ -52,7 +52,6 @@ const SubjectPage = () => {
                 onClose={() => setOpen(false)}
                 onSubmit={function (value: ISubject): void {
                     console.log(value);
-
                 }}
             />
         </CommonPageLayout >

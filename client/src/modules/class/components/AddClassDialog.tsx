@@ -24,9 +24,9 @@ const AddClassDialog = (props: Props) => {
     const handleSubmit = () => {
 
         if (isEdit)
-            update(form, { onSuccess: () => { props.onClose(); props.onSubmit(form); } });
+            update(form, { onSuccess: () => { props.onClose(); props.onSubmit(form); setForm(defClass)} });
         else
-            mutate(form, { onSuccess: () => { props.onClose(); props.onSubmit(form); } });
+            mutate(form, { onSuccess: () => { props.onClose(); props.onSubmit(form); setForm(defClass)} });
     };
 
     useEffect(() => {

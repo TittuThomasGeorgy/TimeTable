@@ -1,4 +1,4 @@
-import { Dialog, DialogTitle, DialogContent, Container, Grid, TextField, DialogActions, Button, Autocomplete, Box, Avatar, Typography } from '@mui/material';
+import { Dialog, DialogTitle, DialogContent, Container, Grid, TextField, DialogActions, Button, Autocomplete, Box, Avatar, Typography, IconButton, Tooltip } from '@mui/material';
 // import { enqueueSnackbar } from 'notistack';
 import { useEffect, useState } from 'react'
 import { useGetTeachers } from '../../teacher/hooks/useTeacher';
@@ -6,11 +6,15 @@ import type { IClassSubject } from '../types/ClassSubject';
 import { defClassSubject } from '../constants/ClassSubject.default';
 import { useGetSubjects } from '../../subject/hooks/useSubject';
 import { useCreateClassSubject, useUpdateClassSubject } from '../hooks/useClassSubject';
+import { Add } from '@mui/icons-material';
+import CustomIconButton from '../../../components/CustomIconButton';
 
 interface Props {
     open: boolean;
     onClose: () => void;
     onSubmit: (value: IClassSubject) => void;
+    onAddTeacher: () => void;
+    onAddSubject: () => void;
     value?: IClassSubject | null;
     classId: string;
 }
@@ -27,9 +31,9 @@ const AddClassSubjectDialog = (props: Props) => {
 
     const handleSubmit = () => {
         if (isEdit)
-            update(form, { onSuccess: () => { props.onClose(); props.onSubmit(form); } });
+            update(form, { onSuccess: () => { props.onClose(); props.onSubmit(form);setForm(defClassSubject) } });
         else
-            mutate(form, { onSuccess: () => { props.onClose(); props.onSubmit(form); } });
+            mutate(form, { onSuccess: () => { props.onClose(); props.onSubmit(form);setForm(defClassSubject) } });
     };
 
     useEffect(() => {
@@ -52,7 +56,7 @@ const AddClassSubjectDialog = (props: Props) => {
                         <Grid container spacing={1}>
 
 
-                            <Grid size={{ xs: 12 }}>
+                            <Grid size={{ xs: 12 }} sx={{display:"flex",flexDirection:'row'}}>
                                 <Autocomplete
                                     options={subjects ?? []}
                                     autoHighlight
@@ -65,7 +69,7 @@ const AddClassSubjectDialog = (props: Props) => {
                                                 <Box
                                                     key={key}
                                                     component="li"
-                                                   
+
                                                     {...optionProps}
                                                 >
                                                     {option.name}
@@ -86,8 +90,9 @@ const AddClassSubjectDialog = (props: Props) => {
 
                                     }}
                                 />
+                                <CustomIconButton icon={<Add/>} onClick={props.onAddSubject} title='Add Subject' />
                             </Grid>
-                            <Grid size={{ xs: 12 }}>
+                            <Grid size={{ xs: 12 }} sx={{display:"flex",flexDirection:'row'}}>
                                 <Autocomplete
                                     options={teachers ?? []}
                                     autoHighlight
@@ -122,6 +127,8 @@ const AddClassSubjectDialog = (props: Props) => {
 
                                     }}
                                 />
+                                <CustomIconButton icon={<Add/>} onClick={props.onAddTeacher} title='Add Teacher' />
+
                             </Grid>
                             <Grid size={{ xs: 12 }}>
                                 <TextField
@@ -145,6 +152,7 @@ const AddClassSubjectDialog = (props: Props) => {
                 </DialogActions>
             </form>
         </Dialog>
+
     )
 }
 
