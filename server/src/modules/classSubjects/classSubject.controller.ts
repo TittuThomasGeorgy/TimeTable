@@ -4,6 +4,7 @@ import sendApiResponse from "../../utils/sendApiResponse";
 import Class from "./classSubject.model";
 import ClassSubject from "./classSubject.model";
 import { IClassSubject } from "./classSubject.types";
+import { ISubject } from "../subject/subject.types";
 
 export const createClassSubject = async (req: Request, res: Response, next: NextFunction) => {
     try {
@@ -34,7 +35,8 @@ export const getClassSubjects = async (req: Request, res: Response, next: NextFu
         const _data = await ClassSubject.find({
             class: req.params.id
         }).populate(['subject', 'teacher'])
-        
+
+
         // If your logo is being populated correctly, we need to handle it properly in the map function
         const data: IClassSubject[] = _data.map((_class) => {
 
@@ -42,7 +44,17 @@ export const getClassSubjects = async (req: Request, res: Response, next: NextFu
                 ..._class.toObject(),  // Convert mongoose document to a plain object
 
             };
-        });
+        }).sort((a, b) => {
+            // Primary sort key: subject.name (ascending)
+            // localeCompare is a robust way to compare strings, handling different languages and cases.
+            const subjectNameComparison = (a.subject as ISubject).name.localeCompare((b.subject as ISubject).name);
+
+            if (a.noOfHours - b.noOfHours === 0) {
+                return subjectNameComparison;
+            }
+            
+            return b.noOfHours - a.noOfHours;
+        });;
 
         sendApiResponse(res, 'OK', data, 'Successfully fetched list of Class Subjects');
     } catch (error) {
