@@ -52,7 +52,7 @@ export const getClasses = async (req: Request, res: Response, next: NextFunction
                 : {}),
 
         })
-            .sort({ 'name': 1 });
+            .sort({ 'name': 1,'div':1 });
         // If your logo is being populated correctly, we need to handle it properly in the map function
         const data: IClass[] = _data.map((_class) => {
 
