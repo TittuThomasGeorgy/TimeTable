@@ -32,11 +32,11 @@ const ClassSubCard = (props: Props) => {
 
 
                 <Stack direction="column" spacing={1} alignItems="center">
-                    <Typography variant="h5" component="h2" sx={{ fontWeight: 'bold', mb: 0.5, color: 'text.primary' }}>
-                        {(subject as ISubject).name}
+                    <Typography variant="h5" component="h6" sx={{ fontWeight: 'bold', mb: 0.5, color: 'text.primary',textAlign:'center' }}>
+                        {(subject as ISubject).code}
                     </Typography>
                     <Typography variant="body2" color="text.secondary">
-                        Teacher: <TeacherChip value={teacher as ITeacher} />
+                        <TeacherChip value={teacher as ITeacher} />
                     </Typography>
                     <Typography variant="body2" color="text.secondary">
                         0 / {noOfHours}

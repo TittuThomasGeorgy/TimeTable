@@ -4,10 +4,30 @@ import sendApiResponse from "../../utils/sendApiResponse";
 import Subject from "./subject.model";
 import { ISubject } from "./subject.types";
 
+
+const isSubjectExist = async (name: string) => {
+    const data = await Subject.find({
+        $or: [{
+            name: {
+                $regex: name as string,
+                $options: 'i',
+            }
+        },
+        {
+            code: {
+                $regex: name as string,
+                $options: 'i',
+            }
+        },]
+    });
+    return data.length > 0;
+}
 export const createSubject = async (req: Request, res: Response, next: NextFunction) => {
     try {
-
-        const newSubject = new Subject({ ...req.body, _id: new mongoose.Types.ObjectId(), classTeacher: new mongoose.Types.ObjectId(req.body.classTeacher) });
+        if (await isSubjectExist(req.body.name)) {
+            return sendApiResponse(res, 'CONFLICT', null, 'Subject Already Exist');
+        }
+        const newSubject = new Subject({ ...req.body, _id: new mongoose.Types.ObjectId(), classTeacher: new mongoose.Types.ObjectId(req.body.classTeacher as string) });
         newSubject.save();
         if (!newSubject) {
             return sendApiResponse(res, 'CONFLICT', null, 'Subject Not Created');
