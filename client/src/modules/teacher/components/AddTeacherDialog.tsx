@@ -8,6 +8,7 @@ import ImageUploader from '../../../components/ImageUploader';
 import { useCreateTeacher, useUpdateTeacher } from '../hooks/useTeacher';
 import { useGetSubjects } from '../../subject/hooks/useSubject';
 import CustomIconButton from '../../../components/CustomIconButton';
+import { capitalize } from '../../../services/capitalize';
 
 interface Props {
     open: boolean;
@@ -29,7 +30,7 @@ const AddTeacherDialog = (props: Props) => {
     const [usernameError, setUsernameError] = useState('');
     const [passwordError, setPasswordError] = useState('');
 
-  const handleClose = () => {
+    const handleClose = () => {
         setForm(defTeacher);
         props.onClose();
     }
@@ -50,10 +51,12 @@ const AddTeacherDialog = (props: Props) => {
         else {
             setPasswordError('')
         }
+        const _form = { ...form, name: capitalize(form.name) }
+
         if (isEdit)
-            update(form, { onSuccess: () => { handleClose(); props.onSubmit(form); } });
+            update(_form, { onSuccess: () => { handleClose(); props.onSubmit(_form); } });
         else
-            mutate(form, { onSuccess: () => { handleClose(); props.onSubmit(form); } });
+            mutate(_form, { onSuccess: () => { handleClose(); props.onSubmit(_form); } });
     };
     const validateUsername = (username: string) => {
         // Example: Username should be at least 4 characters long

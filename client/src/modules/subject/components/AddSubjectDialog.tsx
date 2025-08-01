@@ -5,7 +5,7 @@ import type { ISubject } from '../types/Subject';
 import { useGetTeachers } from '../../teacher/hooks/useTeacher';
 import { useCreateSubject, useUpdateSubject } from '../hooks/useSubject';
 import { defSubject } from '../constants/Subject.default';
-import type { ITeacher } from '../../teacher/types/Teacher';
+import { capitalize } from '../../../services/capitalize';
 
 interface Props {
     open: boolean;
@@ -22,16 +22,18 @@ const AddSubjectDialog = (props: Props) => {
     const { mutate, isPending: isCreating } = useCreateSubject();
     const { mutate: update, isPending: updating } = useUpdateSubject();
 
-      const handleClose = () => {
+    const handleClose = () => {
         setForm(defSubject);
         props.onClose();
     }
     const handleSubmit = () => {
 
+        const _form = { ...form, name: capitalize(form.name) }
+
         if (isEdit)
-            update(form, { onSuccess: () => { handleClose(); props.onSubmit(form);  } });
+            update(_form, { onSuccess: () => { handleClose(); props.onSubmit(_form); } });
         else
-            mutate(form, { onSuccess: () => { handleClose(); props.onSubmit(form);  } });
+            mutate(_form, { onSuccess: () => { handleClose(); props.onSubmit(_form); } });
     };
 
     useEffect(() => {
