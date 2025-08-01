@@ -52,13 +52,25 @@ const AddClassDialog = (props: Props) => {
                     <Container>
                         <Grid container spacing={1}>
 
-                            <Grid size={{ xs: 12 }}>
+                            <Grid size={6}>
                                 {/* &ensp; */}
                                 <TextField
                                     label="Name"
                                     value={form.name}
                                     onChange={(e) => {
                                         setForm(_class => ({ ..._class, name: e.target.value }))
+                                    }}
+                                    fullWidth
+                                    required
+                                />
+                            </Grid>
+                            <Grid size={6}>
+                                {/* &ensp; */}
+                                <TextField
+                                    label="Division"
+                                    value={form.div}
+                                    onChange={(e) => {
+                                        setForm(_class => ({ ..._class, div: e.target.value }))
                                     }}
                                     fullWidth
                                     required

@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import CommonPageLayout from '../../../layouts/CommonPageLayout'
-import {  useParams } from 'react-router-dom';
-import { Typography,Grid, Box, Button, Divider, Tabs, Tab } from '@mui/material';
+import { useParams } from 'react-router-dom';
+import { Typography, Grid, Box, Button, Divider, Tabs, Tab } from '@mui/material';
 import AddClassDialog from '../components/AddClassDialog';
 import type { IClass } from '../types/Class';
 import { useGetClassById } from '../hooks/useClass';
@@ -62,8 +62,7 @@ const ViewClassPage = () => {
             }
             <Grid container spacing={0}>
                 <Grid size={{ xs: 12, md: 6 }}>
-                    <Typography variant="h4">CLASS: {
-                        _class?.name}
+                    <Typography variant="h4">CLASS: {_class?.name} {_class?.div}
                     </Typography>
                     {teacher &&
                         <Box sx={{ display: 'flex', flexDirection: 'row' }}>

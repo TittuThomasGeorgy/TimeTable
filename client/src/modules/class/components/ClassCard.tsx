@@ -12,7 +12,7 @@ const ClassCard = (props: { value: IClass }) => {
                     <Stack direction="column"
                         spacing={0}>
                         <Typography variant="body1" color="initial">
-                            {props.value.name}
+                            {props.value.name} {props.value.div}
                         </Typography>
                     </Stack>
             </CardContent>
