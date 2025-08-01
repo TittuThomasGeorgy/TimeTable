@@ -5,26 +5,26 @@ import Subject from "./subject.model";
 import { ISubject } from "./subject.types";
 
 
-const isSubjectExist = async (name: string) => {
-    const data = await Subject.find({
-        $or: [{
-            name: {
-                $regex: name as string,
-                $options: 'i',
-            }
-        },
-        {
-            code: {
-                $regex: name as string,
-                $options: 'i',
-            }
-        },]
-    });
-    return data.length > 0;
-}
+const isSubjectExist = async (name: string,code:string) => {
+  const data = await Subject.findOne({
+    $or: [{
+      name: {
+        $regex: name,
+        $options: 'i',
+      }
+    },
+    {
+      code: {
+        $regex: code,
+        $options: 'i',
+      }
+    },]
+  });
+  return data !== null;
+};
 export const createSubject = async (req: Request, res: Response, next: NextFunction) => {
     try {
-        if (await isSubjectExist(req.body.name)) {
+        if ((await isSubjectExist(req.body.name,req.body.code))) {
             return sendApiResponse(res, 'CONFLICT', null, 'Subject Already Exist');
         }
         const newSubject = new Subject({ ...req.body, _id: new mongoose.Types.ObjectId(), classTeacher: new mongoose.Types.ObjectId(req.body.classTeacher as string) });

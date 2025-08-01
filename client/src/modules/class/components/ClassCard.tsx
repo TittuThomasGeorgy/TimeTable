@@ -1,6 +1,7 @@
 import { Card, CardContent, Stack, Typography } from '@mui/material'
 import { useNavigate } from 'react-router-dom'
 import type { IClass } from '../types/Class';
+import classList from '../constants/ClassList.default';
 
 const ClassCard = (props: { value: IClass }) => {
     const navigate = useNavigate();
@@ -12,7 +13,7 @@ const ClassCard = (props: { value: IClass }) => {
                     <Stack direction="column"
                         spacing={0}>
                         <Typography variant="body1" color="initial">
-                            {props.value.name} {props.value.div}
+                            {classList[props.value.name]} {props.value.div}
                         </Typography>
                     </Stack>
             </CardContent>

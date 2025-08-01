@@ -1,5 +1,5 @@
 import axios from "axios";
-import { serverURL } from "./config";
+import { serverURL } from "../configs/config";
 
 const http = axios.create({
   baseURL: serverURL,

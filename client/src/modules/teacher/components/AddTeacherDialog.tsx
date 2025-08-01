@@ -8,7 +8,7 @@ import ImageUploader from '../../../components/ImageUploader';
 import { useCreateTeacher, useUpdateTeacher } from '../hooks/useTeacher';
 import { useGetSubjects } from '../../subject/hooks/useSubject';
 import CustomIconButton from '../../../components/CustomIconButton';
-import { capitalize } from '../../../services/capitalize';
+import { capitalize } from '../../../functions/capitalize';
 
 interface Props {
     open: boolean;
@@ -203,6 +203,8 @@ const AddTeacherDialog = (props: Props) => {
                                     onChange={(_, newValue) => {
                                         if (newValue)
                                             setForm(_class => ({ ..._class, subject: newValue?._id }))
+else
+                                            setForm(_class => ({ ..._class, subject: '' }))
 
                                     }}
                                 />

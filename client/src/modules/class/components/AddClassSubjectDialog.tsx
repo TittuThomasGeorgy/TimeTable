@@ -29,15 +29,15 @@ const AddClassSubjectDialog = (props: Props) => {
     const { mutate, isPending: isCreating } = useCreateClassSubject();
     const { mutate: update, isPending: updating } = useUpdateClassSubject();
 
-      const handleClose = () => {
+    const handleClose = () => {
         setForm({ ...defClassSubject, class: props.classId });
         props.onClose();
     }
     const handleSubmit = () => {
         if (isEdit)
-            update(form, { onSuccess: () => { handleClose(); props.onSubmit(form);} });
+            update(form, { onSuccess: () => { handleClose(); props.onSubmit(form); } });
         else
-            mutate(form, { onSuccess: () => { handleClose(); props.onSubmit(form);} });
+            mutate(form, { onSuccess: () => { handleClose(); props.onSubmit(form); } });
     };
 
     useEffect(() => {
@@ -60,7 +60,7 @@ const AddClassSubjectDialog = (props: Props) => {
                         <Grid container spacing={1}>
 
 
-                            <Grid size={{ xs: 12 }} sx={{display:"flex",flexDirection:'row'}}>
+                            <Grid size={{ xs: 12 }} sx={{ display: "flex", flexDirection: 'row' }}>
                                 <Autocomplete
                                     options={subjects ?? []}
                                     autoHighlight
@@ -91,12 +91,16 @@ const AddClassSubjectDialog = (props: Props) => {
                                     onChange={(_, newValue) => {
                                         if (newValue)
                                             setForm(_class => ({ ..._class, subject: newValue?._id }))
+                                        else
+                                            setForm(_class => ({ ..._class, subject: '' }))
 
                                     }}
+                                    sx={{ mt: .5 }}
+
                                 />
-                                <CustomIconButton icon={<Add/>} onClick={props.onAddSubject} title='Add Subject' />
+                                <CustomIconButton icon={<Add />} onClick={props.onAddSubject} title='Add Subject' />
                             </Grid>
-                            <Grid size={{ xs: 12 }} sx={{display:"flex",flexDirection:'row'}}>
+                            <Grid size={{ xs: 12 }} sx={{ display: "flex", flexDirection: 'row' }}>
                                 <Autocomplete
                                     options={teachers ?? []}
                                     autoHighlight
@@ -128,10 +132,12 @@ const AddClassSubjectDialog = (props: Props) => {
                                     onChange={(_, newValue) => {
                                         if (newValue)
                                             setForm(_class => ({ ..._class, teacher: newValue?._id }))
+else
+                                            setForm(_class => ({ ..._class, teacher: '' }))
 
                                     }}
                                 />
-                                <CustomIconButton icon={<Add/>} onClick={props.onAddTeacher} title='Add Teacher' />
+                                <CustomIconButton icon={<Add />} onClick={props.onAddTeacher} title='Add Teacher' />
 
                             </Grid>
                             <Grid size={{ xs: 12 }}>

@@ -9,6 +9,7 @@ import { useGetTeacherById } from '../../teacher/hooks/useTeacher';
 import { Delete as DeleteIcon, Edit as EditIcon } from '@mui/icons-material';
 import SubjectTab from '../components/SubjectTab';
 import TeacherChip from '../../teacher/components/TeacherChip';
+import classList from '../constants/ClassList.default';
 
 const ViewClassPage = () => {
 
@@ -62,7 +63,7 @@ const ViewClassPage = () => {
             }
             <Grid container spacing={0}>
                 <Grid size={{ xs: 12, md: 6 }}>
-                    <Typography variant="h4">CLASS: {_class?.name} {_class?.div}
+                    <Typography variant="h4">CLASS: {classList[_class?.name??-1]} {_class?.div}
                     </Typography>
                     {teacher &&
                         <Box sx={{ display: 'flex', flexDirection: 'row' }}>

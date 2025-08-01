@@ -4,16 +4,31 @@ import sendApiResponse from "../../utils/sendApiResponse";
 import Class from "./class.model";
 import { IClass } from "./class.types";
 
+const isClassExist = async (name: number, div: string) => {
+   const classRecord = await Class.findOne({
+      name: name,
+      div: {
+        $regex: div,
+        $options: 'i',
+      }
+    });
+
+    return classRecord !== null;
+
+}
 export const createClass = async (req: Request, res: Response, next: NextFunction) => {
     try {
 
-        const newClass = new Class({ ...req.body, _id: new mongoose.Types.ObjectId(), classTeacher: new mongoose.Types.ObjectId(req.body.classTeacher) });
+        if((await isClassExist(req.body.name,req.body.div)))
+            return sendApiResponse(res, 'CONFLICT', null, 'Class Already Exist');
+
+        const newClass = new Class({ ...req.body, _id: new mongoose.Types.ObjectId(), classTeacher: req.body.classTeacher?new mongoose.Types.ObjectId(req.body.classTeacher as string):'' });
         newClass.save();
         if (!newClass) {
             return sendApiResponse(res, 'CONFLICT', null, 'Class Not Created');
         }
 
-        sendApiResponse(res, 'CREATED', 
+        sendApiResponse(res, 'CREATED',
             newClass,
             `Added Class successfully`);
     } catch (error) {

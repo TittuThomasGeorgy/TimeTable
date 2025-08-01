@@ -5,6 +5,7 @@ import type { IClass } from '../types/Class';
 import { defClass } from '../constants/Class.default';
 import { useGetTeachers } from '../../teacher/hooks/useTeacher';
 import { useCreateClass, useUpdateClass } from '../hooks/useClass';
+import classList from '../constants/ClassList.default';
 
 interface Props {
     open: boolean;
@@ -54,28 +55,49 @@ const AddClassDialog = (props: Props) => {
 
                             <Grid size={6}>
                                 {/* &ensp; */}
-                                <TextField
-                                    label="Name"
-                                    value={form.name}
-                                    onChange={(e) => {
-                                        setForm(_class => ({ ..._class, name: e.target.value }))
+                                <Autocomplete
+                                    options={classList ?? []}
+                                    value={classList[form.name]}
+                                    onChange={(_, newVal) => {
+                                        if (newVal)
+                                            setForm(_class => ({ ..._class, name: classList.indexOf(newVal) }))
+                                        else
+                                            setForm(_class => ({ ..._class, name: -1 }))
                                     }}
-                                    fullWidth
-                                    required
+                                    renderInput={(params) => (
+                                        <TextField
+                                            {...params}
+                                            label=" Class"
+                                            required
+                                        />
+                                    )}
+                                    sx={{mt:.5}}
+                                    
                                 />
                             </Grid>
                             <Grid size={6}>
                                 {/* &ensp; */}
-                                <TextField
-                                    label="Division"
+                                <Autocomplete
+                                    options={["A","B","C","D","SCI","COM"]}
                                     value={form.div}
-                                    onChange={(e) => {
-                                        setForm(_class => ({ ..._class, div: e.target.value }))
+                                    onChange={(_, newVal) => {
+                                        if (newVal)
+                                            setForm(_class => ({ ..._class, div: newVal }))
+                                        else
+                                            setForm(_class => ({ ..._class, div: "" }))
                                     }}
-                                    fullWidth
-                                    required
+                                    renderInput={(params) => (
+                                        <TextField
+                                            {...params}
+                                            label="Division"
+                                            required
+                                        />
+                                    )}
+                                    sx={{mt:.5}}
+                                    
                                 />
                             </Grid>
+               
                             <Grid size={{ xs: 12 }}>
                                 <Autocomplete
                                     options={teachers ?? []}
@@ -108,6 +130,8 @@ const AddClassDialog = (props: Props) => {
                                     onChange={(_, newValue) => {
                                         if (newValue)
                                             setForm(_class => ({ ..._class, classTeacher: newValue?._id }))
+                                        else
+                                            setForm(_class => ({ ..._class, classTeacher: '' }))
 
                                     }}
                                 />

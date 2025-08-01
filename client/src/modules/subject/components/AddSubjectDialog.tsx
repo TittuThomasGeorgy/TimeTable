@@ -5,7 +5,7 @@ import type { ISubject } from '../types/Subject';
 import { useGetTeachers } from '../../teacher/hooks/useTeacher';
 import { useCreateSubject, useUpdateSubject } from '../hooks/useSubject';
 import { defSubject } from '../constants/Subject.default';
-import { capitalize } from '../../../services/capitalize';
+import { capitalize } from '../../../functions/capitalize';
 
 interface Props {
     open: boolean;

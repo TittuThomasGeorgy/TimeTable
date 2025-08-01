@@ -1,7 +1,7 @@
 export interface IClass {
 
     _id: string;
-    name: string;
+    name: number;
     div?: string;
     classTeacher: string;
 }
