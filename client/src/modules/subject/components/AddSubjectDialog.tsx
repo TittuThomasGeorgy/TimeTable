@@ -22,12 +22,16 @@ const AddSubjectDialog = (props: Props) => {
     const { mutate, isPending: isCreating } = useCreateSubject();
     const { mutate: update, isPending: updating } = useUpdateSubject();
 
+      const handleClose = () => {
+        setForm(defSubject);
+        props.onClose();
+    }
     const handleSubmit = () => {
 
         if (isEdit)
-            update(form, { onSuccess: () => { props.onClose(); props.onSubmit(form);setForm(defSubject)} });
+            update(form, { onSuccess: () => { handleClose(); props.onSubmit(form);  } });
         else
-            mutate(form, { onSuccess: () => { props.onClose(); props.onSubmit(form); setForm(defSubject)} });
+            mutate(form, { onSuccess: () => { handleClose(); props.onSubmit(form);  } });
     };
 
     useEffect(() => {
@@ -38,7 +42,7 @@ const AddSubjectDialog = (props: Props) => {
     }, [props.value])
 
     return (
-        <Dialog open={props.open} onClose={() => props.onClose()}>
+        <Dialog open={props.open} onClose={handleClose}>
             <form onSubmit={(e) => {
                 e.preventDefault();
 
@@ -73,12 +77,12 @@ const AddSubjectDialog = (props: Props) => {
                                     required
                                 />
                             </Grid>
-     
+
                         </Grid>
                     </Container>
                 </DialogContent>
                 <DialogActions>
-                    <Button onClick={() => props.onClose()} disabled={isCreating || updating}>Cancel</Button>
+                    <Button onClick={() => { handleClose() }} disabled={isCreating || updating}>Cancel</Button>
                     <Button type="submit" disabled={isCreating || updating}> {isEdit ? 'Edit' : 'Add'}</Button>
                 </DialogActions>
             </form>

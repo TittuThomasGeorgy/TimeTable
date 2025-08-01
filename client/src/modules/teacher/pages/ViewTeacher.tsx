@@ -7,10 +7,13 @@ import { Person, Subject } from '@mui/icons-material';
 import AddTeacherDialog from '../components/AddTeacherDialog';
 import type { ITeacher } from '../types/Teacher';
 import { useGetSubjectById } from '../../subject/hooks/useSubject';
+import AddSubjectDialog from '../../subject/components/AddSubjectDialog';
+import type { ISubject } from '../../subject/types/Subject';
 
 const ViewTeacherPage = () => {
     const { id } = useParams<{ id: string }>(); // Specify the type for useParams
     const [open, setOpen] = useState(false);
+    const [openAddSubject, setOpenAddSubject] = useState(false);
 
     // Ensure id is present before making the API call
     const { data: res, isLoading, isError, error } = useGetTeacherById(id || ''); // Pass an empty string if id is undefined to satisfy type, or handle in hook
@@ -72,7 +75,7 @@ const ViewTeacherPage = () => {
                             </Grid>
                             <Grid size={{ xs: 12, md: 6 }}>
                                 <Typography variant="subtitle1" color="text.secondary">Subject:</Typography>
-                                <Typography variant="body1">{iSLoadingSub||isErrorSub ? "..." : subject?.name}</Typography>
+                                <Typography variant="body1">{iSLoadingSub || isErrorSub ? "..." : subject?.name}</Typography>
                             </Grid>
                             <Grid size={{ xs: 12, md: 6 }}>
                                 <Typography variant="subtitle1" color="text.secondary">Admin Status:</Typography>
@@ -116,6 +119,14 @@ const ViewTeacherPage = () => {
                 onSubmit={function (value: ITeacher): void {
                     console.log(value);
 
+                }}
+                onAddSubject={() => setOpenAddSubject(true)}
+
+            />
+            <AddSubjectDialog open={openAddSubject}
+                onClose={() => setOpenAddSubject(false)}
+                onSubmit={function (value: ISubject): void {
+                    console.log(value);
                 }}
             />
 

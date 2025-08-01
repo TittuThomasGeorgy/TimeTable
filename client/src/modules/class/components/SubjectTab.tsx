@@ -1,5 +1,5 @@
 import { Button, Grid, Typography } from '@mui/material'
-import  { useState } from 'react'
+import { useState } from 'react'
 import { Add as AddIcon } from '@mui/icons-material';
 import AddClassSubjectDialog from './AddClassSubjectDialog';
 import type { IClassSubject } from '../types/ClassSubject';
@@ -58,7 +58,7 @@ const SubjectTab = (props: Props) => {
 
                             >
                                 <ClassSubCard value={sub} key={index} onEdit={() => setOpenAddSubjects({
-                                    value: {...sub,subject:(sub.subject as ISubject)._id,teacher:(sub.teacher as ITeacher)._id}, open: true
+                                    value: { ...sub, subject: (sub.subject as ISubject)._id, teacher: (sub.teacher as ITeacher)._id }, open: true
                                 })} />
 
                             </Grid>
@@ -71,15 +71,15 @@ const SubjectTab = (props: Props) => {
             <AddClassSubjectDialog classId={props.classId}
                 open={openAddSubjects.open}
                 onClose={() => setOpenAddSubjects({
-                    value:null,
+                    value: null,
                     open: false,
                 })}
                 onSubmit={function (value: IClassSubject): void {
                     console.log(value);
 
                 }}
-                onAddSubject={()=>setOpenAddSubject(true)}
-                onAddTeacher={()=>setOpenAddTeacher(true)}
+                onAddSubject={() => setOpenAddSubject(true)}
+                onAddTeacher={() => setOpenAddTeacher(true)}
                 value={openAddSubjects.value}
             />
             <AddSubjectDialog open={openAddSubject}
@@ -88,12 +88,14 @@ const SubjectTab = (props: Props) => {
                     console.log(value);
                 }}
             />
-             <AddTeacherDialog open={openAddTeacher}
+            <AddTeacherDialog open={openAddTeacher}
                 onClose={() => setOpenAddTeacher(false)}
                 onSubmit={function (value: ITeacher): void {
                     console.log(value);
 
                 }}
+                onAddSubject={() => setOpenAddSubject(true)}
+
             />
         </>
     )

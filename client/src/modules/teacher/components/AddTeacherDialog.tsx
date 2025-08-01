@@ -1,16 +1,18 @@
 import { Dialog, DialogTitle, DialogContent, Container, Grid, TextField, DialogActions, Button, IconButton, InputAdornment, Autocomplete, Typography, Avatar, Box } from '@mui/material';
 // import { enqueueSnackbar } from 'notistack';
 import { useEffect, useState } from 'react'
-import { Visibility as VisibilityIcon, VisibilityOff as VisibilityOffIcon } from '@mui/icons-material';
+import { Add, Visibility as VisibilityIcon, VisibilityOff as VisibilityOffIcon } from '@mui/icons-material';
 import type { ITeacher } from '../types/Teacher';
 import { defTeacher } from '../constants/Teacher.default';
 import ImageUploader from '../../../components/ImageUploader';
 import { useCreateTeacher, useUpdateTeacher } from '../hooks/useTeacher';
 import { useGetSubjects } from '../../subject/hooks/useSubject';
+import CustomIconButton from '../../../components/CustomIconButton';
 
 interface Props {
     open: boolean;
     onClose: () => void;
+    onAddSubject: () => void;
     onSubmit: (value: ITeacher) => void;
     value?: ITeacher
 }
@@ -27,6 +29,10 @@ const AddTeacherDialog = (props: Props) => {
     const [usernameError, setUsernameError] = useState('');
     const [passwordError, setPasswordError] = useState('');
 
+  const handleClose = () => {
+        setForm(defTeacher);
+        props.onClose();
+    }
     const handleSubmit = () => {
         const userError = validateUsername(form.username);
         const passError = validatePassword(form.password);
@@ -45,9 +51,9 @@ const AddTeacherDialog = (props: Props) => {
             setPasswordError('')
         }
         if (isEdit)
-            update(form, { onSuccess: () => { props.onClose(); props.onSubmit(form);setForm(defTeacher) } });
+            update(form, { onSuccess: () => { handleClose(); props.onSubmit(form); } });
         else
-            mutate(form, { onSuccess: () => { props.onClose(); props.onSubmit(form);setForm(defTeacher) } });
+            mutate(form, { onSuccess: () => { handleClose(); props.onSubmit(form); } });
     };
     const validateUsername = (username: string) => {
         // Example: Username should be at least 4 characters long
@@ -78,7 +84,7 @@ const AddTeacherDialog = (props: Props) => {
     }, [props.value])
 
     return (
-        <Dialog open={props.open} onClose={() => props.onClose()}>
+        <Dialog open={props.open} onClose={() => handleClose()}>
             <form onSubmit={(e) => {
                 e.preventDefault();
 
@@ -177,7 +183,7 @@ const AddTeacherDialog = (props: Props) => {
 
                                 />
                             </Grid>
-                            <Grid size={{ xs: 12 }}>
+                            <Grid size={{ xs: 12 }} sx={{ display: "flex", flexDirection: 'row' }}>
                                 <Autocomplete
                                     options={subjects ?? []}
                                     autoHighlight
@@ -187,7 +193,7 @@ const AddTeacherDialog = (props: Props) => {
                                         <TextField
                                             {...params}
                                             label="Select a Subject"
-
+                                            required
                                         />
                                     )}
                                     value={subjects?.find(sub => sub._id === form.subject)}
@@ -197,12 +203,13 @@ const AddTeacherDialog = (props: Props) => {
 
                                     }}
                                 />
+                                <CustomIconButton icon={<Add />} onClick={props.onAddSubject} title='Add Subject' />
                             </Grid>
                         </Grid>
                     </Container>
                 </DialogContent>
                 <DialogActions>
-                    <Button onClick={() => props.onClose()} disabled={isCreating || updating}>Cancel</Button>
+                    <Button onClick={handleClose} disabled={isCreating || updating}>Cancel</Button>
                     <Button type="submit" disabled={isCreating || updating}> {isEdit ? 'Edit' : 'Add'}</Button>
                 </DialogActions>
             </form>
