@@ -29,12 +29,14 @@ export const useCreateSubject = () => {
 }
 
 export const useUpdateSubject = () => {
-  const queryClient = useQueryClient();
+    const queryClient = useQueryClient();
 
-  return useMutation({
-    mutationFn: updateSubject,
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['ViewSubject'] });
-    },
-  });
+    return useMutation({
+        mutationFn: updateSubject,
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ['ViewSubject'] });
+            queryClient.invalidateQueries({ queryKey: ['Subjects'] });
+
+        },
+    });
 };

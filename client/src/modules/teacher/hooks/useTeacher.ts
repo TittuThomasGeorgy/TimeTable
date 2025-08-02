@@ -28,12 +28,14 @@ export const useCreateTeacher = () => {
 }
 
 export const useUpdateTeacher = () => {
-  const queryClient = useQueryClient();
+    const queryClient = useQueryClient();
 
-  return useMutation({
-    mutationFn: updateTeacher,
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['ViewTeacher'] });
-    },
-  });
+    return useMutation({
+        mutationFn: updateTeacher,
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ['ViewTeacher'] });
+            queryClient.invalidateQueries({ queryKey: ['Teachers'] });
+
+        },
+    });
 };

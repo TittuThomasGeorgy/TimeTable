@@ -30,12 +30,14 @@ export const useCreateClass = () => {
 }
 
 export const useUpdateClass = () => {
-  const queryClient = useQueryClient();
+    const queryClient = useQueryClient();
 
-  return useMutation({
-    mutationFn: updateClass,
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['ViewClass'] });
-    },
-  });
+    return useMutation({
+        mutationFn: updateClass,
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ['ViewClass'] });
+            queryClient.invalidateQueries({ queryKey: ['Classes'] });
+
+        },
+    });
 };
