@@ -57,7 +57,7 @@ const AddClassSubjectDialog = (props: Props) => {
                 <DialogTitle>{(isEdit ? 'Edit ' : 'Add ') + 'Class Subject'}</DialogTitle>
                 <DialogContent>
                     <Container>
-                        <Grid container spacing={1}>
+                        <Grid container spacing={1} sx={{ mt: .5 }}>
 
 
                             <Grid size={{ xs: 12 }} sx={{ display: "flex", flexDirection: 'row' }}>
@@ -132,7 +132,7 @@ const AddClassSubjectDialog = (props: Props) => {
                                     onChange={(_, newValue) => {
                                         if (newValue)
                                             setForm(_class => ({ ..._class, teacher: newValue?._id }))
-else
+                                        else
                                             setForm(_class => ({ ..._class, teacher: '' }))
 
                                     }}

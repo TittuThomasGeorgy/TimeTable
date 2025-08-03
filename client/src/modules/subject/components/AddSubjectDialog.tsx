@@ -53,7 +53,7 @@ const AddSubjectDialog = (props: Props) => {
                 <DialogTitle>{(isEdit ? 'Edit ' : 'Add ') + 'Subject'}</DialogTitle>
                 <DialogContent>
                     <Container>
-                        <Grid container spacing={1}>
+                        <Grid container spacing={1} sx={{mt:.5}}>
 
                             <Grid size={{ xs: 12 }}>
                                 {/* &ensp; */}
