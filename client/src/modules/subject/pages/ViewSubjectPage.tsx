@@ -1,11 +1,11 @@
 import { useState } from 'react'
 import CommonPageLayout from '../../../layouts/CommonPageLayout'
 import { useNavigate, useParams } from 'react-router-dom';
-import { Container, Card, CardHeader, Typography, Avatar, CardContent, Grid, Chip, Box, Button } from '@mui/material';
+import { Typography, Grid, Button, Divider } from '@mui/material';
 import AddSubjectDialog from '../components/AddSubjectDialog';
-import { useGetTeacherById } from '../../teacher/hooks/useTeacher';
 import type { ISubject } from '../types/Subject';
 import { useGetSubjectById } from '../hooks/useSubject';
+import { Delete as DeleteIcon, Edit as EditIcon } from '@mui/icons-material';
 
 const ViewSubjectPage = () => {
     // const navigate = useNavigate();
@@ -34,43 +34,25 @@ const ViewSubjectPage = () => {
             {isError &&
                 <div>Error fetching class: {error?.message || 'Unknown error'}</div>
             }
-            <Container maxWidth="md" sx={{ mt: 4 }}>
-                <Card sx={{ boxShadow: 3 }}>
-                    <CardHeader
-                        title={
-                            <Typography variant="h5" component="div">
-                                Subject Details
-                            </Typography>
-                        }
+            <Grid container spacing={0}>
+                <Grid size={{ xs: 12, md: 6 }}>
+                    <Typography variant="h4">{subject?.name}
+                    </Typography>
+                    <Typography variant="body2">{subject?.code}
+                    </Typography>
 
-                        sx={{ bgcolor: 'primary.main', color: 'white' }}
-                    />
-                    <CardContent>
-                        <Grid container spacing={2}>
-                            <Grid size={{ xs: 12, md: 6 }}>
-                                <Typography variant="subtitle1" color="text.secondary">Name:</Typography>
-                                <Typography variant="body1">{subject?.name}</Typography>
-                            </Grid>
-                            <Grid size={{ xs: 12, md: 6 }}>
-                                <Typography variant="subtitle1" color="text.secondary">Code:</Typography>
-                                <Typography variant="body1">{subject?.code}</Typography>
-                            </Grid>
+                </Grid>
+                <Grid size={{ xs: 12, md: 6 }} sx={{ p: 2, display: 'flex', justifyContent: 'flex-end', gap: 1 }}>
+                    <Button variant="outlined" color="primary" onClick={() => setOpen(true)} startIcon={<EditIcon />}>
+                        Edit
+                    </Button>
+                    <Button variant="outlined" color="error" onClick={() => console.log('Delete clicked')} startIcon={<DeleteIcon />}>
+                        Delete
+                    </Button>
+                </Grid>
+            </Grid>
+            <Divider  />
 
-
-                        </Grid>
-
-
-                    </CardContent>
-                    <Box sx={{ p: 2, display: 'flex', justifyContent: 'flex-end', gap: 1 }}>
-                        <Button variant="outlined" color="primary" onClick={() => setOpen(true)}>
-                            Edit
-                        </Button>
-                        <Button variant="outlined" color="error" onClick={() => console.log('Delete clicked')}>
-                            Delete
-                        </Button>
-                    </Box>
-                </Card>
-            </Container>
             <AddSubjectDialog open={open} onClose={() => setOpen(false)}
                 value={subject}
                 onSubmit={function (value: ISubject): void {
