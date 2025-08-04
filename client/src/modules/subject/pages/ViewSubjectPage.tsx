@@ -6,6 +6,8 @@ import AddSubjectDialog from '../components/AddSubjectDialog';
 import type { ISubject } from '../types/Subject';
 import { useGetSubjectById } from '../hooks/useSubject';
 import { Delete as DeleteIcon, Edit as EditIcon } from '@mui/icons-material';
+import { useGetClassSubjects } from '../../class/hooks/useClassSubject';
+import ClassSubCard from '../../class/components/ClassSubCard';
 
 const ViewSubjectPage = () => {
     // const navigate = useNavigate();
@@ -16,6 +18,8 @@ const ViewSubjectPage = () => {
     // Ensure id is present before making the API call
     const { data: res, isLoading, isError, error } = useGetSubjectById(id || ''); // Pass an empty string if id is undefined to satisfy type, or handle in hook
     const subject = res?.data;
+    const { data: classSubs, isLoading:isLoadingClassSubs } = useGetClassSubjects(id || '', 'subject');
+    const classSubjects = classSubs?.data;
 
     // 3. Now, use the values from the hooks in your conditional rendering
     if (!id) {
@@ -51,8 +55,27 @@ const ViewSubjectPage = () => {
                     </Button>
                 </Grid>
             </Grid>
-            <Divider  />
+            <Divider /> <br />
+            <Grid container spacing={1}>
 
+                {
+                    isLoading ? (
+                        <Typography>Loading Classes...</Typography>
+                    ) : (
+                        classSubjects?.map((sub, index) => (
+                            <Grid
+                                size={{ xs: 6, md: 2 }}
+
+                            >
+                                <ClassSubCard value={sub} key={index}  type='subject' />
+
+                            </Grid>
+
+                        ))
+
+                    )
+                }
+            </Grid>
             <AddSubjectDialog open={open} onClose={() => setOpen(false)}
                 value={subject}
                 onSubmit={function (value: ISubject): void {
@@ -60,6 +83,7 @@ const ViewSubjectPage = () => {
 
                 }}
             />
+            
 
         </CommonPageLayout >
     )

@@ -15,7 +15,7 @@ interface Props {
 }
 
 const SubjectTab = (props: Props) => {
-    const { data: res, isLoading } = useGetClassSubjects(props.classId);
+    const { data: res, isLoading } = useGetClassSubjects(props.classId,'class');
     const classSubjects = res?.data;
 
     const [openAddTeacher, setOpenAddTeacher] = useState(false);
@@ -59,7 +59,7 @@ const SubjectTab = (props: Props) => {
                             >
                                 <ClassSubCard value={sub} key={index} onEdit={() => setOpenAddSubjects({
                                     value: { ...sub, subject: (sub.subject as ISubject)._id, teacher: (sub.teacher as ITeacher)._id }, open: true
-                                })} />
+                                })} type='class' />
 
                             </Grid>
 

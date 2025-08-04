@@ -5,6 +5,8 @@ import Class from "./classSubject.model";
 import ClassSubject from "./classSubject.model";
 import { IClassSubject } from "./classSubject.types";
 import { ISubject } from "../subject/subject.types";
+import { IClass } from "../class/class.types";
+import { ITeacher } from "../teacher/teacher.types";
 
 export const createClassSubject = async (req: Request, res: Response, next: NextFunction) => {
     try {
@@ -31,36 +33,72 @@ export const createClassSubject = async (req: Request, res: Response, next: Next
 
 export const getClassSubjects = async (req: Request, res: Response, next: NextFunction) => {
     try {
+        const { type } = req.query;
+        const { id } = req.params;
 
-        const _data = await ClassSubject.find({
-            class: req.params.id
-        }).populate(['subject', 'teacher'])
+        let populateOptions: string[] = [];
+        let condition: object = {};
 
+        switch (type) {
+            case 'class':
+                populateOptions = ['subject', 'teacher'];
+                condition = { class: id };
+                break;
+            case 'subject':
+                populateOptions = ['class', 'teacher'];
+                condition = { subject: id };
+                break;
+            case 'teacher':
+                populateOptions = ['subject', 'class'];
+                condition = { teacher: id };
+                break;
+            default:
+                return sendApiResponse(res, 'BAD REQUEST', null, 'Invalid or missing "type" query parameter.');
+        }
 
-        // If your logo is being populated correctly, we need to handle it properly in the map function
-        const data: IClassSubject[] = _data.map((_class) => {
+        const classSubjects = await ClassSubject.find(condition).populate(populateOptions);
 
-            return {
-                ..._class.toObject(),  // Convert mongoose document to a plain object
+        if (!classSubjects || classSubjects.length === 0) {
+            return sendApiResponse(res, 'NOT FOUND', [], 'No data found.');
+        }
 
-            };
-        }).sort((a, b) => {
-            // Primary sort key: subject.name (ascending)
-            // localeCompare is a robust way to compare strings, handling different languages and cases.
-            const subjectNameComparison = (a.subject as ISubject).name.localeCompare((b.subject as ISubject).name);
+        const sortedData = classSubjects.map((subject) => subject.toObject()).sort((a, b) => {
 
-            if (a.noOfHours - b.noOfHours === 0) {
-                return subjectNameComparison;
+            if (type === 'subject' || type == 'teacher') {
+                const classA = a.class as unknown as IClass;
+                const classB = b.class as unknown as IClass;
+
+                // Sort by class.name, then class.div
+                const classNameComparison = classA.name - classB.name;
+                if (classNameComparison !== 0) {
+                    return classNameComparison;
+                }
+
+                const classDivComparison = classA.div.localeCompare(classB.div);
+                if (classDivComparison !== 0) {
+                    return classDivComparison;
+                }
             }
-            
-            return b.noOfHours - a.noOfHours;
-        });;
+            if (type === 'teacher'||type=='class'&&(b.noOfHours - a.noOfHours==0)) {
+                const subjectA = a.subject as ISubject;
+                const subjectB = b.subject as ISubject;
+                return subjectA.name.localeCompare(subjectB.name);
+            }
+            if (type === 'subject') {
+                const teacherA = a.teacher as unknown as ITeacher;
+                const teacherB = b.teacher as unknown as ITeacher;
+                return teacherA.name.localeCompare(teacherB.name);
+            }
 
-        sendApiResponse(res, 'OK', data, 'Successfully fetched list of Class Subjects');
+            // Fallback for 'class' type or any other case
+            return b.noOfHours - a.noOfHours;
+        });
+
+        sendApiResponse(res, 'OK', sortedData, 'Successfully fetched list of Class Subjects');
     } catch (error) {
         next(error);
     }
-}
+};
 
 
 
