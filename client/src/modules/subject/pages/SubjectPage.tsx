@@ -1,5 +1,5 @@
 // import React from 'react'
-import { Button, Typography, Grid } from '@mui/material'
+import { Button, Typography, Grid, Divider } from '@mui/material'
 import CommonPageLayout from '../../../layouts/CommonPageLayout'
 import { Add as AddIcon } from '@mui/icons-material';
 import { useState } from 'react';
@@ -15,19 +15,29 @@ const SubjectPage = () => {
     const subjects = res?.data;
     return (
 
-        <CommonPageLayout title='Subjects'>
-            <Button
-                variant="contained"
-                color="primary"
-                sx={{ textTransform: 'none', float: 'right' }}
-                startIcon={<AddIcon />}
-                onClick={() => {
-                    setOpen(true)
-                }
-                }
-            >                ADD
-            </Button>
-            <br />
+        <CommonPageLayout>
+            <Grid container spacing={0}>
+                <Grid size={{ xs: 12, md: 6 }}>
+                    <Typography variant="h4">Subjects
+                    </Typography>
+
+                </Grid>
+                <Grid size={{ xs: 12, md: 6 }} sx={{ p: 1, display: 'flex', justifyContent: 'flex-end', gap: 1 }}>
+                    <Button
+                        variant="contained"
+                        color="primary"
+                        startIcon={<AddIcon />}
+                        onClick={() => {
+                            setOpen(true)
+                        }
+                        }
+                    >                ADD
+                    </Button>
+                </Grid>
+            </Grid>
+            <Divider /> <br />
+          
+            {/* <br /> */}
             <Grid container spacing={1}>
 
                 {

@@ -7,7 +7,17 @@ const TeacherCard = (props: { value: ITeacher }) => {
     const navigate = useNavigate();
     return (
         <Card onClick={() =>
-            navigate(`/teacher/${props.value._id}`)}>
+            navigate(`/teacher/${props.value._id}`)}
+             sx={{
+                cursor: 'pointer',
+                borderRadius: 2,
+                boxShadow: 3,
+                transition: 'all 0.3s cubic-bezier(.25,.8,.25,1)',
+                '&:hover': {
+                    boxShadow: 6,
+                    transform: 'translateY(-5px)',
+                },
+            }}>
             <CardContent>
                 <Stack direction="row"
                     spacing={2}>
