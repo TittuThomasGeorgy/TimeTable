@@ -73,12 +73,13 @@ const CommonPageLayout = (props: { children: React.ReactNode; title?: string; hi
           <Box key={0}>
             <ListItem >
               <ListItemButton
+                onClick={handleDrawerToggle}
                 sx={{
                   borderRadius: '20px ',
                   justifyContent: 'center'
                 }}>
 
-                <ListItemIcon onClick={handleDrawerToggle}
+                <ListItemIcon
                   sx={{
                     minWidth: 0,
                     mr: isCollapsed ? 0 : 2,
