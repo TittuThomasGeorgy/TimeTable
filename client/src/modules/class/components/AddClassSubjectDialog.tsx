@@ -8,6 +8,7 @@ import { useGetSubjects } from '../../subject/hooks/useSubject';
 import { useCreateClassSubject, useUpdateClassSubject } from '../hooks/useClassSubject';
 import { Add } from '@mui/icons-material';
 import CustomIconButton from '../../../components/CustomIconButton';
+import PreferenceGrid from './PreferenceGrid';
 
 interface Props {
     open: boolean;
@@ -154,6 +155,7 @@ const AddClassSubjectDialog = (props: Props) => {
                                 />
                             </Grid>
                         </Grid>
+                         <PreferenceGrid />
                     </Container>
                 </DialogContent>
                 <DialogActions>
