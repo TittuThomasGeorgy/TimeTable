@@ -5,15 +5,13 @@ import type { ISubject } from '../../subject/types/Subject';
 import TeacherChip from '../../teacher/components/TeacherChip';
 import type { ITeacher } from '../../teacher/types/Teacher';
 import MenuButton from '../../../components/MenuButton';
-import { AddTask as PreferenceIcon, Edit as EditIcon, Visibility } from '@mui/icons-material';
+import { Edit as EditIcon, Visibility as VisibilityIcon } from '@mui/icons-material';
 import type { IClass } from '../types/Class';
 import classList from '../constants/ClassList.default';
-import PreferenceGrid from './PreferenceGrid';
 
 interface Props {
     value: IClassSubject;
     onEdit?: () => void;
-    onPreference?: () => void;
     type: 'class' | 'teacher' | 'subject';
 }
 const ClassSubCard = (props: Props) => {
@@ -50,8 +48,7 @@ const ClassSubCard = (props: Props) => {
                 <MenuButton
                     menuItems={[
                         ...(props.onEdit ? [{ label: 'Edit', onClick: props.onEdit, icon: <EditIcon color='primary' sx={{ mt: .5 }} /> }] : []),
-                        { label: 'View', onClick: () => navigate(props.type === 'class' ? `/subject/${(subject as ISubject)._id}` : `/class/${(_class as IClass)._id}`), icon: <Visibility color='primary' sx={{ mt: .5 }} /> },
-                        ...(props.onPreference ? [{ label: 'Preference', onClick: props.onPreference, icon: <PreferenceIcon color='primary' sx={{ mt: .5 }} /> }] : []),
+                        { label: 'View', onClick: () => navigate(props.type === 'class' ? `/subject/${(subject as ISubject)._id}` : `/class/${(_class as IClass)._id}`), icon: <VisibilityIcon color='primary' sx={{ mt: .5 }} /> },
                     ]} sx={{ float: 'right' }} />
             </CardContent>
 
