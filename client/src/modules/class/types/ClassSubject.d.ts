@@ -1,6 +1,7 @@
 import type { ISubject } from "../../subject/types/Subject";
 import type { ITeacher } from "../../teacher/types/Teacher";
 import type { IClass } from "./Class";
+import type { Preferences } from "./Preferences";
 
 export interface IClassSubject {
 
@@ -9,4 +10,5 @@ export interface IClassSubject {
     subject: string | ISubject;
     teacher: string | ITeacher;
     noOfHours: number;
+    preferences:Preferences[];
 }

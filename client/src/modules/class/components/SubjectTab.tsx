@@ -9,18 +9,26 @@ import type { ISubject } from '../../subject/types/Subject';
 import type { ITeacher } from '../../teacher/types/Teacher';
 import AddSubjectDialog from '../../subject/components/AddSubjectDialog';
 import AddTeacherDialog from '../../teacher/components/AddTeacherDialog';
+import PreferenceGrid from './PreferenceGrid';
 
 interface Props {
     classId: string;
 }
 
 const SubjectTab = (props: Props) => {
-    const { data: res, isLoading } = useGetClassSubjects(props.classId,'class');
+    const { data: res, isLoading } = useGetClassSubjects(props.classId, 'class');
     const classSubjects = res?.data;
 
     const [openAddTeacher, setOpenAddTeacher] = useState(false);
     const [openAddSubject, setOpenAddSubject] = useState(false);
     const [openAddSubjects, setOpenAddSubjects] = useState<{
+        open: boolean
+        value: null | IClassSubject
+    }>({
+        open: false,
+        value: null,
+    });
+    const [selectedSubjectPreference, setSelectedSubjectPreference] = useState<{
         open: boolean
         value: null | IClassSubject
     }>({
@@ -55,11 +63,15 @@ const SubjectTab = (props: Props) => {
                         classSubjects?.map((sub, index) => (
                             <Grid
                                 size={{ xs: 6, md: 2 }}
-
+                                key={index}
                             >
-                                <ClassSubCard value={sub} key={index} onEdit={() => setOpenAddSubjects({
-                                    value: { ...sub, subject: (sub.subject as ISubject)._id, teacher: (sub.teacher as ITeacher)._id }, open: true
-                                })} type='class' />
+                                <ClassSubCard value={sub} key={index}
+                                    onEdit={() => setOpenAddSubjects({
+                                        value: { ...sub, subject: (sub.subject as ISubject)._id, teacher: (sub.teacher as ITeacher)._id }, open: true
+                                    })}
+                                    onPreference={() => setSelectedSubjectPreference({open:true,value:sub})
+                                    }
+                                    type='class' />
 
                             </Grid>
 

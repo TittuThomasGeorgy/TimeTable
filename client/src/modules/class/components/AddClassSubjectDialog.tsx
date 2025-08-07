@@ -155,7 +155,10 @@ const AddClassSubjectDialog = (props: Props) => {
                                 />
                             </Grid>
                         </Grid>
-                         <PreferenceGrid />
+                        <PreferenceGrid value={form.preferences} onChange={(newVal) => {
+                                        setForm(Teacher => ({ ...Teacher, preferences:newVal }))
+                                    }}/>
+
                     </Container>
                 </DialogContent>
                 <DialogActions>

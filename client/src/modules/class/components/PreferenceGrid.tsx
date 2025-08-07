@@ -1,5 +1,5 @@
 // components/PreferenceGrid.tsx
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   Table,
   TableBody,
@@ -7,31 +7,34 @@ import {
   TableContainer,
   TableHead,
   TableRow,
-  Typography,
   Button,
   Paper,
   Box,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions, Typography, Grid,
 } from '@mui/material';
+import type { Day, Period, PreferenceChoice, Preferences } from '../types/Preferences';
+import { days, periods } from '../../timetable/constants/Day.default'
+import type { ISubject } from '../../subject/types/Subject';
+import type { IClassSubject } from '../types/ClassSubject';
+import TeacherChip from '../../teacher/components/TeacherChip';
+import type { ITeacher } from '../../teacher/types/Teacher';
 
-type Day = 'MON' | 'TUE' | 'WED' | 'THU' | 'FRI';
-type Period = 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8;
 
-type Preference = 0 | 1 | -1;
-
-type Preferences = Record<Day, Record<Period, Preference>>;
-
-const days: Day[] = ['MON', 'TUE', 'WED', 'THU', 'FRI'];
-const periods: Period[] = [1, 2, 3, 4, 5, 6, 7, 8];
-
-const getInitialPreferences = (): Preferences =>
-  Object.fromEntries(
-    days.map(day => [
+const getInitialPreferences = (): Preferences[] =>
+  days.flatMap(day =>
+    periods.map(period => ({
       day,
-      Object.fromEntries(periods.map(period => [period, 0])) as Record<Period, Preference>,
-    ])
-  ) as Preferences;
+      period,
+      preference: 0 as PreferenceChoice
+    }))
+  );
 
-const getColor = (pref: Preference): string => {
+
+
+const getColor = (pref: PreferenceChoice): string => {
   switch (pref) {
     case 1:
       return '#A5D6A7'; // green
@@ -41,75 +44,78 @@ const getColor = (pref: Preference): string => {
       return '#E0E0E0'; // grey
   }
 };
-
-const PreferenceGrid: React.FC = () => {
-  const [preferences, setPreferences] = useState<Preferences>(getInitialPreferences);
+interface Props {
+  value: Preferences[] ;
+  onChange:(newVal:Preferences[])=>void;
+  // onSubmit: (value: IClassSubject1) => void;
+}
+const PreferenceGrid = (props: Props) => {
+  const [preferences, setPreferences] = useState<Preferences[]>(getInitialPreferences);
 
   const togglePreference = (day: Day, period: Period) => {
-    const current = preferences[day][period];
-    const next: Preference =
-      current === 0 ? 1 : current === 1 ? -1 : 0;
+    const current: Preferences = preferences.find(_preference => _preference.day === day && _preference.period == period) as Preferences;
 
-    setPreferences(prev => ({
-      ...prev,
-      [day]: {
-        ...prev[day],
-        [period]: next,
-      },
-    }));
+    const next: PreferenceChoice =
+      current.preference === 0 ? 1 : current.preference === 1 ? -1 : 0;
+
+    setPreferences(prev => prev.map(pref => (pref.day === day && pref.period === period) ? ({ ...pref, preference: next }) : pref))
   };
 
   const handleSave = () => {
     console.log('Saving preferences:', preferences);
     // Send preferences to your backend via API
   };
+  useEffect(() => {
+    console.log('PreferenceDialog mounted');
+    return () => {
+      console.log('PreferenceDialog unmounted');
+    };
+  }, []);
 
-  return (
-    <Box p={2}>
-      <TableContainer component={Paper}>
-        <Table>
-          <TableHead>
-            <TableRow>
-              <TableCell></TableCell>
-              {periods.map(period => (
-                <TableCell key={period} align="center">
-                  {period}
-                </TableCell>
-              ))}
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {days.map(day => (
-              <TableRow key={day}>
-                <TableCell>{day}</TableCell>
-                {periods.map(period => (
-                  <TableCell
-                    key={period}
-                    align="center"
-                    onClick={() => togglePreference(day, period)}
-                    sx={{
-                      backgroundColor: getColor(preferences[day][period]),
-                      cursor: 'pointer',
-                      transition: '0.2s ease',
-                      fontWeight: 'bold',
-                    }}
-                  >
-                    {preferences[day][period] == 0 ? '' :
-                     preferences[day][period] == 1 ? '✓' : '✗'}
-                  </TableCell>
+
+  return (    
+
+          <TableContainer component={Paper}>
+            <Table>
+              <TableHead>
+                <TableRow>
+                  <TableCell></TableCell>
+                  {periods.map(period => (
+                    <TableCell key={period} align="center">
+                      {period}
+                    </TableCell>
+                  ))}
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {days.map(day => (
+                  <TableRow key={day}>
+                    <TableCell>{day}</TableCell>
+                    {periods.map(period => {
+                      const current: Preferences = preferences.find(_preference => _preference.day === day && _preference.period == period) as Preferences;
+                      return (
+                        <TableCell
+                          key={period}
+                          align="center"
+                          onClick={() => togglePreference(day, period)}
+                          sx={{
+                            backgroundColor: getColor(current.preference),
+                            cursor: 'pointer',
+                            transition: '0.2s ease',
+                            fontWeight: 'bold',
+                          }}
+                        >
+                          {current.preference == 0 ? '' :
+                            current.preference == 1 ? '✓' : '✗'}
+                        </TableCell>
+                      )
+                    })}
+                  </TableRow>
                 ))}
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </TableContainer>
+              </TableBody>
+            </Table>
+          </TableContainer>
 
-      <Box mt={2} display="flex" justifyContent="flex-end">
-        <Button variant="contained" color="primary" onClick={handleSave}>
-          Save Preferences
-        </Button>
-      </Box>
-    </Box>
   );
 };
 

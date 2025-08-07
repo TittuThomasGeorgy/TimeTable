@@ -5,13 +5,15 @@ import type { ISubject } from '../../subject/types/Subject';
 import TeacherChip from '../../teacher/components/TeacherChip';
 import type { ITeacher } from '../../teacher/types/Teacher';
 import MenuButton from '../../../components/MenuButton';
-import { Edit as EditIcon, Visibility } from '@mui/icons-material';
+import { AddTask as PreferenceIcon, Edit as EditIcon, Visibility } from '@mui/icons-material';
 import type { IClass } from '../types/Class';
 import classList from '../constants/ClassList.default';
+import PreferenceGrid from './PreferenceGrid';
 
 interface Props {
     value: IClassSubject;
     onEdit?: () => void;
+    onPreference?: () => void;
     type: 'class' | 'teacher' | 'subject';
 }
 const ClassSubCard = (props: Props) => {
@@ -38,18 +40,22 @@ const ClassSubCard = (props: Props) => {
                     <Typography variant="h5" component="h6" sx={{ fontWeight: 'bold', mb: 0.5, color: 'text.primary', textAlign: 'center' }}>
                         {props.type == 'class' ? (subject as ISubject).code : `${classList[(_class as IClass)?.name ?? -1]} ${(_class as IClass)?.div}`}
                     </Typography>
-                    <Typography variant="body2" color="text.secondary">
-                        {props.type == 'teacher' ? (subject as ISubject).code : <TeacherChip value={teacher as ITeacher} />}
-                    </Typography>
+                    {props.type == 'teacher' ? <Typography variant="body2" color="text.secondary">
+                        {(subject as ISubject).code}
+                    </Typography> : <TeacherChip value={teacher as ITeacher} />}
                     <Typography variant="body2" color="text.secondary">
                         0 / {noOfHours}
                     </Typography>
                 </Stack>
-                <MenuButton menuItems={[
-                    ...(props.onEdit ? [{ label: 'Edit', onClick: props.onEdit, icon: <EditIcon color='primary' sx={{ mt: .5 }} /> }] : []),
-                    { label: 'View', onClick: () => navigate(props.type==='class'?`/subject/${(subject as ISubject)._id}`:`/class/${(_class as IClass)._id}`), icon: <Visibility color='primary' sx={{ mt: .5 }} /> },
-                ]} sx={{ float: 'right' }} />
+                <MenuButton
+                    menuItems={[
+                        ...(props.onEdit ? [{ label: 'Edit', onClick: props.onEdit, icon: <EditIcon color='primary' sx={{ mt: .5 }} /> }] : []),
+                        { label: 'View', onClick: () => navigate(props.type === 'class' ? `/subject/${(subject as ISubject)._id}` : `/class/${(_class as IClass)._id}`), icon: <Visibility color='primary' sx={{ mt: .5 }} /> },
+                        ...(props.onPreference ? [{ label: 'Preference', onClick: props.onPreference, icon: <PreferenceIcon color='primary' sx={{ mt: .5 }} /> }] : []),
+                    ]} sx={{ float: 'right' }} />
             </CardContent>
+
+
         </Card>
     );
 };
