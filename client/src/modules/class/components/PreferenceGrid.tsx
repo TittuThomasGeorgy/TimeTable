@@ -11,6 +11,7 @@ import {
 } from '@mui/material';
 import type { Day, Period, PreferenceChoice, Preferences } from '../types/Preferences';
 import { days, periods } from '../../timetable/constants/Day.default'
+import { Close,RadioButtonChecked } from '@mui/icons-material';
 
 const getInitialPreferences = (): Preferences[] =>
   days.flatMap(day =>
@@ -93,7 +94,7 @@ const PreferenceGrid = (props: Props) => {
                     }}
                   >
                     {current.preference == 0 ? '' :
-                      current.preference == 1 ? '✓' : '✗'}
+                      current.preference == 1 ? <RadioButtonChecked/> : <Close/>}
                   </TableCell>
                 )
               })}
