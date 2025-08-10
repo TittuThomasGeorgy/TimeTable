@@ -10,8 +10,6 @@ const TimeTablePage = () => {
                 <div>TimeTablePage</div>
                 <div>TimeTablePage</div>
                 <div>TimeTablePage</div>
-                
-                <div>TimeTablePage</div>
                 <div>TimeTablePage</div>
                 <div>TimeTablePage</div>
                 <div>TimeTablePage</div>
