@@ -59,7 +59,10 @@ const PreferenceGrid = (props: Props) => {
       setPreferences([...pref, ...props.value])
     } else
       setPreferences(getInitialPreferences)
-  }, [preferences, props.value])
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [props.value])
+
+  
 
   return (
 
