@@ -5,14 +5,16 @@ import type { ISubject } from '../../subject/types/Subject';
 import TeacherChip from '../../teacher/components/TeacherChip';
 import type { ITeacher } from '../../teacher/types/Teacher';
 import MenuButton from '../../../components/MenuButton';
-import { Edit as EditIcon, Visibility as VisibilityIcon } from '@mui/icons-material';
+import {  Edit as EditIcon,  Delete as DeleteIcon, Visibility as VisibilityIcon } from '@mui/icons-material';
 import type { IClass } from '../types/Class';
 import classList from '../constants/ClassList.default';
 
 interface Props {
     value: IClassSubject;
     onEdit?: () => void;
+    onDelete?: () => void;
     type: 'class' | 'teacher' | 'subject';
+
 }
 const ClassSubCard = (props: Props) => {
     const navigate = useNavigate();
@@ -49,6 +51,7 @@ const ClassSubCard = (props: Props) => {
                     menuItems={[
                         ...(props.onEdit ? [{ label: 'Edit', onClick: props.onEdit, icon: <EditIcon color='primary' sx={{ mt: .5 }} /> }] : []),
                         { label: 'View', onClick: () => navigate(props.type === 'class' ? `/subject/${(subject as ISubject)._id}` : `/class/${(_class as IClass)._id}`), icon: <VisibilityIcon color='primary' sx={{ mt: .5 }} /> },
+                        ...(props.onDelete ? [{ label: 'Delete', onClick: props.onDelete, icon: <DeleteIcon color='error' sx={{ mt: .5 }} /> }] : []),
                     ]} sx={{ float: 'right' }} />
             </CardContent>
 

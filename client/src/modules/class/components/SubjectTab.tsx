@@ -3,13 +3,13 @@ import { useState } from 'react'
 import { Add as AddIcon } from '@mui/icons-material';
 import AddClassSubjectDialog from './AddClassSubjectDialog';
 import type { IClassSubject } from '../types/ClassSubject';
-import { useGetClassSubjects } from '../hooks/useClassSubject';
+import { useDeleteClassSubject, useGetClassSubjects } from '../hooks/useClassSubject';
 import ClassSubCard from './ClassSubCard';
 import type { ISubject } from '../../subject/types/Subject';
 import type { ITeacher } from '../../teacher/types/Teacher';
 import AddSubjectDialog from '../../subject/components/AddSubjectDialog';
 import AddTeacherDialog from '../../teacher/components/AddTeacherDialog';
-import PreferenceGrid from './PreferenceGrid';
+import ConfirmationDialog from '../../../components/ConfirmationDialog';
 
 interface Props {
     classId: string;
@@ -18,6 +18,7 @@ interface Props {
 const SubjectTab = (props: Props) => {
     const { data: res, isLoading } = useGetClassSubjects(props.classId, 'class');
     const classSubjects = res?.data;
+    const { mutate: deleteClassSubject} = useDeleteClassSubject()
 
     const [openAddTeacher, setOpenAddTeacher] = useState(false);
     const [openAddSubject, setOpenAddSubject] = useState(false);
@@ -28,14 +29,10 @@ const SubjectTab = (props: Props) => {
         open: false,
         value: null,
     });
-    const [selectedSubjectPreference, setSelectedSubjectPreference] = useState<{
-        open: boolean
-        value: null | IClassSubject
-    }>({
-        open: false,
-        value: null,
-    });
-
+    const [confirmDelete, setConfirmDelete] = useState<null | IClassSubject>(null)
+    const handleDelete = (id: string) => {
+        deleteClassSubject(id);
+    }
 
     return (
         <>
@@ -69,8 +66,7 @@ const SubjectTab = (props: Props) => {
                                     onEdit={() => setOpenAddSubjects({
                                         value: { ...sub, subject: (sub.subject as ISubject)._id, teacher: (sub.teacher as ITeacher)._id }, open: true
                                     })}
-                                    onPreference={() => setSelectedSubjectPreference({open:true,value:sub})
-                                    }
+                                    onDelete={() => setConfirmDelete(sub)}
                                     type='class' />
 
                             </Grid>
@@ -109,6 +105,8 @@ const SubjectTab = (props: Props) => {
                 onAddSubject={() => setOpenAddSubject(true)}
 
             />
+            {confirmDelete && <ConfirmationDialog open={!!confirmDelete} onClose={() => setConfirmDelete(null)}
+                onConfirm={() => handleDelete(confirmDelete?._id ?? '')} title={`Are You sure want to Delete Class Subject ${(confirmDelete?.subject as ISubject).name}?`} />}
         </>
     )
 }

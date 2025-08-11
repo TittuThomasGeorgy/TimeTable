@@ -9,3 +9,5 @@ export const getClassSubjects = async (classId: string, type: 'class' | 'teacher
     getResponse<IClassSubject[]>(http.get(`/class_sub/${classId}`, { params: { type } }))
 export const updateClassSubject = async (data: IClassSubject) =>
     getResponse<IClassSubject>(http.patch(`/class_sub/${data._id}`, data))
+export const deleteClassSubject =  async (classSubId: string,) =>
+    getResponse<IClassSubject>(http.delete(`/class_sub/${classSubId}`))

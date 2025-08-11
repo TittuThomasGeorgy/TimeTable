@@ -59,7 +59,7 @@ export const getClassSubjects = async (req: Request, res: Response, next: NextFu
         const classSubjects = await ClassSubject.find(condition).populate(populateOptions);
 
         if (!classSubjects || classSubjects.length === 0) {
-            return sendApiResponse(res, 'NOT FOUND', [], 'No data found.');
+            return sendApiResponse(res, 'OK', [], 'No data found.');
         }
 
         const sortedData = classSubjects.map((subject) => subject.toObject()).sort((a, b) => {
@@ -119,6 +119,26 @@ export const updateClassSubject = async (req: Request, res: Response, next: Next
 
         sendApiResponse(res, 'OK', _updatedClass,
             `Class Subject updated successfully`);
+    } catch (error) {
+        next(error);
+    }
+}
+export const deleteClassSubject = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        const prevClass = await ClassSubject.findById(req.params.id)
+        // .populate('logo').populate('manager.img');
+        if (!prevClass) {
+            return sendApiResponse(res, 'NOT FOUND', null, 'Class Subject Not Found');
+        }
+
+
+        const updatedClass = await ClassSubject.findByIdAndDelete(req.params.id);
+        if (!updatedClass) {
+            return sendApiResponse(res, 'CONFLICT', null, 'Class Subject Not Deleted');
+        }
+
+        sendApiResponse(res, 'OK', updatedClass,
+            `Class Subject deleted successfully`);
     } catch (error) {
         next(error);
     }
