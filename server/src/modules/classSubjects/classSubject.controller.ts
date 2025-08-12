@@ -79,7 +79,7 @@ export const getClassSubjects = async (req: Request, res: Response, next: NextFu
                     return classDivComparison;
                 }
             }
-            if (type === 'teacher'||type=='class'&&(b.noOfHours - a.noOfHours==0)) {
+            if (type === 'teacher' || type == 'class' && (b.noOfHours - a.noOfHours == 0)) {
                 const subjectA = a.subject as ISubject;
                 const subjectB = b.subject as ISubject;
                 return subjectA.name.localeCompare(subjectB.name);
@@ -143,4 +143,45 @@ export const deleteClassSubject = async (req: Request, res: Response, next: Next
         next(error);
     }
 }
+export const importClassSubject = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        const { to, subjects }: {
+            to: string,
+            subjects: string[]
+        } = req.body;
 
+        const importedSubjects = await Promise.all(subjects.map(async (subId) => {
+            // Find the existing subject, convert to a plain object
+            const classSub = await ClassSubject.findById(subId).lean();
+
+            if (!classSub) {
+                // You might want to handle this case, e.g., throw an error
+                return null;
+            }
+
+            // Create a new ClassSubject with the new class ID
+            const newClassSub = new ClassSubject({
+                ...classSub,
+                _id: new mongoose.Types.ObjectId(), // Create a new ID
+                class: new mongoose.Types.ObjectId(to),
+                preferences: [], // Reset preferences
+            });
+
+            // Save the new document and return it
+            return await newClassSub.save();
+        }));
+
+        // Filter out any null values if a subject wasn't found
+        const successfulImports = importedSubjects.filter(sub => sub !== null);
+
+        // Send a single, consolidated response after all operations are complete
+        if (successfulImports.length === 0) {
+            return sendApiResponse(res, 'BAD REQUEST', null, 'No subjects were imported.');
+        }
+
+        sendApiResponse(res, 'CREATED', successfulImports, `Successfully added ${successfulImports.length} class subjects.`);
+
+    } catch (error) {
+        next(error);
+    }
+};

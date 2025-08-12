@@ -1,6 +1,6 @@
 import { Button, Grid, Typography } from '@mui/material'
 import { useState } from 'react'
-import { Add as AddIcon } from '@mui/icons-material';
+import { Add as AddIcon, Download as DownloadIcon } from '@mui/icons-material';
 import AddClassSubjectDialog from './AddClassSubjectDialog';
 import type { IClassSubject } from '../types/ClassSubject';
 import { useDeleteClassSubject, useGetClassSubjects } from '../hooks/useClassSubject';
@@ -10,6 +10,7 @@ import type { ITeacher } from '../../teacher/types/Teacher';
 import AddSubjectDialog from '../../subject/components/AddSubjectDialog';
 import AddTeacherDialog from '../../teacher/components/AddTeacherDialog';
 import ConfirmationDialog from '../../../components/ConfirmationDialog';
+import ImportClassSubjectDialog from './ImportClassSubjectDialog';
 
 interface Props {
     classId: string;
@@ -18,10 +19,11 @@ interface Props {
 const SubjectTab = (props: Props) => {
     const { data: res, isLoading } = useGetClassSubjects(props.classId, 'class');
     const classSubjects = res?.data;
-    const { mutate: deleteClassSubject} = useDeleteClassSubject()
+    const { mutate: deleteClassSubject } = useDeleteClassSubject()
 
     const [openAddTeacher, setOpenAddTeacher] = useState(false);
     const [openAddSubject, setOpenAddSubject] = useState(false);
+    const [importSubjects, setImportSubjects] = useState(false);
     const [openAddSubjects, setOpenAddSubjects] = useState<{
         open: boolean
         value: null | IClassSubject
@@ -37,10 +39,11 @@ const SubjectTab = (props: Props) => {
     return (
         <>
 
+
             <Button
                 variant="contained"
                 color="primary"
-                sx={{ textTransform: 'none', float: 'right', mt: .5 }}
+                sx={{ textTransform: 'none', float: 'right', }}
                 startIcon={<AddIcon />}
                 onClick={() => {
                     setOpenAddSubjects({
@@ -50,6 +53,18 @@ const SubjectTab = (props: Props) => {
                 }
             >                ADD
             </Button>
+            <Button
+                variant="contained"
+                color="primary"
+                sx={{ textTransform: 'none', float: 'right', mr: .5 }}
+                startIcon={<DownloadIcon />}
+                onClick={() => {
+                    setImportSubjects(true)
+                }
+                }
+            >                IMPORT
+            </Button>
+            <br />
             <br />
             <Grid container spacing={1}>
 
@@ -67,7 +82,8 @@ const SubjectTab = (props: Props) => {
                                         value: { ...sub, subject: (sub.subject as ISubject)._id, teacher: (sub.teacher as ITeacher)._id }, open: true
                                     })}
                                     onDelete={() => setConfirmDelete(sub)}
-                                    type='class' />
+                                    type='class' 
+                                    options/>
 
                             </Grid>
 
@@ -105,6 +121,11 @@ const SubjectTab = (props: Props) => {
                 onAddSubject={() => setOpenAddSubject(true)}
 
             />
+            <ImportClassSubjectDialog
+                classId={props.classId}
+                open={importSubjects}
+                onClose={()=>setImportSubjects(false)}
+               />
             {confirmDelete && <ConfirmationDialog open={!!confirmDelete} onClose={() => setConfirmDelete(null)}
                 onConfirm={() => handleDelete(confirmDelete?._id ?? '')} title={`Are You sure want to Delete Class Subject ${(confirmDelete?.subject as ISubject).name}?`} />}
         </>

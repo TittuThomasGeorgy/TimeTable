@@ -5,6 +5,7 @@ import { useNavigate } from 'react-router-dom';
 
 interface Props{
     value:ITeacher;
+    disableTeacherNavigate?:boolean
     
 }
 const TeacherChip = (props:Props) => {
@@ -13,7 +14,7 @@ const TeacherChip = (props:Props) => {
         <Chip avatar={<Avatar aria-label="" src={props.value?.image} sx={{ height: 30, width: 30 }} />}
             onClick={(e) => {
                 e.stopPropagation();
-                navigate(`/teacher/${props.value?._id}`)
+               if(!props.disableTeacherNavigate) navigate(`/teacher/${props.value?._id}`)
             }}
             label={<Typography variant="body1">{props.value?.name}</Typography>} />
     )

@@ -14,7 +14,10 @@ interface Props {
     onEdit?: () => void;
     onDelete?: () => void;
     type: 'class' | 'teacher' | 'subject';
-
+    options?:boolean;
+    onClick?: () => void;
+    isSelected?:boolean;
+    disableTeacherNavigate?:boolean;
 }
 const ClassSubCard = (props: Props) => {
     const navigate = useNavigate();
@@ -22,8 +25,10 @@ const ClassSubCard = (props: Props) => {
 
     return (
         <Card
+        onClick={props.onClick}
             sx={{
-                cursor: 'pointer',
+                cursor: props.onClick?'pointer':'default',
+                bgcolor:props.isSelected?'greenyellow':'initial',
                 borderRadius: 2,
                 boxShadow: 3,
                 transition: 'all 0.3s cubic-bezier(.25,.8,.25,1)',
@@ -42,17 +47,17 @@ const ClassSubCard = (props: Props) => {
                     </Typography>
                     {props.type == 'teacher' ? <Typography variant="body2" color="text.secondary">
                         {(subject as ISubject).code}
-                    </Typography> : <TeacherChip value={teacher as ITeacher} />}
+                    </Typography> : <TeacherChip value={teacher as ITeacher} disableTeacherNavigate={props.disableTeacherNavigate}/>}
                     <Typography variant="body2" color="text.secondary">
                         0 / {noOfHours}
                     </Typography>
                 </Stack>
-                <MenuButton
+                {props.options&&<MenuButton
                     menuItems={[
                         ...(props.onEdit ? [{ label: 'Edit', onClick: props.onEdit, icon: <EditIcon color='primary' sx={{ mt: .5 }} /> }] : []),
                         { label: 'View', onClick: () => navigate(props.type === 'class' ? `/subject/${(subject as ISubject)._id}` : `/class/${(_class as IClass)._id}`), icon: <VisibilityIcon color='primary' sx={{ mt: .5 }} /> },
                         ...(props.onDelete ? [{ label: 'Delete', onClick: props.onDelete, icon: <DeleteIcon color='error' sx={{ mt: .5 }} /> }] : []),
-                    ]} sx={{ float: 'right' }} />
+                    ]} sx={{ float: 'right' }} />}
             </CardContent>
 
 

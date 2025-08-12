@@ -131,7 +131,8 @@ const ViewTeacherPage = () => {
                                 size={{ xs: 6, md: 2 }}
 
                             >
-                                <ClassSubCard value={sub} key={index} type='teacher' />
+                                <ClassSubCard value={sub} key={index} type='teacher' 
+                                options/>
 
                             </Grid>
 

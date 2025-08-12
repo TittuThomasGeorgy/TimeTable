@@ -1,5 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { createClassSSubject, deleteClassSubject, getClassSubjects, updateClassSubject } from '../services/classSubject.api';
+import { createClassSSubject, deleteClassSubject, getClassSubjects, importClassSubject, updateClassSubject } from '../services/classSubject.api';
+import type { IImportFrom } from '../types/ImportFrom';
 
 
 export const useGetClassSubjects = (id: string, type: 'class' | 'teacher' | 'subject') => {
@@ -27,6 +28,16 @@ export const useUpdateClassSubject = () => {
 
   return useMutation({
     mutationFn: updateClassSubject,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['classSubjects'] });
+    },
+  });
+};
+export const useImportClassSubject = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (importFrom: IImportFrom) => importClassSubject(importFrom),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['classSubjects'] });
     },
