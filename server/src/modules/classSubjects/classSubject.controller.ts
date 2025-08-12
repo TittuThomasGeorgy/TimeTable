@@ -143,6 +143,14 @@ export const deleteClassSubject = async (req: Request, res: Response, next: Next
         next(error);
     }
 }
+const isSubExist = async (classId: string, subject: string, teacher: string) => {
+    const subRecord = await ClassSubject.findOne({
+        class: classId, subject: subject, teacher: teacher
+    });
+
+    return subRecord !== null;
+
+}
 export const importClassSubject = async (req: Request, res: Response, next: NextFunction) => {
     try {
         const { to, subjects }: {
@@ -150,6 +158,7 @@ export const importClassSubject = async (req: Request, res: Response, next: Next
             subjects: string[]
         } = req.body;
 
+        var alreadyExists: string[] = []
         const importedSubjects = await Promise.all(subjects.map(async (subId) => {
             // Find the existing subject, convert to a plain object
             const classSub = await ClassSubject.findById(subId).lean();
@@ -158,7 +167,10 @@ export const importClassSubject = async (req: Request, res: Response, next: Next
                 // You might want to handle this case, e.g., throw an error
                 return null;
             }
-
+            if (await isSubExist(to, classSub.subject.toString(), classSub.teacher.toString())) {
+                alreadyExists = [...alreadyExists, subId]
+                return null;
+            }
             // Create a new ClassSubject with the new class ID
             const newClassSub = new ClassSubject({
                 ...classSub,
@@ -166,9 +178,9 @@ export const importClassSubject = async (req: Request, res: Response, next: Next
                 class: new mongoose.Types.ObjectId(to),
                 preferences: [], // Reset preferences
             });
-
+            await newClassSub.save();
             // Save the new document and return it
-            return await newClassSub.save();
+            return newClassSub._id;
         }));
 
         // Filter out any null values if a subject wasn't found
@@ -179,7 +191,7 @@ export const importClassSubject = async (req: Request, res: Response, next: Next
             return sendApiResponse(res, 'BAD REQUEST', null, 'No subjects were imported.');
         }
 
-        sendApiResponse(res, 'CREATED', successfulImports, `Successfully added ${successfulImports.length} class subjects.`);
+        sendApiResponse(res, 'CREATED', { successfulImports, alreadyExists }, `Successfully added ${successfulImports.length} class subjects.`);
 
     } catch (error) {
         next(error);

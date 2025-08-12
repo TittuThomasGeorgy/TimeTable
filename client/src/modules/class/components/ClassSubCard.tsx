@@ -28,7 +28,7 @@ const ClassSubCard = (props: Props) => {
         onClick={props.onClick}
             sx={{
                 cursor: props.onClick?'pointer':'default',
-                bgcolor:props.isSelected?'greenyellow':'initial',
+                bgcolor:props.isSelected?'#A0E2D8':'initial',
                 borderRadius: 2,
                 boxShadow: 3,
                 transition: 'all 0.3s cubic-bezier(.25,.8,.25,1)',
