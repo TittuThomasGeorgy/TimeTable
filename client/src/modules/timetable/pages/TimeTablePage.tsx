@@ -60,7 +60,7 @@ const TimeTablePage = () => {
          
             <AddTimetableDialog open={open}
                 onClose={() => setOpen(false)}
-                onSubmit={function (value: ITimetable): void {
+                onSubmit={function (_: ITimetable): void {
                     throw new Error('Function not implemented.');
                 }}
             />

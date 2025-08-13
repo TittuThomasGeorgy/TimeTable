@@ -24,7 +24,6 @@ const ViewTimetablePage = () => {
         // If the ID is truly missing from the URL, you handle it here.
         return <div>Error: Subject ID not found in URL. Please check the URL.</div>;
     }
-    // eslint-disable-next-line react-hooks/rules-of-hooks
 
 
     return (

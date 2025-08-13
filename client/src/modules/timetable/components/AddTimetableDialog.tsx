@@ -1,7 +1,6 @@
-import { Dialog, DialogTitle, DialogContent, Container, Grid, TextField, DialogActions, Button, Autocomplete, Box, Avatar, Typography } from '@mui/material';
+import { Dialog, DialogTitle, DialogContent, Container, Grid, TextField, DialogActions, Button } from '@mui/material';
 // import { enqueueSnackbar } from 'notistack';
 import { useEffect, useState } from 'react'
-import { useGetTeachers } from '../../teacher/hooks/useTeacher';
 import { capitalize } from '../../../functions/capitalize';
 import { defTimetable } from '../constants/Timetable.default';
 import type { ITimetable } from '../types/Timetable';
