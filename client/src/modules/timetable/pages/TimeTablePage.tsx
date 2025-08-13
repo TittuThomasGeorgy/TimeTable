@@ -6,6 +6,7 @@ import AddTimetableDialog from '../components/AddTimetableDialog';
 import { useState } from 'react';
 import { useGetTimetables } from '../hooks/useTimetable';
 import type { ITimetable } from '../types/Timetable';
+import TimetableCard from '../components/TimetableCard';
 
 const TimeTablePage = () => {
     const [open, setOpen] = useState(false);
@@ -47,7 +48,7 @@ const TimeTablePage = () => {
                                 size={{ xs: 6, md: 2 }}
 
                             >
-                                {/* <TimetableCard value={_timetable} key={index} /> */}
+                                <TimetableCard value={_timetable} key={index} />
 
                             </Grid>
 
