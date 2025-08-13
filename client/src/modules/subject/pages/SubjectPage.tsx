@@ -60,8 +60,8 @@ const SubjectPage = () => {
             </Grid>
             <AddSubjectDialog open={open}
                 onClose={() => setOpen(false)}
-                onSubmit={function (value: ISubject): void {
-                    console.log(value);
+                onSubmit={function (value: ISubject): void { //TODO
+                    // console.log(value);
                 }}
             />
         </CommonPageLayout >

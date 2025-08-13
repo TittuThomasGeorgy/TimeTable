@@ -1,26 +1,27 @@
-import { Dialog, DialogTitle, DialogContent, Container, Grid, TextField, DialogActions, Button } from '@mui/material';
+import { Dialog, DialogTitle, DialogContent, Container, Grid, TextField, DialogActions, Button, Autocomplete, Box, Avatar, Typography } from '@mui/material';
 // import { enqueueSnackbar } from 'notistack';
 import { useEffect, useState } from 'react'
-import type { ISubject } from '../types/Subject';
-import { useCreateSubject, useUpdateSubject } from '../hooks/useSubject';
-import { defSubject } from '../constants/Subject.default';
+import { useGetTeachers } from '../../teacher/hooks/useTeacher';
 import { capitalize } from '../../../functions/capitalize';
+import { defTimetable } from '../constants/Timetable.default';
+import type { ITimetable } from '../types/Timetable';
+import { useCreateTimetable, useUpdateTimetable } from '../hooks/useTimetable';
 
 interface Props {
     open: boolean;
     onClose: () => void;
-    onSubmit: (value: ISubject) => void;
-    value?: ISubject
+    onSubmit: (value: ITimetable) => void;
+    value?: ITimetable
 }
 
-const AddSubjectDialog = (props: Props) => {
+const AddTimetableDialog = (props: Props) => {
     const isEdit = !!props.value;
-    const [form, setForm] = useState<ISubject>(defSubject);
-    const { mutate, isPending: isCreating } = useCreateSubject();
-    const { mutate: update, isPending: updating } = useUpdateSubject();
+    const [form, setForm] = useState<ITimetable>(defTimetable);
+    const { mutate, isPending: isCreating } = useCreateTimetable();
+    const { mutate: update, isPending: updating } = useUpdateTimetable();
 
     const handleClose = () => {
-        setForm(defSubject);
+        setForm(defTimetable);
         props.onClose();
     }
     const handleSubmit = () => {
@@ -37,7 +38,7 @@ const AddSubjectDialog = (props: Props) => {
         if (props.value)
             setForm(props.value)
         else
-            setForm(defSubject)
+            setForm(defTimetable)
     }, [props.value])
 
     return (
@@ -47,10 +48,10 @@ const AddSubjectDialog = (props: Props) => {
 
                 handleSubmit();
             }}>
-                <DialogTitle>{(isEdit ? 'Edit ' : 'Add ') + 'Subject'}</DialogTitle>
+                <DialogTitle>{(isEdit ? 'Edit ' : 'Add ') + 'Timetable'}</DialogTitle>
                 <DialogContent>
                     <Container>
-                        <Grid container spacing={1} sx={{mt:.5}}>
+                        <Grid container spacing={1} sx={{ mt: .5 }}>
 
                             <Grid size={{ xs: 12 }}>
                                 {/* &ensp; */}
@@ -64,19 +65,6 @@ const AddSubjectDialog = (props: Props) => {
                                     required
                                 />
                             </Grid>
-                            <Grid size={{ xs: 12 }}>
-                                {/* &ensp; */}
-                                <TextField
-                                    label="Code"
-                                    value={form.code}
-                                    onChange={(e) => {
-                                        setForm(_sub => ({ ..._sub, code: e.target.value }))
-                                    }}
-                                    fullWidth
-                                    required
-                                />
-                            </Grid>
-
                         </Grid>
                     </Container>
                 </DialogContent>
@@ -89,4 +77,4 @@ const AddSubjectDialog = (props: Props) => {
     )
 }
 
-export default AddSubjectDialog
+export default AddTimetableDialog
