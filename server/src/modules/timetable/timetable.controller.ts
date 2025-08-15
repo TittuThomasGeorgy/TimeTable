@@ -6,7 +6,8 @@ import { ITimetable } from "./timetable.types";
 
 export const createTimetable = async (req: Request, res: Response, next: NextFunction) => {
     try {
-        const newTimetable = new Timetable({ ...req.body, _id: new mongoose.Types.ObjectId });
+        const id=new mongoose.Types.ObjectId
+        const newTimetable = new Timetable({ ...req.body, _id: id });
         newTimetable.save();
         if (!newTimetable) {
             return sendApiResponse(res, 'CONFLICT', null, 'Timetable Not Created');
