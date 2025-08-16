@@ -3,12 +3,15 @@ import mongoose, { Types } from "mongoose";
 import sendApiResponse from "../../utils/sendApiResponse";
 import Timetable from "./timetable.model";
 import { ITimetable } from "./timetable.types";
+import { createPeriods } from "../period/period.controller";
+
 
 export const createTimetable = async (req: Request, res: Response, next: NextFunction) => {
     try {
-        const id=new mongoose.Types.ObjectId
+        const id = new mongoose.Types.ObjectId
         const newTimetable = new Timetable({ ...req.body, _id: id });
         newTimetable.save();
+        createPeriods(id, next)
         if (!newTimetable) {
             return sendApiResponse(res, 'CONFLICT', null, 'Timetable Not Created');
         }

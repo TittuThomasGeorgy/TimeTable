@@ -2,10 +2,10 @@ import { Schema, model } from 'mongoose';
 import { IPeriod } from './period.types';
 
 
-export const TimetableSchema = new Schema<IPeriod>({
+export const PeriodSchema = new Schema<IPeriod>({
     _id: { type: Schema.Types.ObjectId, required: true },
-    classId: { type: Schema.Types.ObjectId, required: true, ref: "classes" },
-    subject: { type: Schema.Types.ObjectId, required: true, ref: "subjects" },
+    timetableId:{ type: Schema.Types.ObjectId, required: true, ref: "timetables" },
+    classSubject: { type: Schema.Types.ObjectId, required: true, ref: "class_subjects" },
     day: {
         type: String,
         enum: ['MON', 'TUE', 'WED', 'THU', 'FRI'],
@@ -19,6 +19,6 @@ export const TimetableSchema = new Schema<IPeriod>({
 }, {
     timestamps: true,
 });
-const Timetable = model<IPeriod>('periods', TimetableSchema);
+const Period = model<IPeriod>('periods', PeriodSchema);
 
-export default Timetable;
+export default Period;

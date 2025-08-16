@@ -2,6 +2,7 @@ import { Types } from "mongoose";
 import { ISubject } from "../subject/subject.types";
 import { ITeacher } from "../teacher/teacher.types";
 import { IClass } from "../class/class.types";
+import { DayType, PeriodType } from "../period/period.types";
 
 export interface IClassSubject {
 
@@ -12,13 +13,11 @@ export interface IClassSubject {
     noOfHours: number;
     preferences:Preferences[];
 }
-type Day = 'MON' | 'TUE' | 'WED' | 'THU' | 'FRI';
-type Period = 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8;
 
 type PreferenceChoice = 0 | 1 | -1;
 
 export interface Preferences {
-    day: Day;
-    period: Period;
+    day: DayType;
+    period: PeriodType;
     preference: PreferenceChoice;
 };
