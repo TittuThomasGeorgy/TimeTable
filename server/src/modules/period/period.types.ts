@@ -8,6 +8,8 @@ export interface IPeriod {
     _id: Types.ObjectId;
     timetableId: Types.ObjectId;
     classSubject:Types.ObjectId;
+    class:Types.ObjectId;
+    teacher:Types.ObjectId;
     day: DayType;
     period: PeriodType;
 }

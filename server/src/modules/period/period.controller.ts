@@ -16,28 +16,7 @@ const shuffleClassSubjects = (classSubjects: IClassSubject[]) => {
     return classSubjects;
 };
 
-const isTeacherAvailable = async (timetableId: string | Types.ObjectId, teacherId: string | Types.ObjectId, day: DayType, period: PeriodType) => {
-    const data = await Period.findOne({
-        timetableId: timetableId,
-        day: day,
-        period: period,
-    }).populate({
-        path: 'classSubject',
-        match: { teacher: teacherId }
-    });
-    return data === null;
-};
-
-const isPeriodOnDay = async (timetableId: string | Types.ObjectId, classSub: string | Types.ObjectId, day: DayType) => {
-    const data = await Period.findOne({
-        timetableId: timetableId,
-        classSubject: classSub,
-        day: day,
-    });
-    return data !== null;
-};
-
-const nextAvailable = async (timetableId: string | Types.ObjectId, teacherId: string | Types.ObjectId, classSub: string | Types.ObjectId, startDay: DayType, startPeriod: PeriodType) => {
+const findAvailableSlot = async (timetableId: string | Types.ObjectId, teacherId: string | Types.ObjectId, classId: string | Types.ObjectId, classSubId: string | Types.ObjectId, startDay: DayType, startPeriod: PeriodType) => {
     const startDayIndex = _daysList.indexOf(startDay);
     const startPeriodIndex = _periodsList.indexOf(startPeriod);
 
@@ -48,23 +27,21 @@ const nextAvailable = async (timetableId: string | Types.ObjectId, teacherId: st
         for (let p = startP; p < _periodsList.length; p++) {
             const currentPeriod = _periodsList[p] as PeriodType;
 
-            const isSlotBooked = await Period.findOne({
+            // Check if slot is already occupied by any other class or teacher
+            const slotTaken = await Period.findOne({
                 timetableId: timetableId,
+                day: currentDay,
+                period: currentPeriod,
                 $or: [
-                    { day: currentDay, period: currentPeriod, classSubject: { $ne: classSub } }, // Check if slot is taken by another subject
-                    { day: currentDay, period: currentPeriod } // Check if slot is taken by any subject
+                    { class: classId }, // Check if class is busy
+                    { classSubject: { $ne: classSubId } }, // Check if slot is taken by another subject for this timetable
                 ]
             }).populate({
                 path: 'classSubject',
-                match: {
-                    $or: [
-                        { teacher: teacherId }, // Check if teacher is busy
-                        { _id: classSub } // Check if classSubject is already assigned to a period on this day
-                    ]
-                }
+                match: { teacher: teacherId } // Check if teacher is busy
             });
 
-            if (!isSlotBooked) {
+            if (!slotTaken) {
                 return { day: currentDay, period: currentPeriod };
             }
         }
@@ -74,28 +51,34 @@ const nextAvailable = async (timetableId: string | Types.ObjectId, teacherId: st
 
 export const createPeriods = async (timetableId: string | Types.ObjectId, next: NextFunction) => {
     try {
-        const _classSubjects: IClassSubject[] = await ClassSubject.find({}).populate('subject');
-        const classSubjects = shuffleClassSubjects(_classSubjects);
+        await Period.deleteMany({ timetableId }); // Start with a clean slate for the timetable
+        const classSubjects: IClassSubject[] = await ClassSubject.find({ timetableId }).populate('teacher').populate('class'); // Fetch all class subjects for the timetable
+        const shuffledSubjects = shuffleClassSubjects(classSubjects);
 
-        for (const clzSub of classSubjects) {
+        for (const clzSub of shuffledSubjects) {
             let hoursAssigned = 0;
 
             // 1. Assign preferred slots first
             if (clzSub.preferences && clzSub.preferences.length > 0) {
                 for (const pref of clzSub.preferences) {
                     if (pref.preference === 1 && hoursAssigned < clzSub.noOfHours) {
-                        const isAvailable = await isTeacherAvailable(timetableId, clzSub.teacher as Types.ObjectId, pref.day, pref.period);
-                        const isAlreadyAssigned = await isPeriodOnDay(timetableId, clzSub._id, pref.day);
-
-                        if (isAvailable && !isAlreadyAssigned) {
-                            const newPeriod = new Period({
-                                _id: new mongoose.Types.ObjectId(),
+                        const availableSlot = await findAvailableSlot(
+                            timetableId,
+                            clzSub.teacher as Types.ObjectId,
+                            clzSub.class as Types.ObjectId,
+                            clzSub._id,
+                            pref.day,
+                            pref.period
+                        );
+                        if (availableSlot) {
+                            await new Period({
                                 timetableId: timetableId,
                                 classSubject: clzSub._id,
-                                day: pref.day,
-                                period: pref.period,
-                            });
-                            await newPeriod.save();
+                                teacher: clzSub.teacher, // Add teacher ID for denormalized queries
+                                class: clzSub.class, // Add class ID for denormalized queries
+                                day: availableSlot.day,
+                                period: availableSlot.period,
+                            }).save();
                             hoursAssigned++;
                         }
                     }
@@ -107,26 +90,31 @@ export const createPeriods = async (timetableId: string | Types.ObjectId, next: 
             let lastPeriod = 1 as PeriodType;
 
             while (hoursAssigned < clzSub.noOfHours) {
-                const availability = await nextAvailable(timetableId, clzSub.teacher as Types.ObjectId, clzSub._id, lastDay, lastPeriod);
+                const availableSlot = await findAvailableSlot(
+                    timetableId,
+                    clzSub.teacher as Types.ObjectId,
+                    clzSub.class as Types.ObjectId,
+                    clzSub._id,
+                    lastDay,
+                    lastPeriod
+                );
 
-                if (!availability) {
-                    console.error(`Could not find a slot for subject ID: ${clzSub._id},${lastDay}, ${lastPeriod}`);
+                if (!availableSlot) {
+                    console.error(`Could not find a slot for subject ID: ${clzSub._id} and Class: ${clzSub.class}`);
                     break;
                 }
 
-                const newPeriod = new Period({
-                    _id: new mongoose.Types.ObjectId(),
+                await new Period({
                     timetableId: timetableId,
                     classSubject: clzSub._id,
-                    day: availability.day,
-                    period: availability.period,
-                });
-                await newPeriod.save();
+                    teacher: clzSub.teacher,
+                    class: clzSub.class,
+                    day: availableSlot.day,
+                    period: availableSlot.period,
+                }).save();
                 hoursAssigned++;
-
-                // Update the last checked slot for the next iteration
-                lastDay = availability.day;
-                lastPeriod = availability.period;
+                lastDay = availableSlot.day;
+                lastPeriod = availableSlot.period;
             }
         }
     } catch (error) {
