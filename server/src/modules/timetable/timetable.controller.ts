@@ -5,9 +5,17 @@ import Timetable from "./timetable.model";
 import { ITimetable } from "./timetable.types";
 import { createPeriods } from "../period/period.controller";
 
+const timetableNameExist = async (name: string) => {
+    const teacher = await Timetable.find({ name: name });
+    return teacher;
+}
 
 export const createTimetable = async (req: Request, res: Response, next: NextFunction) => {
     try {
+         const isNameExist = await timetableNameExist(req.body.name);
+        if (isNameExist.length > 0)
+            return sendApiResponse(res, 'CONFLICT', null,
+                `TimeTable Already Exist`);
         const id = new mongoose.Types.ObjectId
         const newTimetable = new Timetable({ ...req.body, _id: id });
         newTimetable.save();
