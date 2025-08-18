@@ -10,12 +10,12 @@ import {
   Paper,
 } from '@mui/material';
 import type { Day, Period, PreferenceChoice, Preferences } from '../types/Preferences';
-import { days, periods } from '../../timetable/constants/Day.default'
+import { daysList,  periodsList } from '../../timetable/constants/Day.default'
 import { Close,RadioButtonChecked } from '@mui/icons-material';
 
 const getInitialPreferences = (): Preferences[] =>
-  days.flatMap(day =>
-    periods.map(period => ({
+  daysList.flatMap(day =>
+    periodsList.map(period => ({
       day,
       period,
       preference: 0 as PreferenceChoice
@@ -71,7 +71,7 @@ const PreferenceGrid = (props: Props) => {
         <TableHead>
           <TableRow>
             <TableCell></TableCell>
-            {periods.map(period => (
+            {periodsList.map(period => (
               <TableCell key={period} align="center">
                 {period}
               </TableCell>
@@ -79,10 +79,10 @@ const PreferenceGrid = (props: Props) => {
           </TableRow>
         </TableHead>
         <TableBody>
-          {days.map(day => (
+          {daysList.map(day => (
             <TableRow key={day}>
               <TableCell>{day}</TableCell>
-              {periods.map(period => {
+              {periodsList.map(period => {
                 const current: Preferences = preferences.find(_preference => _preference.day === day && _preference.period == period) as Preferences;
                 return (
                   <TableCell

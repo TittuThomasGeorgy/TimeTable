@@ -19,7 +19,7 @@ export const createTimetable = async (req: Request, res: Response, next: NextFun
         const id = new mongoose.Types.ObjectId
         const newTimetable = new Timetable({ ...req.body, _id: id });
         newTimetable.save();
-        createPeriods(id, next)
+        await createPeriods(id)
         if (!newTimetable) {
             return sendApiResponse(res, 'CONFLICT', null, 'Timetable Not Created');
         }
