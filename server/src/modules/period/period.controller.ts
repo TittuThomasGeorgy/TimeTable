@@ -8,39 +8,63 @@ import { IClassSubject } from "../classSubjects/classSubject.types";
 import { IClass } from "../class/class.types";
 import Class from "../class/class.model";
 import { daysList, periodsList } from "./period.constants";
-const shuffleClassSubjects = (classSubjects: IClassSubject[]) => {
-    for (let i = classSubjects.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [classSubjects[i], classSubjects[j]] = [classSubjects[j], classSubjects[i]];
-    }
-    return classSubjects;
+// Sort subjects by noOfHours, with a random tie-breaker
+const sortClassSubjects = (classSubjects: IClassSubject[]) => {
+    return classSubjects.sort((a, b) => {
+        const hoursDiff = b.noOfHours - a.noOfHours;
+        if (hoursDiff !== 0) {
+            return hoursDiff;
+        }
+        return Math.random() - 0.5;
+    });
 };
 
-const findAvailableSlot = async (timetableId: string | Types.ObjectId, classSubject: IClassSubject, startDay: DayType, startPeriod: PeriodType) => {
+// Finds the first available slot for a given subject
+const findAvailableSlot = async (
+    timetableId: string | Types.ObjectId,
+    classSubject: IClassSubject,
+    startDay: DayType,
+    startPeriod: PeriodType,
+) => {
     const startDayIndex = daysList.indexOf(startDay);
     const startPeriodIndex = periodsList.indexOf(startPeriod);
 
     for (let d = startDayIndex; d < daysList.length; d++) {
         const currentDay = daysList[d] as DayType;
-        const startP = (d === startDayIndex) ? startPeriodIndex : 0;
+        const startP = d === startDayIndex ? startPeriodIndex : 0;
+
+        // Check if this subject has already been assigned on the current day
+        const isSubjectAssignedToday = await Period.findOne({
+            timetableId: timetableId,
+            day: currentDay,
+            classSubject: classSubject._id,
+        });
+
+        if (classSubject.noOfHours > 1 && isSubjectAssignedToday) {
+            continue;
+        }
 
         for (let p = startP; p < periodsList.length; p++) {
             const currentPeriod = periodsList[p] as PeriodType;
-
-            // Check for both teacher and class availability in one query
+            
+            // Check for conflicts with other subjects for the same class or teacher
             const slotTaken = await Period.findOne({
                 timetableId: timetableId,
                 day: currentDay,
                 period: currentPeriod,
                 $or: [
-                    { class: classSubject.class }, // Check if the class is busy
-                    { teacher: classSubject.teacher } // Check if the teacher is busy
+                    { class: classSubject.class },
+                    { teacher: classSubject.teacher },
                 ]
             });
+            
+            // Check if the slot is a "not preferred" one
             const preferred = classSubject.preferences.find(pref => {
-                pref.day === currentDay && pref.period === currentPeriod
+                return pref.day === currentDay && pref.period === currentPeriod;
             });
-            const isNotPreferred = preferred?.preference === -1
+
+            const isNotPreferred = preferred?.preference === -1;
+            
             if (!slotTaken && !isNotPreferred) {
                 return { day: currentDay, period: currentPeriod };
             }
@@ -49,28 +73,30 @@ const findAvailableSlot = async (timetableId: string | Types.ObjectId, classSubj
     return null;
 };
 
+
+// Main function to create the timetable
 export const createPeriods = async (timetableId: string | Types.ObjectId) => {
     try {
-        await Period.deleteMany({ timetableId }); // Start with a clean slate
+        await Period.deleteMany({ timetableId });
         const classes: IClass[] = await Class.find({});
 
         for (const clz of classes) {
-            const classSubjects: IClassSubject[] = await ClassSubject.find({ class: clz._id }).populate('teacher').populate('class');
-            const shuffledSubjects = shuffleClassSubjects(classSubjects);
+            const classSubjects: IClassSubject[] = await ClassSubject.find({ class: clz._id })
+                .populate('teacher')
+                .populate('class')
+                .populate('preferences');
 
-            // This will hold the total hours needed for the class
-            const totalHoursNeeded = shuffledSubjects.reduce((sum, subj) => sum + subj.noOfHours, 0);
-            let hoursAssignedForClass = 0;
+            const sortedSubjects = sortClassSubjects(classSubjects);
+            const assignedHoursMap = new Map<string, number>(sortedSubjects.map(s => [s._id.toString(), 0]));
+            const totalHoursNeeded = sortedSubjects.reduce((sum, subj) => sum + subj.noOfHours, 0);
 
-            // This map will track hours assigned per subject to handle multiple periods
-            const assignedHoursMap = new Map<string, number>(shuffledSubjects.map(s => [s._id.toString(), 0]));
-
-            // First, schedule all preferred slots for this class
-            for (const clzSub of shuffledSubjects) {
-                if (clzSub.preferences && clzSub.preferences.length > 0) {
-                    for (const pref of clzSub.preferences) {
-                        const assigned = assignedHoursMap.get(clzSub._id.toString()) || 0;
-                        if (pref.preference === 1 && assigned < clzSub.noOfHours) {
+            // Pass 1: Schedule all preferred slots (preference === 1)
+            for (const clzSub of sortedSubjects) {
+                for (const pref of clzSub.preferences) {
+                    if (pref.preference === 1) {
+                        const assignedCount = assignedHoursMap.get(clzSub._id.toString()) || 0;
+                        if (assignedCount < clzSub.noOfHours) {
+                            // Call findAvailableSlot, starting the search at the preferred slot
                             const availableSlot = await findAvailableSlot(
                                 timetableId,
                                 clzSub,
@@ -87,56 +113,52 @@ export const createPeriods = async (timetableId: string | Types.ObjectId) => {
                                     period: availableSlot.period,
                                     _id: new mongoose.Types.ObjectId()
                                 }).save();
-                                assignedHoursMap.set(clzSub._id.toString(), assigned + 1);
-                                hoursAssignedForClass++;
+                                assignedHoursMap.set(clzSub._id.toString(), assignedCount + 1);
                             }
                         }
                     }
                 }
             }
 
-            // Then, schedule the remaining slots for this class
-            let lastDay = 'MON' as DayType;
-            let lastPeriod = 1 as PeriodType;
-            let subjectIndex = 0;
-
+            // Pass 2: Schedule the remaining slots
+            let hoursAssignedForClass = Array.from(assignedHoursMap.values()).reduce((sum, val) => sum + val, 0);
             while (hoursAssignedForClass < totalHoursNeeded) {
-                const clzSub = shuffledSubjects[subjectIndex];
-                const assigned = assignedHoursMap.get(clzSub._id.toString()) || 0;
+                let assignedThisLoop = false;
+                for (const clzSub of sortedSubjects) {
+                    const assignedCount = assignedHoursMap.get(clzSub._id.toString()) || 0;
+                    
+                    if (assignedCount < clzSub.noOfHours) {
+                        const availableSlot = await findAvailableSlot(
+                            timetableId,
+                            clzSub,
+                            'MON',
+                            1
+                        );
 
-                if (assigned < clzSub.noOfHours) {
-                    const availableSlot = await findAvailableSlot(
-                        timetableId,
-                        clzSub,
-                        lastDay,
-                        lastPeriod
-                    );
+                        if (availableSlot) {
+                            await new Period({
+                                timetableId: timetableId,
+                                classSubject: clzSub._id,
+                                teacher: clzSub.teacher,
+                                class: clzSub.class,
+                                day: availableSlot.day,
+                                period: availableSlot.period,
+                                _id: new mongoose.Types.ObjectId()
+                            }).save();
 
-                    if (!availableSlot) {
-                        console.error(`Timetable generation failed for class ${clz._id}. No more slots available.`);
-                        break;
+                            assignedHoursMap.set(clzSub._id.toString(), assignedCount + 1);
+                            hoursAssignedForClass++;
+                            assignedThisLoop = true;
+                        }
                     }
-
-                    await new Period({
-                        timetableId: timetableId,
-                        classSubject: clzSub._id,
-                        teacher: clzSub.teacher,
-                        class: clzSub.class,
-                        day: availableSlot.day,
-                        period: availableSlot.period,
-                        _id: new mongoose.Types.ObjectId()
-                    }).save();
-                    assignedHoursMap.set(clzSub._id.toString(), assigned + 1);
-                    hoursAssignedForClass++;
-
-                    lastDay = availableSlot.day;
-                    lastPeriod = availableSlot.period;
                 }
-
-                // Move to the next subject in the shuffled list
-                subjectIndex = (subjectIndex + 1) % shuffledSubjects.length;
+                if (!assignedThisLoop && hoursAssignedForClass < totalHoursNeeded) {
+                     console.error(`Timetable generation failed for class ${clz.name}. Could not find slots for all subjects.`);
+                     break;
+                }
             }
         }
+        console.log("Timetable generation completed successfully.");
     } catch (error) {
         console.error("Error during timetable creation:", error);
     }
