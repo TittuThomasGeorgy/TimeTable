@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import CommonPageLayout from '../../../layouts/CommonPageLayout'
 import { useNavigate, useParams } from 'react-router-dom';
-import { Typography, Grid, Button, Divider, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from '@mui/material';
+import { Typography, Grid, Button, Divider, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Box } from '@mui/material';
 import { Close, Delete as DeleteIcon, Edit as EditIcon, RadioButtonChecked } from '@mui/icons-material';
 import { useDeleteTimetable, useGetTimetableById } from '../hooks/useTimetable';
 import AddTimetableDialog from '../components/AddTimetableDialog';
@@ -13,6 +13,10 @@ import type { Preferences } from '../../class/types/Preferences';
 import { daysList, periodsList } from '../constants/Day.default';
 import type { IPeriod } from '../types/Period';
 import ConfirmationDialog from '../../../components/ConfirmationDialog';
+import TimetableGrid from '../components/TimetableGrid';
+import { useGetTeachers } from '../../teacher/hooks/useTeacher';
+import { useGetSubjects } from '../../subject/hooks/useSubject';
+import { useGetAllClassSubjects } from '../../class/hooks/useClassSubject';
 
 const ViewTimetablePage = () => {
     const navigate = useNavigate();
@@ -21,16 +25,22 @@ const ViewTimetablePage = () => {
     const [open, setOpen] = useState(false);
 
     // Ensure id is present before making the API call
-    const { data: res, isLoading, isError, error } = useGetTimetableById(id || ''); // Pass an empty string if id is undefined to satisfy type, or handle in hook
-    const timetable = res?.data;
+    const { data: timetableRes, isLoading, isError, error } = useGetTimetableById(id || ''); // Pass an empty string if id is undefined to satisfy type, or handle in hook
     const { data: periodRes, isLoading: isPeriodsLoading } = useGetPeriods(id || ''); // Pass an empty string if id is undefined to satisfy type, or handle in hook
-    const periods = periodRes?.data;
-    const { data: clzRes, isLoading: isClassLoading } = useGetClasses();
-    const classes = clzRes?.data;
     const { mutate: deleteTimetable } = useDeleteTimetable()
+    const { data: clzRes, isLoading: isClassLoading } = useGetClasses();
+    const { data: teacherRes } = useGetTeachers();
+    const { data: subjectRes } = useGetSubjects();
+    const { data: classSubjectRes } = useGetAllClassSubjects();
+    const subjects = subjectRes?.data;
+    const teachers = teacherRes?.data;
+    const classSubects = classSubjectRes?.data;
+    const periods = periodRes?.data;
+    const classes = clzRes?.data;
+    const timetable = timetableRes?.data;
     const [confirmDelete, setConfirmDelete] = useState(false)
     const handleDelete = () => {
-        deleteTimetable(id??'');
+        deleteTimetable(id ?? '');
         navigate(-1)
     }
 
@@ -73,47 +83,17 @@ const ViewTimetablePage = () => {
             </Grid>
             <Divider /> <br />
             {
-                classes?.map(clz =>
-                    <>
+                classes?.map((clz, indx) =>
+                    <Box key={indx}>
                         <Typography variant="body1" color="initial"> {classList[clz.name]} {clz.div}
                         </Typography>
 
-                        <TableContainer component={Paper}>
-                            <Table>
-                                <TableHead>
-                                    <TableRow>
-                                        <TableCell></TableCell>
-                                        {periodsList.map(period => (
-                                            <TableCell key={period} align="center">
-                                                {period}
-                                            </TableCell>
-                                        ))}
-                                    </TableRow>
-                                </TableHead>
-                                <TableBody>
-                                    {daysList.map(day => (
-                                        <TableRow key={day}>
-                                            <TableCell>{day}</TableCell>
-                                            {periodsList.map(period => {
-                                                const _period: IPeriod | null = periods?.find(per => per.day === day && per.period === period && per.class === clz._id) ?? null
-                                                return (
-                                                    <TableCell
-                                                        align="center"
-                                                    >{
-                                                            _period?.classSubject.toString() ?? '-'
-                                                        }
-                                                    </TableCell>
-
-
-
-                                                )
-                                            })}
-                                        </TableRow>
-                                    ))}
-                                </TableBody>
-                            </Table>
-                        </TableContainer>
-                    </>
+                        <TimetableGrid
+                            periods={periods?.filter(period => period.class == clz._id) ?? []} 
+                            classSubjects={classSubects??[]} 
+                            teachers={teachers??[]} 
+                            subjects={subjects??[]}                             />
+                    </Box>
                 )
             }
             <AddTimetableDialog open={open} onClose={() => setOpen(false)}

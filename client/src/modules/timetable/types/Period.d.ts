@@ -8,7 +8,7 @@ type Period = 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8;
 export interface IPeriod {
     _id: string;
     timetableId: string;
-    classSubject: IClassSubject;
+    classSubject: string;
     class:string;
     teacher:string;
     day: Day;

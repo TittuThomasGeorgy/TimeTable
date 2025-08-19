@@ -30,6 +30,25 @@ export const createClassSubject = async (req: Request, res: Response, next: Next
         next(error);
     }
 }
+export const getAllClassSubjects = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+
+        const _data = await ClassSubject.find(
+            {})
+        // If your logo is being populated correctly, we need to handle it properly in the map function
+        const data: IClassSubject[] = _data.map((_class) => {
+
+            return {
+                ..._class.toObject(),  // Convert mongoose document to a plain object
+
+            };
+        });
+
+        sendApiResponse(res, 'OK', data, 'Successfully fetched list of ClassSubjects');
+    } catch (error) {
+        next(error);
+    }
+}
 
 export const getClassSubjects = async (req: Request, res: Response, next: NextFunction) => {
     try {

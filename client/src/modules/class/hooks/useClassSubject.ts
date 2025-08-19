@@ -1,8 +1,14 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { createClassSSubject, deleteClassSubject, getClassSubjects, importClassSubject, updateClassSubject } from '../services/classSubject.api';
+import { createClassSSubject, deleteClassSubject, getAllClassSubjects, getClassSubjects, importClassSubject, updateClassSubject } from '../services/classSubject.api';
 import type { IImportFrom } from '../types/ImportFrom';
 
-
+export const useGetAllClassSubjects = () => {
+  return useQuery({
+    queryKey: ['AllClassSubjects'],
+    queryFn: getAllClassSubjects,
+    staleTime: 5 * 60 * 1000, // Data considered fresh for 5 minutes (optional)
+  });
+};
 export const useGetClassSubjects = (id: string, type: 'class' | 'teacher' | 'subject') => {
   return useQuery({
     queryKey: ['classSubjects', id, type], // Include id in the queryKey to re-fetch when id changes
