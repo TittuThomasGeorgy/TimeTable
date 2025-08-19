@@ -16,29 +16,32 @@ const shuffleClassSubjects = (classSubjects: IClassSubject[]) => {
     return classSubjects;
 };
 
-const findAvailableSlot = async (timetableId: string | Types.ObjectId, teacherId: string | Types.ObjectId, classId: string | Types.ObjectId, startDay: DayType, startPeriod: PeriodType) => {
+const findAvailableSlot = async (timetableId: string | Types.ObjectId, classSubject: IClassSubject, startDay: DayType, startPeriod: PeriodType) => {
     const startDayIndex = daysList.indexOf(startDay);
     const startPeriodIndex = periodsList.indexOf(startPeriod);
-    
+
     for (let d = startDayIndex; d < daysList.length; d++) {
         const currentDay = daysList[d] as DayType;
         const startP = (d === startDayIndex) ? startPeriodIndex : 0;
-        
+
         for (let p = startP; p < periodsList.length; p++) {
             const currentPeriod = periodsList[p] as PeriodType;
-            
+
             // Check for both teacher and class availability in one query
             const slotTaken = await Period.findOne({
                 timetableId: timetableId,
                 day: currentDay,
                 period: currentPeriod,
                 $or: [
-                    { class: classId }, // Check if the class is busy
-                    { teacher: teacherId } // Check if the teacher is busy
+                    { class: classSubject.class }, // Check if the class is busy
+                    { teacher: classSubject.teacher } // Check if the teacher is busy
                 ]
             });
-
-            if (!slotTaken) {
+            const preferred = classSubject.preferences.find(pref => {
+                pref.day === currentDay && pref.period === currentPeriod
+            });
+            const isNotPreferred = preferred?.preference === -1
+            if (!slotTaken && !isNotPreferred) {
                 return { day: currentDay, period: currentPeriod };
             }
         }
@@ -54,7 +57,7 @@ export const createPeriods = async (timetableId: string | Types.ObjectId) => {
         for (const clz of classes) {
             const classSubjects: IClassSubject[] = await ClassSubject.find({ class: clz._id }).populate('teacher').populate('class');
             const shuffledSubjects = shuffleClassSubjects(classSubjects);
-            
+
             // This will hold the total hours needed for the class
             const totalHoursNeeded = shuffledSubjects.reduce((sum, subj) => sum + subj.noOfHours, 0);
             let hoursAssignedForClass = 0;
@@ -70,8 +73,7 @@ export const createPeriods = async (timetableId: string | Types.ObjectId) => {
                         if (pref.preference === 1 && assigned < clzSub.noOfHours) {
                             const availableSlot = await findAvailableSlot(
                                 timetableId,
-                                clzSub.teacher as Types.ObjectId,
-                                clzSub.class as Types.ObjectId,
+                                clzSub,
                                 pref.day,
                                 pref.period
                             );
@@ -105,8 +107,7 @@ export const createPeriods = async (timetableId: string | Types.ObjectId) => {
                 if (assigned < clzSub.noOfHours) {
                     const availableSlot = await findAvailableSlot(
                         timetableId,
-                        clzSub.teacher as Types.ObjectId,
-                        clzSub.class as Types.ObjectId,
+                        clzSub,
                         lastDay,
                         lastPeriod
                     );
@@ -131,7 +132,7 @@ export const createPeriods = async (timetableId: string | Types.ObjectId) => {
                     lastDay = availableSlot.day;
                     lastPeriod = availableSlot.period;
                 }
-                
+
                 // Move to the next subject in the shuffled list
                 subjectIndex = (subjectIndex + 1) % shuffledSubjects.length;
             }
