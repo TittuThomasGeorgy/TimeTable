@@ -144,8 +144,6 @@ export const createPeriods = async (timetableId: string | Types.ObjectId) => {
 
 export const getPeriods = async (req: Request, res: Response, next: NextFunction) => {
     try {
-        console.log(req.query.timetableId);
-
 
         const _data = await Period.find({ timetableId: req.query.timetableId })
 

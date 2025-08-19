@@ -1,5 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { getTimetables, getTimetableById, createTimetable, updateTimetable } from '../services/timetable.api';
+import { getTimetables, getTimetableById, createTimetable, updateTimetable, deleteTimetable } from '../services/timetable.api';
 
 
 export const useGetTimetables = () => {
@@ -38,5 +38,17 @@ export const useUpdateTimetable = () => {
             queryClient.invalidateQueries({ queryKey: ['Timetables'] });
 
         },
+    });
+};
+export const useDeleteTimetable = () => {
+    const queryClient = useQueryClient();
+
+    return useMutation({
+        mutationFn: (id: string) => deleteTimetable(id),
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ['ViewTimetable'] });
+            queryClient.invalidateQueries({ queryKey: ['Timetables'] });
+        },
+
     });
 };

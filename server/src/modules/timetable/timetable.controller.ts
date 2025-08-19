@@ -4,6 +4,7 @@ import sendApiResponse from "../../utils/sendApiResponse";
 import Timetable from "./timetable.model";
 import { ITimetable } from "./timetable.types";
 import { createPeriods } from "../period/period.controller";
+import Period from "../period/period.model";
 
 const timetableNameExist = async (name: string) => {
     const teacher = await Timetable.find({ name: name });
@@ -120,3 +121,24 @@ export const updateTimetable = async (req: Request, res: Response, next: NextFun
     }
 }
 
+export const deleteTimetable = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        const prevClass = await Timetable.findById(req.params.id)
+        // .populate('logo').populate('manager.img');
+        if (!prevClass) {
+            return sendApiResponse(res, 'NOT FOUND', null, 'Timetable Not Found');
+        }
+
+
+        const updatedClass = await Timetable.findByIdAndDelete(req.params.id);
+        if (!updatedClass) {
+            return sendApiResponse(res, 'CONFLICT', null, 'Timetable Not Deleted');
+        }
+        await Period.deleteMany({timetableId:req.params.id})
+
+        sendApiResponse(res, 'OK', updatedClass,
+            `Class Subject deleted successfully`);
+    } catch (error) {
+        next(error);
+    }
+}

@@ -11,3 +11,5 @@ export const getTimetableById = async (id: string) =>
     getResponse<ITimetable>(http.get(`/timetable/${id}`))
 export const updateTimetable = async (data: ITimetable) =>
     getResponse<ITimetable>(http.patch(`/timetable/${data._id}`, data))
+export const deleteTimetable = async (id: string,) =>
+    getResponse<ITimetable>(http.delete(`/timetable/${id}`))

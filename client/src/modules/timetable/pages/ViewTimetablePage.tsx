@@ -1,20 +1,21 @@
 import { useState } from 'react'
 import CommonPageLayout from '../../../layouts/CommonPageLayout'
-import { useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { Typography, Grid, Button, Divider, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from '@mui/material';
 import { Close, Delete as DeleteIcon, Edit as EditIcon, RadioButtonChecked } from '@mui/icons-material';
-import { useGetTimetableById } from '../hooks/useTimetable';
+import { useDeleteTimetable, useGetTimetableById } from '../hooks/useTimetable';
 import AddTimetableDialog from '../components/AddTimetableDialog';
 import type { ITimetable } from '../types/Timetable';
 import { useGetPeriods } from '../hooks/usePeriods';
 import { useGetClasses } from '../../class/hooks/useClass';
 import classList from '../../class/constants/ClassList.default';
 import type { Preferences } from '../../class/types/Preferences';
-import {  daysList, periodsList } from '../constants/Day.default';
+import { daysList, periodsList } from '../constants/Day.default';
 import type { IPeriod } from '../types/Period';
+import ConfirmationDialog from '../../../components/ConfirmationDialog';
 
 const ViewTimetablePage = () => {
-    // const navigate = useNavigate();
+    const navigate = useNavigate();
 
     const { id } = useParams<{ id: string }>(); // Specify the type for useParams
     const [open, setOpen] = useState(false);
@@ -26,6 +27,12 @@ const ViewTimetablePage = () => {
     const periods = periodRes?.data;
     const { data: clzRes, isLoading: isClassLoading } = useGetClasses();
     const classes = clzRes?.data;
+    const { mutate: deleteTimetable } = useDeleteTimetable()
+    const [confirmDelete, setConfirmDelete] = useState(false)
+    const handleDelete = () => {
+        deleteTimetable(id??'');
+        navigate(-1)
+    }
 
     // 3. Now, use the values from the hooks in your conditional rendering
     if (!id) {
@@ -59,7 +66,7 @@ const ViewTimetablePage = () => {
                     <Button variant="outlined" color="primary" onClick={() => setOpen(true)} startIcon={<EditIcon />}>
                         Edit
                     </Button>
-                    <Button variant="outlined" color="error" onClick={() => console.log('Delete clicked')} startIcon={<DeleteIcon />}>
+                    <Button variant="outlined" color="error" onClick={() => setConfirmDelete(true)} startIcon={<DeleteIcon />}>
                         Delete
                     </Button>
                 </Grid>
@@ -88,13 +95,13 @@ const ViewTimetablePage = () => {
                                         <TableRow key={day}>
                                             <TableCell>{day}</TableCell>
                                             {periodsList.map(period => {
-                                                const _period: IPeriod|null = periods?.find(per => per.day === day && per.period === period && per.class===clz._id)??null
+                                                const _period: IPeriod | null = periods?.find(per => per.day === day && per.period === period && per.class === clz._id) ?? null
                                                 return (
                                                     <TableCell
                                                         align="center"
                                                     >{
-                                                        _period?.classSubject.toString()??'-'
-                                                    }
+                                                            _period?.classSubject.toString() ?? '-'
+                                                        }
                                                     </TableCell>
 
 
@@ -116,6 +123,8 @@ const ViewTimetablePage = () => {
 
                 }}
             />
+            {confirmDelete && <ConfirmationDialog open={confirmDelete} onClose={() => setConfirmDelete(false)}
+                onConfirm={() => handleDelete()} title={`Are You sure want to Delete timetable ${timetable?.name}?`} />}
 
 
         </CommonPageLayout >
