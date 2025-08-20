@@ -10,8 +10,8 @@ import {
   Paper,
 } from '@mui/material';
 import type { Day, Period, PreferenceChoice, Preferences } from '../types/Preferences';
-import { daysList,  periodsList } from '../../timetable/constants/Day.default'
-import { Close,RadioButtonChecked } from '@mui/icons-material';
+import { daysList, periodsList } from '../../timetable/constants/Day.default'
+import { Close, RadioButtonChecked } from '@mui/icons-material';
 
 const getInitialPreferences = (): Preferences[] =>
   daysList.flatMap(day =>
@@ -53,16 +53,23 @@ const PreferenceGrid = (props: Props) => {
   };
 
 
-  useEffect(() => {
-    if (props.value) {
-      const pref = preferences.filter(pref => props.value.find(val => val.day === pref.day && val.period == pref.period) == null)
-      setPreferences([...pref, ...props.value])
-    } else
-      setPreferences(getInitialPreferences)
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [props.value])
+useEffect(() => {
+  if (props.value) {
+    const newPreferences = getInitialPreferences(); // Start with a fresh, initial state
+    const updatedPreferences = newPreferences.map(pref => {
+      const matchingPref = props.value.find(p => p.day === pref.day && p.period === pref.period);
+      if (matchingPref) {
+        return { ...pref, preference: matchingPref.preference };
+      }
+      return pref;
+    });
+    setPreferences(updatedPreferences);
+  } else {
+    setPreferences(getInitialPreferences());
+  }
+}, [props.value]);
 
-  
+
 
   return (
 
@@ -97,7 +104,7 @@ const PreferenceGrid = (props: Props) => {
                     }}
                   >
                     {current.preference == 0 ? '' :
-                      current.preference == 1 ? <RadioButtonChecked/> : <Close/>}
+                      current.preference == 1 ? <RadioButtonChecked /> : <Close />}
                   </TableCell>
                 )
               })}

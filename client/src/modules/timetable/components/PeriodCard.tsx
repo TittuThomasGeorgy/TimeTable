@@ -3,13 +3,18 @@ import React from 'react'
 interface Props {
     teacher: string;
     subject: string;
-    // class:string
+    // class:string;
+    onClick: () => void;
+    selected: boolean;
+
 }
 const PeriodCard = (props: Props) => {
 
     return (
         <Box
+            onClick={props.onClick}
             sx={{
+                bgcolor:props.selected?'#A0E2D8':'initial',
 
                 borderRadius: 2,
                 boxShadow: 3,

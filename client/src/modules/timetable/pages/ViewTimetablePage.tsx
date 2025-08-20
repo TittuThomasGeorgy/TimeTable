@@ -17,6 +17,9 @@ import TimetableGrid from '../components/TimetableGrid';
 import { useGetTeachers } from '../../teacher/hooks/useTeacher';
 import { useGetSubjects } from '../../subject/hooks/useSubject';
 import { useGetAllClassSubjects } from '../../class/hooks/useClassSubject';
+import RemarkDialog from '../components/RemarkDialog';
+import type { IClassSubject } from '../../class/types/ClassSubject';
+import { useGetRemarks } from '../hooks/useRemarks';
 
 const ViewTimetablePage = () => {
     const navigate = useNavigate();
@@ -32,13 +35,19 @@ const ViewTimetablePage = () => {
     const { data: teacherRes } = useGetTeachers();
     const { data: subjectRes } = useGetSubjects();
     const { data: classSubjectRes } = useGetAllClassSubjects();
+    const { data: remarksRes } = useGetRemarks(id || '');
     const subjects = subjectRes?.data;
     const teachers = teacherRes?.data;
-    const classSubects = classSubjectRes?.data;
+    const classSubjects = classSubjectRes?.data;
     const periods = periodRes?.data;
     const classes = clzRes?.data;
     const timetable = timetableRes?.data;
+    const remarks = remarksRes?.data;
+
     const [confirmDelete, setConfirmDelete] = useState(false)
+    const [selectedSubject, setSelectedSubject] = useState<IClassSubject | null>(null)
+
+
     const handleDelete = () => {
         deleteTimetable(id ?? '');
         navigate(-1)
@@ -89,13 +98,30 @@ const ViewTimetablePage = () => {
                         </Typography>
 
                         <TimetableGrid
-                            periods={periods?.filter(period => period.class == clz._id) ?? []} 
-                            classSubjects={classSubects??[]} 
-                            teachers={teachers??[]} 
-                            subjects={subjects??[]}                             />
+                            periods={periods?.filter(period => period.class == clz._id) ?? []}
+                            classSubjects={classSubjects ?? []}
+                            teachers={teachers ?? []}
+                            subjects={subjects ?? []}
+                            selectedClassSubject={selectedSubject?._id ?? ''}
+                            onSelectClassSubject={(selected) => setSelectedSubject(classSubjects?.find(clzSub => clzSub._id === selected) ?? null)} />
                     </Box>
                 )
             }
+            {selectedSubject && (() => {
+                const sub = subjects?.find(s => s._id === selectedSubject.subject);
+                const teacher = teachers?.find(s => s._id === selectedSubject.teacher);
+                const noOfHours = periods?.filter(per => per.classSubject == selectedSubject._id).length;
+                const _remarks = remarks?.filter(rem => rem.classSubject == selectedSubject._id) ?? []
+                return (
+                    sub && teacher && <RemarkDialog
+                        subject={sub}
+                        teacher={teacher}
+                        noOfHours={noOfHours ?? 0}
+                        totalNoOfHours={selectedSubject.noOfHours}
+                        remarks={_remarks}
+                    />
+                );
+            })()}
             <AddTimetableDialog open={open} onClose={() => setOpen(false)}
                 value={timetable}
                 onSubmit={function (value: ITimetable): void {

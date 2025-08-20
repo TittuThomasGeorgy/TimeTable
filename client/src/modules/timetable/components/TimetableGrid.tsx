@@ -1,5 +1,5 @@
 import { TableContainer, Paper, Table, TableHead, TableRow, TableCell, TableBody, Typography } from '@mui/material'
-import React from 'react'
+import React, { useState } from 'react'
 import { periodsList, daysList } from '../constants/Day.default'
 import type { IPeriod } from '../types/Period'
 import type { IClassSubject } from '../../class/types/ClassSubject';
@@ -12,9 +12,12 @@ interface Props {
     classSubjects: IClassSubject[];
     teachers: ITeacher[];
     subjects: ISubject[];
+    selectedClassSubject:string;
+    onSelectClassSubject:(selectedSub:string)=>void;
 
 }
 const TimetableGrid = (props: Props) => {
+
     const getClassSub = (id: string) => {
         const classSub = props.classSubjects?.find(clzSub => clzSub._id == id);
 
@@ -60,7 +63,7 @@ const TimetableGrid = (props: Props) => {
                                         align="center"
                                     >{
                                             _period?.classSubject ?
-                                                <PeriodCard subject={getSubjectCode(_period?.classSubject)} teacher={getTeacherCode(_period?.classSubject)} /> : '-'
+                                                <PeriodCard subject={getSubjectCode(_period?.classSubject)} teacher={getTeacherCode(_period?.classSubject)} onClick={()=>props.onSelectClassSubject(_period.classSubject)} selected={_period.classSubject==props.selectedClassSubject}/> : '-'
                                         }
                                     </TableCell>
 
