@@ -21,10 +21,10 @@ const findBestSubjectForSlot = (
     // Filter for subjects that still need hours and haven't been assigned today.
     const suitableSubjects = classSubjects.filter(sub => {
         const assignedCount = assignedHoursMap.get(sub._id.toString()) || 0;
-        
+
         // Exclude subjects that have been assigned on the current day if they need more than one hour.
-        const isAssignedToday = assignedSubjectsToday.has(sub._id.toString());
-        if (sub.noOfHours > 1 && isAssignedToday) {
+        const isAssignedToday = assignedSubjectsToday.has(`${day}-${sub._id.toString()}`);
+        if (sub.noOfHours <= 5 && isAssignedToday) {
             return false;
         }
 
@@ -32,6 +32,10 @@ const findBestSubjectForSlot = (
             return false;
         }
         return true;
+    }).sort((a, b) => {
+        const remainingCountA = a.noOfHours - (assignedHoursMap.get(a._id.toString()) || 0);
+        const remainingCountB = b.noOfHours - (assignedHoursMap.get(b._id.toString()) || 0);
+        return remainingCountB - remainingCountA
     });
 
     // If no suitable subjects, return null.
@@ -39,8 +43,17 @@ const findBestSubjectForSlot = (
         return null;
     }
 
-    // Return a random suitable subject from the filtered list.
-    return suitableSubjects[Math.floor(Math.random() * suitableSubjects.length)];
+    // Find the subject with the most remaining hours (the first element after sorting).
+    const maxRemainingHours = suitableSubjects[0].noOfHours - (assignedHoursMap.get(suitableSubjects[0]._id.toString()) || 0);
+
+    // Filter for all subjects that have this maximum number of remaining hours.
+    const topSubjects = suitableSubjects.filter(sub => {
+        const remainingHours = sub.noOfHours - (assignedHoursMap.get(sub._id.toString()) || 0);
+        return remainingHours === maxRemainingHours;
+    });
+
+    // Return a random subject from the top-tier subjects.
+    return topSubjects[Math.floor(Math.random() * topSubjects.length)];
 };
 
 /**
@@ -57,8 +70,7 @@ export const createPeriods = async (timetableId: string | Types.ObjectId) => {
             const classSubjects: IClassSubject[] = await ClassSubject.find({ class: clz._id })
                 .populate('teacher')
                 .populate('class')
-                .populate('subject')
-                .populate('preferences');
+                .populate('subject');
 
             const assignedHoursMap = new Map<string, number>(
                 classSubjects.map(s => [s._id.toString(), 0])
@@ -67,23 +79,22 @@ export const createPeriods = async (timetableId: string | Types.ObjectId) => {
             // In-memory conflict trackers to avoid repeated DB queries.
             const timetableSlots = new Set<string>(); // Tracks occupied slots: 'Monday-1'
             const teacherAssignments = new Map<string, string>(); // Tracks teacher assignments: 'Monday-1-teacherId'
-            
-            // 1. Assign all preferred slots first.
+
+            const dayAssignments = new Set<string>();
             for (const clzSub of classSubjects) {
                 const assignedCount = assignedHoursMap.get(clzSub._id.toString()) || 0;
                 // Track which subjects have been assigned today to enforce the once-per-day rule.
-                const hasBeenAssignedToday = new Set<string>();
 
                 for (const pref of clzSub.preferences) {
                     if (pref.preference === 1) {
                         const slotKey = `${pref.day}-${pref.period}`;
                         const teacherId = clzSub.teacher._id.toString();
-                        
+
                         // Check for all conflicts before assigning.
                         if (
-                            !timetableSlots.has(slotKey) && 
+                            !timetableSlots.has(slotKey) &&
                             !teacherAssignments.has(`${slotKey}-${teacherId}`) &&
-                            !hasBeenAssignedToday.has(clzSub._id.toString()) &&
+                            !dayAssignments.has(`${pref.day}-${clzSub._id}`) &&
                             assignedCount < clzSub.noOfHours
                         ) {
                             await new Period({
@@ -99,25 +110,24 @@ export const createPeriods = async (timetableId: string | Types.ObjectId) => {
                             timetableSlots.add(slotKey);
                             teacherAssignments.set(`${slotKey}-${teacherId}`, teacherId);
                             assignedHoursMap.set(clzSub._id.toString(), (assignedCount || 0) + 1);
-                            hasBeenAssignedToday.add(clzSub._id.toString());
+                            dayAssignments.add(`${pref.day}-${clzSub._id}`);
                             createRemark(timetableId, clzSub._id, `Assigned preferred slot at ${pref.day} ${pref.period}.`, 1);
                         }
                     }
                 }
             }
-            
+
             // 2. Fill remaining slots with non-preferred subjects.
             for (const day of daysList) {
                 // A new set for each day to reset the "once-per-day" check.
-                const assignedSubjectsToday = new Set<string>();
                 for (const period of periodsList) {
                     const slotKey = `${day}-${period}`;
                     if (timetableSlots.has(slotKey)) {
                         continue;
                     }
 
-                    let bestSubject = findBestSubjectForSlot(classSubjects, assignedHoursMap, day, assignedSubjectsToday);
-                    
+                    let bestSubject = findBestSubjectForSlot(classSubjects, assignedHoursMap, day, dayAssignments);
+
                     if (bestSubject) {
                         const teacherId = bestSubject.teacher._id.toString();
                         const hasTeacherConflict = teacherAssignments.has(`${slotKey}-${teacherId}`);
@@ -136,7 +146,8 @@ export const createPeriods = async (timetableId: string | Types.ObjectId) => {
                             assignedHoursMap.set(bestSubject._id.toString(), (assignedHoursMap.get(bestSubject._id.toString()) || 0) + 1);
                             timetableSlots.add(slotKey);
                             teacherAssignments.set(`${slotKey}-${teacherId}`, teacherId);
-                            assignedSubjectsToday.add(bestSubject._id.toString());
+                            dayAssignments.add(`${day}-${bestSubject._id}`);
+
                             createRemark(timetableId, bestSubject._id, `Assigned to slot ${day} ${period}.`, 1);
                         } else {
                             // Teacher conflict found; move to the next period.
@@ -155,6 +166,7 @@ export const createPeriods = async (timetableId: string | Types.ObjectId) => {
         throw new Error(errorMessage);
     }
 };
+
 export const getPeriods = async (req: Request, res: Response, next: NextFunction) => {
     try {
 
