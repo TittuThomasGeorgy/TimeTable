@@ -1,5 +1,5 @@
 import { Box, Typography } from '@mui/material';
-import React from 'react'
+
 interface Props {
     teacher: string;
     subject: string;
@@ -14,10 +14,9 @@ const PeriodCard = (props: Props) => {
         <Box
             onClick={props.onClick}
             sx={{
-                bgcolor:props.selected?'#A0E2D8':'initial',
-
+                bgcolor: props.selected ? '#A0E2D8' : 'initial',
                 borderRadius: 2,
-                boxShadow: 3,
+                // boxShadow: 3,
                 transition: 'all 0.3s cubic-bezier(.25,.8,.25,1)',
                 '&:hover': {
                     boxShadow: 6,

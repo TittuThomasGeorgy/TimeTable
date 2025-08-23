@@ -91,6 +91,7 @@ const ViewTimetablePage = () => {
                 </Grid>
             </Grid>
             <Divider /> <br />
+            
             {
                 classes?.map((clz, indx) =>
                     <Box key={indx}>
