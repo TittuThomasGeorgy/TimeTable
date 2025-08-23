@@ -12,8 +12,8 @@ interface Props {
     classSubjects: IClassSubject[];
     teachers: ITeacher[];
     subjects: ISubject[];
-    selectedClassSubject:string;
-    onSelectClassSubject:(selectedSub:string)=>void;
+    selectedClassSubject: string;
+    onSelectClassSubject: (selectedSub: string) => void;
 
 }
 const TimetableGrid = (props: Props) => {
@@ -21,7 +21,7 @@ const TimetableGrid = (props: Props) => {
     const getClassSub = (id: string) => {
         const classSub = props.classSubjects?.find(clzSub => clzSub._id == id);
 
-        console.log(classSub,'l');
+        console.log(classSub, 'l');
         return classSub ?? null
     }
     const getSubjectCode = (id: string) => {
@@ -40,7 +40,11 @@ const TimetableGrid = (props: Props) => {
         return teacher?.code ?? ''
     }
     return (
-        <TableContainer component={Paper}>
+        <TableContainer component={Paper}
+            sx={{
+                width: props.selectedClassSubject ? '75%' : '100%',
+
+            }}>
             <Table>
                 <TableHead>
                     <TableRow>
@@ -61,9 +65,14 @@ const TimetableGrid = (props: Props) => {
                                 return (
                                     <TableCell
                                         align="center"
+                                        sx={{
+                                            cursor: _period?.classSubject ? 'pointer' : 'default',
+                                            bgcolor: _period?.classSubject === props.selectedClassSubject ? '#A0E2D8' : 'inherit',
+                                            transition: 'background-color 0.3s ease'
+                                        }}
                                     >{
                                             _period?.classSubject ?
-                                                <PeriodCard subject={getSubjectCode(_period?.classSubject)} teacher={getTeacherCode(_period?.classSubject)} onClick={()=>props.onSelectClassSubject(_period.classSubject)} selected={_period.classSubject==props.selectedClassSubject}/> : '-'
+                                                <PeriodCard subject={getSubjectCode(_period?.classSubject)} teacher={getTeacherCode(_period?.classSubject)} onClick={() => props.onSelectClassSubject(_period.classSubject)} selected={_period.classSubject == props.selectedClassSubject} /> : '-'
                                         }
                                     </TableCell>
 

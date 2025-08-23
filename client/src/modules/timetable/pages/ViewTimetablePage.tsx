@@ -20,6 +20,7 @@ import { useGetAllClassSubjects } from '../../class/hooks/useClassSubject';
 import RemarkDialog from '../components/RemarkDialog';
 import type { IClassSubject } from '../../class/types/ClassSubject';
 import { useGetRemarks } from '../hooks/useRemarks';
+import RemarkDrawer from '../components/RemarkDialog';
 
 const ViewTimetablePage = () => {
     const navigate = useNavigate();
@@ -91,11 +92,11 @@ const ViewTimetablePage = () => {
                 </Grid>
             </Grid>
             <Divider /> <br />
-            
+
             {
                 classes?.map((clz, indx) =>
                     <Box key={indx}>
-                        <Typography variant="body1" color="initial"> {classList[clz.name]} {clz.div}
+                        <Typography variant="body1" color="initial" textAlign={'center'} sx={{ mt: .5, mb: .5 }}> {classList[clz.name]} {clz.div}
                         </Typography>
 
                         <TimetableGrid
@@ -114,7 +115,9 @@ const ViewTimetablePage = () => {
                 const noOfHours = periods?.filter(per => per.classSubject == selectedSubject._id).length;
                 const _remarks = remarks?.filter(rem => rem.classSubject == selectedSubject._id) ?? []
                 return (
-                    sub && teacher && <RemarkDialog
+                    sub && teacher && <RemarkDrawer
+                        open={!!selectedSubject}
+                        onClose={() => setSelectedSubject(null)}
                         subject={sub}
                         teacher={teacher}
                         noOfHours={noOfHours ?? 0}
