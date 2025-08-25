@@ -1,9 +1,10 @@
 import { Router } from 'express';
-import {  getPeriodByIdReq, getPeriods, updatePeriod } from './period.controller';
+import { getPeriods, shufflePeriods, } from './period.controller';
 
 const periodRoutes = Router();
 
 periodRoutes.get('/', getPeriods);
+periodRoutes.post('/:id', shufflePeriods);
 
 
 export default periodRoutes;

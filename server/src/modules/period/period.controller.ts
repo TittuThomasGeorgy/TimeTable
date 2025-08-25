@@ -10,6 +10,7 @@ import Class from "../class/class.model";
 import { daysList, periodsList } from "./period.constants";
 import { createRemark } from "../remarks/remarks.controller";
 import { ISubject } from "../subject/subject.types";
+import Remark from "../remarks/remarks.model";
 // Sort subjects by noOfHours, with a random tie-breaker
 
 /**
@@ -56,9 +57,9 @@ export const findBestSubjectForSlot = (
     suitableSubjects.sort((a, b) => {
         const remainingCountA = a.noOfHours - (assignedHoursMap.get(a._id.toString()) || 0);
         const remainingCountB = b.noOfHours - (assignedHoursMap.get(b._id.toString()) || 0);
-        
+
         // Prioritize higher remaining hours
-        return remainingCountB - remainingCountA; 
+        return remainingCountB - remainingCountA;
     });
 
     // 3. Find the highest remaining hour count
@@ -80,6 +81,7 @@ export const findBestSubjectForSlot = (
 export const createPeriods = async (timetableId: string | Types.ObjectId) => {
     try {
         await Period.deleteMany({ timetableId });
+        await Remark.deleteMany({ timetableId });
         const classes: IClass[] = await Class.find({});
 
         // Fetch ALL ClassSubjects once
@@ -104,10 +106,10 @@ export const createPeriods = async (timetableId: string | Types.ObjectId) => {
         );
         const timetableSlots = new Map<string, string>(); // Key: 'Monday-1', Value: classId (Tracks class-slot conflict)
         const teacherAssignments = new Map<string, string>(); // Key: 'Monday-1-teacherId', Value: teacherId (Tracks global teacher conflict)
-        
+
         // This set will only track subjects assigned on a given day for a class during PHASE 1.
         // It will NOT persist across days in PHASE 2.
-        const phase1DayAssignments = new Set<string>(); 
+        const phase1DayAssignments = new Set<string>();
 
         // =================================================================
         // PHASE 1: ASSIGN PREFERRED SLOTS (Iterate over all ClassSubjects)
@@ -125,7 +127,7 @@ export const createPeriods = async (timetableId: string | Types.ObjectId) => {
                     const classSlotKey = `${slotKey}-${classId}`;
                     const teacherSlotKey = `${slotKey}-${teacherId}`;
                     // The once-per-day key for Phase 1
-                    const daySubKey = `${pref.day}-${clzSub._id}`; 
+                    const daySubKey = `${pref.day}-${clzSub._id}`;
 
                     // Check for all conflicts before assigning.
                     if (
@@ -155,6 +157,8 @@ export const createPeriods = async (timetableId: string | Types.ObjectId) => {
                         phase1DayAssignments.add(daySubKey);
                         createRemark(timetableId, clzSub._id, `Assigned preferred slot at ${pref.day} ${pref.period}.`, 1);
                     }
+                    else
+                        createRemark(timetableId, clzSub._id, `Preferred slot unavailable at ${pref.day} ${pref.period}.`, -1);
                 }
             }
         }
@@ -163,7 +167,7 @@ export const createPeriods = async (timetableId: string | Types.ObjectId) => {
         // PHASE 2: FILL REMAINING SLOTS (Iterate over all classes, then days/periods)
         // =================================================================
         console.log("--- PHASE 2: Filling Remaining Slots ---");
-        
+
         for (const clz of classes) {
             console.log(`Starting Phase 2 for class: ${clz.name}`);
             const classId = clz._id.toString();
@@ -174,7 +178,7 @@ export const createPeriods = async (timetableId: string | Types.ObjectId) => {
                 // *** CRITICAL FIX ***: This set must be local to the day loop 
                 // to correctly enforce the "once-per-day" rule.
                 const currentDayAssignments = new Set<string>();
-                
+
                 // Add subjects already assigned today in Phase 1 to this local tracker
                 currentClassSubjects.forEach(sub => {
                     const phase1Key = `${day}-${sub._id}`;
@@ -191,7 +195,7 @@ export const createPeriods = async (timetableId: string | Types.ObjectId) => {
                     if (timetableSlots.has(classSlotKey)) {
                         continue;
                     }
-
+                    //TODO: loop here to find best
                     // Get the best subject that needs hours and hasn't been assigned TODAY
                     let bestSubject = findBestSubjectForSlot(currentClassSubjects, assignedHoursMap, day, currentDayAssignments);
 
@@ -229,7 +233,7 @@ export const createPeriods = async (timetableId: string | Types.ObjectId) => {
                 }
             }
         }
-        
+
         console.log("Timetable generation completed successfully.");
     } catch (error: any) {
         const errorMessage = `Error during timetable creation: ${error.message}`;
@@ -257,10 +261,10 @@ export const getPeriods = async (req: Request, res: Response, next: NextFunction
     }
 }
 
-export const getPeriodByIdReq = async (req: Request, res: Response, next: NextFunction) => {
+export const shufflePeriods = async (req: Request, res: Response, next: NextFunction) => {
     try {
-        const data: IPeriod = await getPeriodById(req.params.id);
-        sendApiResponse(res, 'OK', data, 'Successfully fetched class');
+        await createPeriods(req.params.id);
+        sendApiResponse(res, 'OK', null, 'Successfully shuffled periods');
     } catch (error) {
         if ((error as any).message === 'PeriodNotFound') {
             sendApiResponse(res, 'NOT FOUND', null, 'Period Not Found');
@@ -269,42 +273,3 @@ export const getPeriodByIdReq = async (req: Request, res: Response, next: NextFu
         }
     }
 };
-export const getPeriodById = async (id: string | Types.ObjectId): Promise<IPeriod> => {
-    const _data = await Period.findById(id)
-        .sort({ 'name': 1 });
-
-    if (!_data) {
-        throw new Error('PeriodNotFound'); // Throw an error if the class is not found
-    }
-
-    const data: IPeriod = {
-        ..._data.toObject(),
-
-    };
-
-    return data; // Return the data to the controller function
-};
-
-
-export const updatePeriod = async (req: Request, res: Response, next: NextFunction) => {
-    try {
-        const _updatedPeriod = req.body;
-        const prevPeriod = await Period.findById(req.params.id)
-        // .populate('logo').populate('manager.img');
-        if (!prevPeriod) {
-            return sendApiResponse(res, 'NOT FOUND', null, 'Period Not Found');
-        }
-
-
-        const updatedPeriod = await Period.findByIdAndUpdate(req.params.id, _updatedPeriod);
-        if (!updatedPeriod) {
-            return sendApiResponse(res, 'CONFLICT', null, 'Period Not Updated');
-        }
-
-        sendApiResponse(res, 'OK', _updatedPeriod,
-            `Period updated successfully`);
-    } catch (error) {
-        next(error);
-    }
-}
-

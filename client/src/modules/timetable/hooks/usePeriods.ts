@@ -1,5 +1,5 @@
-import {  useQuery,  } from '@tanstack/react-query';
-import { getPeriodsById } from '../services/periods.api';
+import {  useMutation, useQuery, useQueryClient,  } from '@tanstack/react-query';
+import { getPeriodsById, shufflePeriodsById } from '../services/periods.api';
 
 
 export const useGetPeriods = (id: string) => {
@@ -9,6 +9,18 @@ export const useGetPeriods = (id: string) => {
         enabled: !!id, // Optional: Only run the query if id is truthy
         staleTime: 5 * 60 * 1000, // Data considered fresh for 5 minutes (optional)
     });
+};
+export const useShufflePeriods = () => {
+        const queryClient = useQueryClient();
+    
+        return useMutation({
+                    mutationFn: (id: string) =>  shufflePeriodsById(id),
+            onSuccess: () => {
+                queryClient.invalidateQueries({ queryKey: ['Periods'] });
+    
+            },
+        });
+
 };
 
 // export const useUpdatePeriod = () => {

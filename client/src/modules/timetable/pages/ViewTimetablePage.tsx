@@ -2,22 +2,18 @@ import { useState } from 'react'
 import CommonPageLayout from '../../../layouts/CommonPageLayout'
 import { useNavigate, useParams } from 'react-router-dom';
 import { Typography, Grid, Button, Divider, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Box } from '@mui/material';
-import { Close, Delete as DeleteIcon, Edit as EditIcon, RadioButtonChecked } from '@mui/icons-material';
+import {  Delete as DeleteIcon, Edit as EditIcon, Repeat as RepeatIcon } from '@mui/icons-material';
 import { useDeleteTimetable, useGetTimetableById } from '../hooks/useTimetable';
 import AddTimetableDialog from '../components/AddTimetableDialog';
 import type { ITimetable } from '../types/Timetable';
-import { useGetPeriods } from '../hooks/usePeriods';
+import { useGetPeriods, useShufflePeriods } from '../hooks/usePeriods';
 import { useGetClasses } from '../../class/hooks/useClass';
 import classList from '../../class/constants/ClassList.default';
-import type { Preferences } from '../../class/types/Preferences';
-import { daysList, periodsList } from '../constants/Day.default';
-import type { IPeriod } from '../types/Period';
 import ConfirmationDialog from '../../../components/ConfirmationDialog';
 import TimetableGrid from '../components/TimetableGrid';
 import { useGetTeachers } from '../../teacher/hooks/useTeacher';
 import { useGetSubjects } from '../../subject/hooks/useSubject';
 import { useGetAllClassSubjects } from '../../class/hooks/useClassSubject';
-import RemarkDialog from '../components/RemarkDialog';
 import type { IClassSubject } from '../../class/types/ClassSubject';
 import { useGetRemarks } from '../hooks/useRemarks';
 import RemarkDrawer from '../components/RemarkDialog';
@@ -32,6 +28,7 @@ const ViewTimetablePage = () => {
     const { data: timetableRes, isLoading, isError, error } = useGetTimetableById(id || ''); // Pass an empty string if id is undefined to satisfy type, or handle in hook
     const { data: periodRes, isLoading: isPeriodsLoading } = useGetPeriods(id || ''); // Pass an empty string if id is undefined to satisfy type, or handle in hook
     const { mutate: deleteTimetable } = useDeleteTimetable()
+    const { mutate: shuffleTimetable } = useShufflePeriods()
     const { data: clzRes, isLoading: isClassLoading } = useGetClasses();
     const { data: teacherRes } = useGetTeachers();
     const { data: subjectRes } = useGetSubjects();
@@ -52,6 +49,9 @@ const ViewTimetablePage = () => {
     const handleDelete = () => {
         deleteTimetable(id ?? '');
         navigate(-1)
+    }
+    const reshuffle = () => {
+        shuffleTimetable(id ?? '');
     }
 
     // 3. Now, use the values from the hooks in your conditional rendering
@@ -83,6 +83,9 @@ const ViewTimetablePage = () => {
 
                 </Grid>
                 <Grid size={{ xs: 12, md: 6 }} sx={{ p: 2, display: 'flex', justifyContent: 'flex-end', gap: 1 }}>
+                    <Button variant="outlined" color="primary" onClick={() => reshuffle()} startIcon={<RepeatIcon />}>
+                        Reshuffle
+                    </Button>
                     <Button variant="outlined" color="primary" onClick={() => setOpen(true)} startIcon={<EditIcon />}>
                         Edit
                     </Button>
