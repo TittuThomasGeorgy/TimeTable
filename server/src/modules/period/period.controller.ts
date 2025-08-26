@@ -27,7 +27,7 @@ export const findBestSubjectForSlot = (
     assignedHoursMap: Map<string, number>,
     day: DayType, // Not strictly needed for logic, but kept for function signature consistency
     assignedSubjectsToday: Set<string>
-): IClassSubject | null => {
+): IClassSubject[] | null => {
 
     // 1. Filter for subjects that meet the constraints
     const suitableSubjects = classSubjects.filter(sub => {
@@ -72,7 +72,7 @@ export const findBestSubjectForSlot = (
     });
 
     // 5. Return a random subject from the top tier (tie-breaker)
-    return topSubjects[Math.floor(Math.random() * topSubjects.length)];
+    return topSubjects;
 };
 
 
@@ -195,37 +195,39 @@ export const createPeriods = async (timetableId: string | Types.ObjectId) => {
                     if (timetableSlots.has(classSlotKey)) {
                         continue;
                     }
-                    //TODO: loop here to find best
                     // Get the best subject that needs hours and hasn't been assigned TODAY
-                    let bestSubject = findBestSubjectForSlot(currentClassSubjects, assignedHoursMap, day, currentDayAssignments);
+                    let bestSubjects = findBestSubjectForSlot(currentClassSubjects, assignedHoursMap, day, currentDayAssignments);
 
-                    if (bestSubject) {
-                        const teacherId = bestSubject.teacher._id.toString();
-                        const teacherSlotKey = `${slotKey}-${teacherId}`;
-                        const hasTeacherConflict = teacherAssignments.has(teacherSlotKey);
+                    if (bestSubjects && bestSubjects?.length > 0) {
+                        for (const bestSubject of bestSubjects) {
+                            const teacherId = bestSubject.teacher._id.toString();
+                            const teacherSlotKey = `${slotKey}-${teacherId}`;
+                            const hasTeacherConflict = teacherAssignments.has(teacherSlotKey);
 
-                        if (!hasTeacherConflict) {
-                            await new Period({
-                                timetableId: timetableId,
-                                classSubject: bestSubject._id,
-                                teacher: bestSubject.teacher,
-                                class: bestSubject.class,
-                                day: day,
-                                period: period,
-                                _id: new mongoose.Types.ObjectId(),
-                            }).save();
+                            if (!hasTeacherConflict) {
+                                await new Period({
+                                    timetableId: timetableId,
+                                    classSubject: bestSubject._id,
+                                    teacher: bestSubject.teacher,
+                                    class: bestSubject.class,
+                                    day: day,
+                                    period: period,
+                                    _id: new mongoose.Types.ObjectId(),
+                                }).save();
 
-                            // Update trackers
-                            const newAssignedCount = (assignedHoursMap.get(bestSubject._id.toString()) || 0) + 1;
-                            assignedHoursMap.set(bestSubject._id.toString(), newAssignedCount);
-                            timetableSlots.set(classSlotKey, classId); // Track class-slot
-                            teacherAssignments.set(teacherSlotKey, teacherId); // Track global teacher
-                            currentDayAssignments.add(bestSubject._id.toString()); // Track for the current day
+                                // Update trackers
+                                const newAssignedCount = (assignedHoursMap.get(bestSubject._id.toString()) || 0) + 1;
+                                assignedHoursMap.set(bestSubject._id.toString(), newAssignedCount);
+                                timetableSlots.set(classSlotKey, classId); // Track class-slot
+                                teacherAssignments.set(teacherSlotKey, teacherId); // Track global teacher
+                                currentDayAssignments.add(bestSubject._id.toString()); // Track for the current day
 
-                            createRemark(timetableId, bestSubject._id, `Assigned to general slot ${day} ${period}.`, 1);
-                        } else {
-                            // Teacher conflict found, need to skip or try next best subject
-                            console.log(`Teacher conflict for slot ${slotKey}. Skipping.`);
+                                createRemark(timetableId, bestSubject._id, `Assigned to general slot ${day} ${period}.`, 1);
+                                break;
+                            } else {
+                                // Teacher conflict found, need to skip or try next best subject
+                                console.log(`Teacher conflict for slot ${slotKey}. Skipping.`);
+                            }
                         }
                     } else {
                         console.log(`No suitable subject found for slot ${slotKey} for class ${clz.name}.`);
