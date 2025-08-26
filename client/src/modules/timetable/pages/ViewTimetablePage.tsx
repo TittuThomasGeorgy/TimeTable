@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import CommonPageLayout from '../../../layouts/CommonPageLayout'
 import { useNavigate, useParams } from 'react-router-dom';
-import { Typography, Grid, Button, Divider, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Box } from '@mui/material';
+import { Typography, Grid, Button, Divider,  Box } from '@mui/material';
 import {  Delete as DeleteIcon, Edit as EditIcon, Repeat as RepeatIcon } from '@mui/icons-material';
 import { useDeleteTimetable, useGetTimetableById } from '../hooks/useTimetable';
 import AddTimetableDialog from '../components/AddTimetableDialog';
