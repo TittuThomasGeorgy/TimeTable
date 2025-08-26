@@ -53,26 +53,25 @@ const PreferenceGrid = (props: Props) => {
   };
 
 
-useEffect(() => {
-  if (props.value) {
-    const newPreferences = getInitialPreferences(); // Start with a fresh, initial state
-    const updatedPreferences = newPreferences.map(pref => {
-      const matchingPref = props.value.find(p => p.day === pref.day && p.period === pref.period);
-      if (matchingPref) {
-        return { ...pref, preference: matchingPref.preference };
-      }
-      return pref;
-    });
-    setPreferences(updatedPreferences);
-  } else {
-    setPreferences(getInitialPreferences());
-  }
-}, [props.value]);
+  useEffect(() => {
+    if (props.value) {
+      const newPreferences = getInitialPreferences(); // Start with a fresh, initial state
+      const updatedPreferences = newPreferences.map(pref => {
+        const matchingPref = props.value.find(p => p.day === pref.day && p.period === pref.period);
+        if (matchingPref) {
+          return { ...pref, preference: matchingPref.preference };
+        }
+        return pref;
+      });
+      setPreferences(updatedPreferences);
+    } else {
+      setPreferences(getInitialPreferences());
+    }
+  }, [props.value]);
 
 
 
   return (
-
     <TableContainer component={Paper}>
       <Table>
         <TableHead>
@@ -101,10 +100,13 @@ useEffect(() => {
                       cursor: 'pointer',
                       transition: '0.2s ease',
                       fontWeight: 'bold',
+                      height: '50px', // Set a fixed height for all cells
+                      width: '50px', // Add a fixed width
+                      p: 0, // Remove padding to prevent extra space
                     }}
                   >
                     {current.preference == 0 ? '' :
-                      current.preference == 1 ? <RadioButtonChecked /> : <Close />}
+                      current.preference == 1 ? <RadioButtonChecked fontSize='small' /> : <Close fontSize='small' />}
                   </TableCell>
                 )
               })}
