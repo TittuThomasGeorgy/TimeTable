@@ -14,8 +14,8 @@ export const PeriodSchema = new Schema<IPeriod>({
         required: true,
     },
     period: {
-        type: Number,
-        enum: [1, 2, 3, 4, 5, 6, 7, 8],
+        type: String,
+        enum: ['I','II','III','IV','V','VI','VII','VIII'],
         required: true,
     },
 }, {

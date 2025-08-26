@@ -17,6 +17,7 @@ export const useShufflePeriods = () => {
                     mutationFn: (id: string) =>  shufflePeriodsById(id),
             onSuccess: () => {
                 queryClient.invalidateQueries({ queryKey: ['Periods'] });
+                queryClient.invalidateQueries({ queryKey: ['Remarks'] });
     
             },
         });

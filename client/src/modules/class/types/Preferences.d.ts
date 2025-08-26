@@ -1,7 +1,7 @@
 import type { ISubject } from "../../subject/types/Subject";
 
 type Day = 'MON' | 'TUE' | 'WED' | 'THU' | 'FRI';
-type Period = 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8;
+type Period ='I'|'II'|'III'|'IV'|'V'|'VI'|'VII'|'VIII';
 
 type PreferenceChoice = 0 | 1 | -1;
 

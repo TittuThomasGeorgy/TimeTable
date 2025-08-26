@@ -1,5 +1,4 @@
-import { TableContainer, Paper, Table, TableHead, TableRow, TableCell, TableBody, Typography } from '@mui/material'
-import React, { useState } from 'react'
+import { TableContainer, Paper, Table, TableHead, TableRow, TableCell, TableBody,  Box } from '@mui/material'
 import { periodsList, daysList } from '../constants/Day.default'
 import type { IPeriod } from '../types/Period'
 import type { IClassSubject } from '../../class/types/ClassSubject';
@@ -40,51 +39,75 @@ const TimetableGrid = (props: Props) => {
         return teacher?.code ?? ''
     }
     return (
-        <TableContainer component={Paper}
-            sx={{
-                width: props.selectedClassSubject ? '75%' : '100%',
+        <Box sx={{ p: 1 }}>
 
-            }}>
-            <Table>
-                <TableHead>
-                    <TableRow>
-                        <TableCell></TableCell>
-                        {periodsList.map(period => (
-                            <TableCell key={period} align="center">
-                                {period}
-                            </TableCell>
-                        ))}
-                    </TableRow>
-                </TableHead>
-                <TableBody>
-                    {daysList.map(day => (
-                        <TableRow key={day}>
-                            <TableCell>{day}</TableCell>
-                            {periodsList.map(period => {
-                                const _period: IPeriod | null = props.periods?.find(per => per.day === day && per.period === period) ?? null
-                                return (
-                                    <TableCell
-                                        align="center"
-                                        sx={{
-                                            cursor: _period?.classSubject ? 'pointer' : 'default',
-                                            bgcolor: _period?.classSubject === props.selectedClassSubject ? '#A0E2D8' : 'inherit',
-                                            transition: 'background-color 0.3s ease'
-                                        }}
-                                    >{
-                                            _period?.classSubject ?
-                                                <PeriodCard subject={getSubjectCode(_period?.classSubject)} teacher={getTeacherCode(_period?.classSubject)} onClick={() => props.onSelectClassSubject(_period.classSubject)} selected={_period.classSubject == props.selectedClassSubject} /> : '-'
-                                        }
-                                    </TableCell>
-
-
-
-                                )
-                            })}
+            <TableContainer component={Paper}
+                sx={{
+                    width: props.selectedClassSubject ? '75%' : '100%',
+                    transition: 'width 0.3s ease',
+                    boxShadow: 1, // Reduced shadow
+                    borderRadius: 1 // Smaller border radius
+                }}>
+                <Table size="small" aria-label="compact timetable">
+                    <TableHead>
+                        <TableRow>
+                            <TableCell sx={{ minWidth: 60, p: 1 }}></TableCell>
+                            {periodsList.map(period => (
+                                <TableCell key={period} align="center" sx={{ fontWeight: 'bold', p: 1, whiteSpace: 'nowrap' }}>
+                                    {period}
+                                </TableCell>
+                            ))}
                         </TableRow>
-                    ))}
-                </TableBody>
-            </Table>
-        </TableContainer>
+                    </TableHead>
+                    <TableBody>
+                        {daysList.map((day) => (
+                            <TableRow
+                                key={day}
+                                sx={{ '&:nth-of-type(odd)': { bgcolor: '#FAFAFA' } }}
+                            >
+                                <TableCell
+                                    component="th"
+                                    scope="row"
+                                    sx={{
+                                        // fontWeight: 'semi-bold',
+                                        p: 1,
+                                        width: '90px', // Set a fixed width, e.g., 100px
+                                        whiteSpace: 'nowrap',
+                                        textAlign:'center'
+                                    }}
+                                >
+                                    {day}
+                                </TableCell>
+                                {periodsList.map(period => {
+                                    const _period: IPeriod | null = props.periods?.find(per => per.day === day && per.period === period) ?? null
+                                    return (
+                                        <TableCell
+                                            key={`${day}-${period}`}
+                                            align="center"
+                                            sx={{
+                                                cursor: _period?.classSubject ? 'pointer' : 'default',
+                                                p: 0.5, // Reduced padding
+                                            }}
+                                        >
+                                            {
+                                                _period?.classSubject ?
+                                                    <PeriodCard
+                                                        subject={getSubjectCode(_period.classSubject)}
+                                                        teacher={getTeacherCode(_period.classSubject)}
+                                                        onClick={() => props.onSelectClassSubject(_period.classSubject)}
+                                                        selected={_period.classSubject === props.selectedClassSubject}
+                                                    /> :
+                                                    <Box sx={{ color: 'text.disabled' }}>-</Box>
+                                            }
+                                        </TableCell>
+                                    )
+                                })}
+                            </TableRow>
+                        ))}
+                    </TableBody>
+                </Table>
+            </TableContainer>
+        </Box>
     )
 }
 

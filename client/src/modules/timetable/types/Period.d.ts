@@ -2,7 +2,7 @@ import { Types } from "mongoose";
 import type { IClassSubject } from "../../class/types/ClassSubject";
 
 type Day = 'MON' | 'TUE' | 'WED' | 'THU' | 'FRI';
-type Period = 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8;
+type Period = 'I'|'II'|'III'|'IV'|'V'|'VI'|'VII'|'VIII';
 
 
 export interface IPeriod {
