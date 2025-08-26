@@ -1,4 +1,4 @@
-import { TableContainer, Paper, Table, TableHead, TableRow, TableCell, TableBody,  Box } from '@mui/material'
+import { TableContainer, Paper, Table, TableHead, TableRow, TableCell, TableBody, Box, Typography } from '@mui/material'
 import { periodsList, daysList } from '../constants/Day.default'
 import type { IPeriod } from '../types/Period'
 import type { IClassSubject } from '../../class/types/ClassSubject';
@@ -7,6 +7,7 @@ import type { ISubject } from '../../subject/types/Subject';
 import PeriodCard from './PeriodCard';
 
 interface Props {
+    className?: string;
     periods: IPeriod[];
     classSubjects: IClassSubject[];
     teachers: ITeacher[];
@@ -39,18 +40,27 @@ const TimetableGrid = (props: Props) => {
         return teacher?.code ?? ''
     }
     return (
-        <Box sx={{ p: 1 }}>
 
+        <Box sx={{ p: 1 }}>
             <TableContainer component={Paper}
                 sx={{
                     width: props.selectedClassSubject ? '75%' : '100%',
                     transition: 'width 0.3s ease',
-                    boxShadow: 1, // Reduced shadow
-                    borderRadius: 1 // Smaller border radius
+                    boxShadow: 1,
+                    borderRadius: 1
                 }}>
                 <Table size="small" aria-label="compact timetable">
                     <TableHead>
+                        {props.className && <TableRow>
+                            {/* The first row of the table head will contain the title */}
+                            <TableCell colSpan={periodsList.length + 1} align="center" >
+                                <Typography variant="h6" color="initial" sx={{ fontWeight: 'bold' }}>
+                                    {props.className}
+                                </Typography>
+                            </TableCell>
+                        </TableRow>}
                         <TableRow>
+                            {/* The second row of the table head will contain the period headers */}
                             <TableCell sx={{ minWidth: 60, p: 1 }}></TableCell>
                             {periodsList.map(period => (
                                 <TableCell key={period} align="center" sx={{ fontWeight: 'bold', p: 1, whiteSpace: 'nowrap' }}>
@@ -69,11 +79,11 @@ const TimetableGrid = (props: Props) => {
                                     component="th"
                                     scope="row"
                                     sx={{
-                                        // fontWeight: 'semi-bold',
+                                        fontWeight: 'medium',
                                         p: 1,
-                                        width: '90px', // Set a fixed width, e.g., 100px
+                                        width: '90px',
                                         whiteSpace: 'nowrap',
-                                        textAlign:'center'
+                                        textAlign: 'center'
                                     }}
                                 >
                                     {day}
@@ -86,7 +96,7 @@ const TimetableGrid = (props: Props) => {
                                             align="center"
                                             sx={{
                                                 cursor: _period?.classSubject ? 'pointer' : 'default',
-                                                p: 0.5, // Reduced padding
+                                                p: 0.5,
                                             }}
                                         >
                                             {

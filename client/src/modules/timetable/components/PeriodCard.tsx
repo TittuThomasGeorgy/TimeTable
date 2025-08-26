@@ -1,4 +1,4 @@
-import {  Paper, Typography } from '@mui/material';
+import { Paper, Typography } from '@mui/material';
 
 interface Props {
     teacher: string;
@@ -26,11 +26,10 @@ const PeriodCard = (props: Props) => {
                 },
             }}
         >
-            <Typography variant="body2" sx={{ fontWeight: 'bold', lineHeight: 1.2 }}> 
-                
+            <Typography variant="body2" sx={{ fontWeight: 'bold', lineHeight: 1.5 }}>
                 {props.subject}
             </Typography>
-            <Typography variant="caption" color="text.secondary" sx={{ lineHeight: 1.2 }}> 
+            <Typography variant="caption" color="text.secondary" sx={{ lineHeight: 1.5 }}>
                 {props.teacher}
             </Typography>
         </Paper>

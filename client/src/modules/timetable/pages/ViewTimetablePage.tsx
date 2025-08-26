@@ -1,8 +1,8 @@
 import { useState } from 'react'
 import CommonPageLayout from '../../../layouts/CommonPageLayout'
 import { useNavigate, useParams } from 'react-router-dom';
-import { Typography, Grid, Button, Divider,  Box } from '@mui/material';
-import {  Delete as DeleteIcon, Edit as EditIcon, Repeat as RepeatIcon } from '@mui/icons-material';
+import { Typography, Grid, Button, Divider, Box } from '@mui/material';
+import { Delete as DeleteIcon, Edit as EditIcon, Repeat as RepeatIcon } from '@mui/icons-material';
 import { useDeleteTimetable, useGetTimetableById } from '../hooks/useTimetable';
 import AddTimetableDialog from '../components/AddTimetableDialog';
 import type { ITimetable } from '../types/Timetable';
@@ -99,10 +99,10 @@ const ViewTimetablePage = () => {
             {
                 classes?.map((clz, indx) =>
                     <Box key={indx}>
-                        <Typography variant="body1" color="initial" textAlign={'center'} sx={{ mt: .5, mb: .5 }}> {classList[clz.name]} {clz.div}
-                        </Typography>
+
 
                         <TimetableGrid
+                            className={`${classList[clz.name]} ${clz.div}`}
                             periods={periods?.filter(period => period.class == clz._id) ?? []}
                             classSubjects={classSubjects ?? []}
                             teachers={teachers ?? []}
