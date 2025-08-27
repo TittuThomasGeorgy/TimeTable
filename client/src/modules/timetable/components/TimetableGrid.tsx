@@ -5,9 +5,11 @@ import type { IClassSubject } from '../../class/types/ClassSubject';
 import type { ITeacher } from '../../teacher/types/Teacher';
 import type { ISubject } from '../../subject/types/Subject';
 import PeriodCard from './PeriodCard';
+import type { IClass } from '../../class/types/Class';
+import classList from '../../class/constants/ClassList.default';
 
 interface Props {
-    className?: string;
+    class?: IClass;
     periods: IPeriod[];
     classSubjects: IClassSubject[];
     teachers: ITeacher[];
@@ -18,10 +20,15 @@ interface Props {
 }
 const TimetableGrid = (props: Props) => {
 
+    const getClassByClassSub=(id: string) => {
+        const classId = props.classSubjects?.find(clzSub => clzSub._id == props.selectedClassSubject)?.class;
+
+        return classId ?? null
+    }
+
     const getClassSub = (id: string) => {
         const classSub = props.classSubjects?.find(clzSub => clzSub._id == id);
 
-        console.log(classSub, 'l');
         return classSub ?? null
     }
     const getSubjectCode = (id: string) => {
@@ -44,18 +51,17 @@ const TimetableGrid = (props: Props) => {
         <Box sx={{ p: 1 }}>
             <TableContainer component={Paper}
                 sx={{
-                    width: props.selectedClassSubject ? '75%' : '100%',
                     transition: 'width 0.3s ease',
                     boxShadow: 1,
                     borderRadius: 1
                 }}>
                 <Table size="small" aria-label="compact timetable">
                     <TableHead>
-                        {props.className && <TableRow>
+                        {props.class && <TableRow>
                             {/* The first row of the table head will contain the title */}
                             <TableCell colSpan={periodsList.length + 1} align="center" >
                                 <Typography variant="h6" color="initial" sx={{ fontWeight: 'bold' }}>
-                                    {props.className}
+                                    {`${classList[props.class.name]} ${props.class.div}`}
                                 </Typography>
                             </TableCell>
                         </TableRow>}

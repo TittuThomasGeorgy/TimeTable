@@ -8,7 +8,6 @@ import AddTimetableDialog from '../components/AddTimetableDialog';
 import type { ITimetable } from '../types/Timetable';
 import { useGetPeriods, useShufflePeriods } from '../hooks/usePeriods';
 import { useGetClasses } from '../../class/hooks/useClass';
-import classList from '../../class/constants/ClassList.default';
 import ConfirmationDialog from '../../../components/ConfirmationDialog';
 import TimetableGrid from '../components/TimetableGrid';
 import { useGetTeachers } from '../../teacher/hooks/useTeacher';
@@ -16,7 +15,7 @@ import { useGetSubjects } from '../../subject/hooks/useSubject';
 import { useGetAllClassSubjects } from '../../class/hooks/useClassSubject';
 import type { IClassSubject } from '../../class/types/ClassSubject';
 import { useGetRemarks } from '../hooks/useRemarks';
-import RemarkDrawer from '../components/RemarkDialog';
+import RemarkBox from '../components/RemarkBox';
 
 const ViewTimetablePage = () => {
     const navigate = useNavigate();
@@ -103,35 +102,44 @@ const ViewTimetablePage = () => {
                 classes?.map((clz, indx) =>
                     <Box key={indx}>
 
+                        <Grid container spacing={0}>
+                            <Grid size={{ xs: 12, md: selectedSubject?.class === clz._id ? 8 : 12 }}>
+                                <TimetableGrid
+                                    class={clz}
+                                    periods={periods?.filter(period => period.class == clz._id) ?? []}
+                                    classSubjects={classSubjects ?? []}
+                                    teachers={teachers ?? []}
+                                    subjects={subjects ?? []}
+                                    selectedClassSubject={selectedSubject?._id ?? ''}
+                                    onSelectClassSubject={(selected) => setSelectedSubject(classSubjects?.find(clzSub => clzSub._id === selected) ?? null)} />
 
-                        <TimetableGrid
-                            className={`${classList[clz.name]} ${clz.div}`}
-                            periods={periods?.filter(period => period.class == clz._id) ?? []}
-                            classSubjects={classSubjects ?? []}
-                            teachers={teachers ?? []}
-                            subjects={subjects ?? []}
-                            selectedClassSubject={selectedSubject?._id ?? ''}
-                            onSelectClassSubject={(selected) => setSelectedSubject(classSubjects?.find(clzSub => clzSub._id === selected) ?? null)} />
+                            </Grid>
+                            {selectedSubject && selectedSubject.class === clz._id && (() => {
+                                const sub = subjects?.find(s => s._id === selectedSubject.subject);
+                                const teacher = teachers?.find(s => s._id === selectedSubject.teacher);
+                                const noOfHours = periods?.filter(per => per.classSubject == selectedSubject._id).length;
+                                const _remarks = remarks?.filter(rem => rem.classSubject == selectedSubject._id) ?? []
+                                return (
+                                    sub && teacher &&
+                                    <Grid size={{ xs: 12, md: 4 }}>
+                                        <RemarkBox
+                                            open={!!selectedSubject}
+                                            onClose={() => setSelectedSubject(null)}
+                                            subject={sub}
+                                            teacher={teacher}
+                                            noOfHours={noOfHours ?? 0}
+                                            totalNoOfHours={selectedSubject.noOfHours}
+                                            remarks={_remarks}
+                                        />
+                                    </Grid>
+                                );
+                            })()}
+                        </Grid>
+
                     </Box>
                 )
             }
-            {selectedSubject && (() => {
-                const sub = subjects?.find(s => s._id === selectedSubject.subject);
-                const teacher = teachers?.find(s => s._id === selectedSubject.teacher);
-                const noOfHours = periods?.filter(per => per.classSubject == selectedSubject._id).length;
-                const _remarks = remarks?.filter(rem => rem.classSubject == selectedSubject._id) ?? []
-                return (
-                    sub && teacher && <RemarkDrawer
-                        open={!!selectedSubject}
-                        onClose={() => setSelectedSubject(null)}
-                        subject={sub}
-                        teacher={teacher}
-                        noOfHours={noOfHours ?? 0}
-                        totalNoOfHours={selectedSubject.noOfHours}
-                        remarks={_remarks}
-                    />
-                );
-            })()}
+
             <AddTimetableDialog open={open} onClose={() => setOpen(false)}
                 value={timetable}
                 onSubmit={function (value: ITimetable): void {
