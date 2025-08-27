@@ -19,7 +19,7 @@ const RemarkBox = (props: Props) => {
   if (!props.open) return null; // Render nothing if 'open' is false
 
   return (
-    <Card sx={{ width: { xs: '100vw', sm: 350 }, p: 2 }}>
+    <Card sx={{ width: { xs: '100vw', sm: 350 }, p: 2 ,mt:.5}}>
       <Stack spacing={2}>
         <Typography variant="h6" fontWeight="bold">
           {`${props.subject.name} (${props.subject.code})`}

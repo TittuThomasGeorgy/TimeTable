@@ -129,17 +129,16 @@ export const createPeriods = async (timetableId: string | Types.ObjectId) => {
                     // The once-per-day key for Phase 1
                     const daySubKey = `${pref.day}-${clzSub._id}`;
 
+                    if (timetableSlots.has(classSlotKey)) {
+                        createRemark(timetableId, clzSub._id, `Preferred slot already taken for ${pref.day} ${pref.period}.`, -1);
+
+                    }
+                    else if (teacherAssignments.has(teacherSlotKey))
+                        createRemark(timetableId, clzSub._id, `Preferred slot Teacher already assigned for ${pref.day} ${pref.period}.`, -1);
+                    else if (assignedCount >= clzSub.noOfHours)
+                        createRemark(timetableId, clzSub._id, `Preferred slot unavailable as number of Hours exceeded.`, -1);
                     // Check for all conflicts before assigning.
-                    if (
-                        // 1. Slot is not already taken by another preferred subject for this CLASS
-                        !timetableSlots.has(classSlotKey) &&
-                        // 2. Teacher is not assigned elsewhere at this time (Global check)
-                        !teacherAssignments.has(teacherSlotKey) &&
-                        // 3. Subject is not assigned yet on this day for this CLASS (once-per-day rule)
-                        !phase1DayAssignments.has(daySubKey) &&
-                        // 4. Subject still needs hours
-                        assignedCount < clzSub.noOfHours
-                    ) {
+                    else {
                         await new Period({
                             timetableId: timetableId,
                             classSubject: clzSub._id,
@@ -157,8 +156,7 @@ export const createPeriods = async (timetableId: string | Types.ObjectId) => {
                         phase1DayAssignments.add(daySubKey);
                         createRemark(timetableId, clzSub._id, `Assigned preferred slot at ${pref.day} ${pref.period}.`, 1);
                     }
-                    else
-                        createRemark(timetableId, clzSub._id, `Preferred slot unavailable at ${pref.day} ${pref.period}.`, -1);
+
                 }
             }
         }

@@ -103,7 +103,7 @@ const ViewTimetablePage = () => {
                     <Box key={indx}>
 
                         <Grid container spacing={0}>
-                            <Grid size={{ xs: 12, md: selectedSubject?.class === clz._id ? 8 : 12 }}>
+                            <Grid size={{ xs: 12, md: selectedSubject?.class === clz._id ? 9 : 12 }}>
                                 <TimetableGrid
                                     class={clz}
                                     periods={periods?.filter(period => period.class == clz._id) ?? []}
@@ -121,7 +121,7 @@ const ViewTimetablePage = () => {
                                 const _remarks = remarks?.filter(rem => rem.classSubject == selectedSubject._id) ?? []
                                 return (
                                     sub && teacher &&
-                                    <Grid size={{ xs: 12, md: 4 }}>
+                                    <Grid size={{ xs: 12, md: 3 }}>
                                         <RemarkBox
                                             open={!!selectedSubject}
                                             onClose={() => setSelectedSubject(null)}
