@@ -2,12 +2,14 @@ import {  useQuery,  } from '@tanstack/react-query';
 import { getRemarksById } from '../services/remarks.api';
 
 
-export const useGetRemarks = (id: string) => {
+export const useGetRemarks = (timeTableId: string, classSubjectId: string) => {
     return useQuery({
-        queryKey: ['Remarks', id], // Include id in the queryKey to re-fetch when id changes
-        queryFn: () => getRemarksById(id), // Pass the id to your queryFn
-        enabled: !!id, // Optional: Only run the query if id is truthy
-        staleTime: 5 * 60 * 1000, // Data considered fresh for 5 minutes (optional)
+        queryKey: ['Remarks', timeTableId, classSubjectId], // Include both IDs in the queryKey
+        queryFn: ({ queryKey }) => { // Destructure queryKey from the context object
+            const [, timeTableId, classSubjectId] = queryKey;
+            return getRemarksById(timeTableId, classSubjectId);
+        },
+        enabled: !!timeTableId && !!classSubjectId, // Only run the query if both IDs are truthy
+        staleTime: 5 * 60 * 1000,
     });
 };
-

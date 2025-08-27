@@ -17,7 +17,7 @@ export const createRemark = async (timetableId: string | Types.ObjectId, classSu
 export const getRemarks = async (req: Request, res: Response, next: NextFunction) => {
     try {
 
-        const _data = await Remark.find({ timetableId: req.query.timetableId }).sort({'createdAt': 1})
+        const _data = await Remark.find({ timetableId: req.query.timetableId,classSubject:req.query.classSubjectId }).sort({'createdAt': 1})
 
         const data: IRemark[] = _data.map((per) => {
 

@@ -33,7 +33,11 @@ const ViewTimetablePage = () => {
     const { data: teacherRes } = useGetTeachers();
     const { data: subjectRes } = useGetSubjects();
     const { data: classSubjectRes } = useGetAllClassSubjects();
-    const { data: remarksRes } = useGetRemarks(id || '');
+
+    const [selectedSubject, setSelectedSubject] = useState<IClassSubject | null>(null)
+
+    const { data: remarksRes } = useGetRemarks(id || '', selectedSubject?._id || '');
+
     const subjects = subjectRes?.data;
     const teachers = teacherRes?.data;
     const classSubjects = classSubjectRes?.data;
@@ -43,7 +47,6 @@ const ViewTimetablePage = () => {
     const remarks = remarksRes?.data;
 
     const [confirmDelete, setConfirmDelete] = useState(false)
-    const [selectedSubject, setSelectedSubject] = useState<IClassSubject | null>(null)
 
 
     const handleDelete = () => {
