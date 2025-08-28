@@ -1,4 +1,4 @@
-import { TableContainer, Paper, Table, TableHead, TableRow, TableCell, TableBody, Box, Typography } from '@mui/material'
+import { TableContainer, Paper, Table, TableHead, TableRow, TableCell, TableBody, Box, Typography, IconButton, Tooltip } from '@mui/material'
 import { periodsList, daysList } from '../constants/Day.default'
 import type { IPeriod } from '../types/Period'
 import type { IClassSubject } from '../../class/types/ClassSubject';
@@ -7,6 +7,7 @@ import type { ISubject } from '../../subject/types/Subject';
 import PeriodCard from './PeriodCard';
 import type { IClass } from '../../class/types/Class';
 import classList from '../../class/constants/ClassList.default';
+import {  Repeat as RepeatIcon } from '@mui/icons-material';
 
 interface Props {
     class?: IClass;
@@ -60,6 +61,11 @@ const TimetableGrid = (props: Props) => {
                         {props.class && <TableRow>
                             {/* The first row of the table head will contain the title */}
                             <TableCell colSpan={periodsList.length + 1} align="center" >
+                               <Tooltip title="Shuffle">
+                                 
+                               <IconButton aria-label="" onClick={()=>{}   } sx={{float:'right'}}>
+                                  <RepeatIcon />
+                                </IconButton></Tooltip> 
                                 <Typography variant="h6" color="initial" sx={{ fontWeight: 'bold' }}>
                                     {`${classList[props.class.name]} ${props.class.div}`}
                                 </Typography>
