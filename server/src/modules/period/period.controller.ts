@@ -130,13 +130,13 @@ export const createPeriods = async (timetableId: string | Types.ObjectId) => {
                     const daySubKey = `${pref.day}-${clzSub._id}`;
 
                     if (timetableSlots.has(classSlotKey)) {
-                        createRemark(timetableId, clzSub._id, `Preferred slot already taken for ${pref.day} ${pref.period}.`, -1);
+                        createRemark(timetableId, clzSub.class.toString(), clzSub._id, `Preferred slot already taken for ${pref.day} ${pref.period}.`, -1);
 
                     }
                     else if (teacherAssignments.has(teacherSlotKey))
-                        createRemark(timetableId, clzSub._id, `Preferred slot Teacher already assigned for ${pref.day} ${pref.period}.`, -1);
+                        createRemark(timetableId, clzSub.class.toString(), clzSub._id, `Preferred slot Teacher already assigned for ${pref.day} ${pref.period}.`, -1);
                     else if (assignedCount >= clzSub.noOfHours)
-                        createRemark(timetableId, clzSub._id, `Preferred slot unavailable as number of Hours exceeded.`, -1);
+                        createRemark(timetableId, clzSub.class.toString(), clzSub._id, `Preferred slot unavailable as number of Hours exceeded.`, -1);
                     // Check for all conflicts before assigning.
                     else {
                         await new Period({
@@ -154,7 +154,7 @@ export const createPeriods = async (timetableId: string | Types.ObjectId) => {
                         teacherAssignments.set(teacherSlotKey, teacherId); // Track global teacher
                         assignedHoursMap.set(clzSub._id.toString(), (assignedCount || 0) + 1);
                         phase1DayAssignments.add(daySubKey);
-                        createRemark(timetableId, clzSub._id, `Assigned preferred slot at ${pref.day} ${pref.period}.`, 1);
+                        createRemark(timetableId, clzSub.class.toString(), clzSub._id, `Assigned preferred slot at ${pref.day} ${pref.period}.`, 1);
                     }
 
                 }
@@ -220,7 +220,7 @@ export const createPeriods = async (timetableId: string | Types.ObjectId) => {
                                 teacherAssignments.set(teacherSlotKey, teacherId); // Track global teacher
                                 currentDayAssignments.add(bestSubject._id.toString()); // Track for the current day
 
-                                createRemark(timetableId, bestSubject._id, `Assigned to general slot ${day} ${period}.`, 1);
+                                createRemark(timetableId, bestSubject.class.toString(), bestSubject._id, `Assigned to general slot ${day} ${period}.`, 1);
                                 break;
                             } else {
                                 // Teacher conflict found, need to skip or try next best subject
@@ -241,6 +241,11 @@ export const createPeriods = async (timetableId: string | Types.ObjectId) => {
         throw new Error(errorMessage);
     }
 };
+
+export const createPeriodForClass = async (timetableId: string | ObjectId, classId: string | ObjectId) => {
+    await Period.deleteMany({ timetableId, class: classId });
+    await Remark.deleteMany({ timetableId, class: classId });
+}
 
 export const getPeriods = async (req: Request, res: Response, next: NextFunction) => {
     try {
