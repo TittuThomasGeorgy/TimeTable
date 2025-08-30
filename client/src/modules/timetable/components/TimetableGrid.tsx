@@ -7,7 +7,8 @@ import type { ISubject } from '../../subject/types/Subject';
 import PeriodCard from './PeriodCard';
 import type { IClass } from '../../class/types/Class';
 import classList from '../../class/constants/ClassList.default';
-import {  Repeat as RepeatIcon } from '@mui/icons-material';
+import { Repeat as RepeatIcon } from '@mui/icons-material';
+import { useShufflePeriodsByClz } from '../hooks/usePeriods';
 
 interface Props {
     class?: IClass;
@@ -17,15 +18,9 @@ interface Props {
     subjects: ISubject[];
     selectedClassSubject: string;
     onSelectClassSubject: (selectedSub: string) => void;
-
+    onReshuffle: () => void
 }
 const TimetableGrid = (props: Props) => {
-
-    const getClassByClassSub=(id: string) => {
-        const classId = props.classSubjects?.find(clzSub => clzSub._id == props.selectedClassSubject)?.class;
-
-        return classId ?? null
-    }
 
     const getClassSub = (id: string) => {
         const classSub = props.classSubjects?.find(clzSub => clzSub._id == id);
@@ -47,6 +42,7 @@ const TimetableGrid = (props: Props) => {
         const teacher = props.teachers?.find(teacher => teacher._id == classSub.teacher);
         return teacher?.code ?? ''
     }
+
     return (
 
         <Box sx={{ p: 1 }}>
@@ -61,11 +57,11 @@ const TimetableGrid = (props: Props) => {
                         {props.class && <TableRow>
                             {/* The first row of the table head will contain the title */}
                             <TableCell colSpan={periodsList.length + 1} align="center" >
-                               <Tooltip title="Shuffle">
-                                 
-                               <IconButton aria-label="" onClick={()=>{}   } sx={{float:'right'}}>
-                                  <RepeatIcon />
-                                </IconButton></Tooltip> 
+                                <Tooltip title="Shuffle">
+
+                                    <IconButton aria-label="" onClick={() => props.onReshuffle()} sx={{ float: 'right' }}>
+                                        <RepeatIcon />
+                                    </IconButton></Tooltip>
                                 <Typography variant="h6" color="initial" sx={{ fontWeight: 'bold' }}>
                                     {`${classList[props.class.name]} ${props.class.div}`}
                                 </Typography>

@@ -1,5 +1,5 @@
 import {  useMutation, useQuery, useQueryClient,  } from '@tanstack/react-query';
-import { getPeriodsById, shufflePeriodsById } from '../services/periods.api';
+import { getPeriodsById, shufflePeriodsByClassId, shufflePeriodsById } from '../services/periods.api';
 
 
 export const useGetPeriods = (id: string) => {
@@ -22,6 +22,19 @@ export const useShufflePeriods = () => {
             },
         });
 
+};
+export const useShufflePeriodsByClz = () => {
+    const queryClient = useQueryClient();
+
+    return useMutation({
+        mutationFn: ({ timetableId, classId }: { timetableId: string, classId: string }) =>
+            shufflePeriodsByClassId(timetableId, classId),
+
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ['Periods'] });
+            queryClient.invalidateQueries({ queryKey: ['Remarks'] });
+        },
+    });
 };
 
 // export const useUpdatePeriod = () => {

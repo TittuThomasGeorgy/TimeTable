@@ -6,7 +6,7 @@ import { Delete as DeleteIcon, Edit as EditIcon, Repeat as RepeatIcon } from '@m
 import { useDeleteTimetable, useGetTimetableById } from '../hooks/useTimetable';
 import AddTimetableDialog from '../components/AddTimetableDialog';
 import type { ITimetable } from '../types/Timetable';
-import { useGetPeriods, useShufflePeriods } from '../hooks/usePeriods';
+import { useGetPeriods, useShufflePeriods, useShufflePeriodsByClz } from '../hooks/usePeriods';
 import { useGetClasses } from '../../class/hooks/useClass';
 import ConfirmationDialog from '../../../components/ConfirmationDialog';
 import TimetableGrid from '../components/TimetableGrid';
@@ -28,6 +28,7 @@ const ViewTimetablePage = () => {
     const { data: periodRes, isLoading: isPeriodsLoading } = useGetPeriods(id || ''); // Pass an empty string if id is undefined to satisfy type, or handle in hook
     const { mutate: deleteTimetable } = useDeleteTimetable()
     const { mutate: shuffleTimetable } = useShufflePeriods()
+    const { mutate: shuffleClassTimetable } = useShufflePeriodsByClz()
     const { data: clzRes, isLoading: isClassLoading } = useGetClasses();
     const { data: teacherRes } = useGetTeachers();
     const { data: subjectRes } = useGetSubjects();
@@ -54,6 +55,9 @@ const ViewTimetablePage = () => {
     }
     const reshuffle = () => {
         shuffleTimetable(id ?? '');
+    }
+    const reshuffleByClass = (classId: string) => {
+        shuffleClassTimetable({ timetableId: id ?? '', classId });
     }
 
     // 3. Now, use the values from the hooks in your conditional rendering
@@ -111,8 +115,8 @@ const ViewTimetablePage = () => {
                                     teachers={teachers ?? []}
                                     subjects={subjects ?? []}
                                     selectedClassSubject={selectedSubject?._id ?? ''}
-                                    onSelectClassSubject={(selected) => setSelectedSubject(classSubjects?.find(clzSub => clzSub._id === selected) ?? null)} />
-
+                                    onSelectClassSubject={(selected) => setSelectedSubject(classSubjects?.find(clzSub => clzSub._id === selected) ?? null)}
+                                    onReshuffle={()=>reshuffleByClass(clz._id)} />
                             </Grid>
                             {selectedSubject && selectedSubject.class === clz._id && (() => {
                                 const sub = subjects?.find(s => s._id === selectedSubject.subject);

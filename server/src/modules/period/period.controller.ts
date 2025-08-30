@@ -11,7 +11,15 @@ import { daysList, periodsList } from "./period.constants";
 import { createRemark } from "../remarks/remarks.controller";
 import { ISubject } from "../subject/subject.types";
 import Remark from "../remarks/remarks.model";
-// Sort subjects by noOfHours, with a random tie-breaker
+
+
+const shuffleClassSubjects = (classSubjects: IClassSubject[]) => {
+    for (let i = classSubjects.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [classSubjects[i], classSubjects[j]] = [classSubjects[j], classSubjects[i]];
+    }
+    return classSubjects;
+};
 
 /**
  * Finds the best suitable subject for a given slot based on the greedy heuristic:
@@ -72,180 +80,203 @@ export const findBestSubjectForSlot = (
     });
 
     // 5. Return a random subject from the top tier (tie-breaker)
-    return topSubjects;
+    return shuffleClassSubjects(topSubjects);
 };
 
+/**
+ * Core function to generate periods for a given set of classes and subjects.
+ * @param timetableId The ID of the timetable.
+ * @param classes The array of classes to process.
+ * @param classSubjects The array of ClassSubjects relevant to these classes.
+ */
+const generateTimetable = async (
+    timetableId: string | Types.ObjectId,
+    classes: IClass[],
+    classSubjects: IClassSubject[]
+) => {
+    // Map for easy access and filtering by class ID
+    const classSubjectsMap = new Map<string, IClassSubject[]>();
+    classSubjects.forEach(clzSub => {
+        const classId = clzSub.class._id ? clzSub.class._id.toString() : clzSub.class.toString();
+        if (!classSubjectsMap.has(classId)) {
+            classSubjectsMap.set(classId, []);
+        }
+        classSubjectsMap.get(classId)!.push(clzSub);
+    });
 
-// ---
+    // Global trackers for assignment state across all classes and phases
+    const assignedHoursMap = new Map<string, number>(
+        classSubjects.map(s => [s._id.toString(), 0])
+    );
+    const timetableSlots = new Map<string, string>(); // Key: 'Monday-1-classId', Value: classId (Tracks class-slot conflict)
+    const teacherAssignments = new Map<string, string>(); // Key: 'Monday-1-teacherId', Value: teacherId (Tracks global teacher conflict)
+
+    // This set will only track subjects assigned on a given day for a class during PHASE 1.
+    const phase1DayAssignments = new Set<string>();
+
+    // =================================================================
+    // PHASE 1: ASSIGN PREFERRED SLOTS (Iterate over all ClassSubjects)
+    // =================================================================
+    console.log("--- PHASE 1: Assigning Preferred Slots ---");
+
+    for (const clzSub of classSubjects) {
+        const assignedCount = assignedHoursMap.get(clzSub._id.toString()) || 0;
+        const teacherId = clzSub.teacher._id.toString();
+        const classId = clzSub.class._id ? clzSub.class._id.toString() : clzSub.class.toString();
+
+        for (const pref of clzSub.preferences) {
+            if (pref.preference === 1) {
+                const slotKey = `${pref.day}-${pref.period}`;
+                const classSlotKey = `${slotKey}-${classId}`;
+                const teacherSlotKey = `${slotKey}-${teacherId}`;
+                const daySubKey = `${pref.day}-${clzSub._id}`;
+
+                if (timetableSlots.has(classSlotKey)) {
+                    createRemark(timetableId.toString(), classId, clzSub._id, `Preferred slot already taken for ${pref.day} ${pref.period}.`, -1);
+                }
+                else if (teacherAssignments.has(teacherSlotKey)) {
+                    createRemark(timetableId.toString(), classId, clzSub._id, `Preferred slot Teacher already assigned for ${pref.day} ${pref.period}.`, -1);
+                }
+                else if (assignedCount >= clzSub.noOfHours) {
+                    createRemark(timetableId.toString(), classId, clzSub._id, `Preferred slot unavailable as number of Hours exceeded.`, -1);
+                }
+                else {
+                    await new Period({
+                        timetableId: timetableId,
+                        classSubject: clzSub._id,
+                        teacher: clzSub.teacher,
+                        class: clzSub.class,
+                        day: pref.day,
+                        period: pref.period,
+                        _id: new mongoose.Types.ObjectId(),
+                    }).save();
+
+                    // Update trackers
+                    timetableSlots.set(classSlotKey, classId);
+                    teacherAssignments.set(teacherSlotKey, teacherId);
+                    assignedHoursMap.set(clzSub._id.toString(), assignedCount + 1);
+                    phase1DayAssignments.add(daySubKey);
+                    createRemark(timetableId.toString(), classId, clzSub._id, `Assigned preferred slot at ${pref.day} ${pref.period}.`, 1);
+                }
+            }
+        }
+    }
+
+    // =================================================================
+    // PHASE 2: FILL REMAINING SLOTS
+    // =================================================================
+    console.log("--- PHASE 2: Filling Remaining Slots ---");
+
+    for (const clz of classes) {
+        console.log(`Starting Phase 2 for class: ${clz.name}`);
+        const classId = clz._id.toString();
+        const currentClassSubjects = classSubjectsMap.get(classId) || [];
+
+        for (const day of daysList) {
+            const currentDayAssignments = new Set<string>();
+            currentClassSubjects.forEach(sub => {
+                const phase1Key = `${day}-${sub._id}`;
+                if (phase1DayAssignments.has(phase1Key)) {
+                    currentDayAssignments.add(sub._id.toString());
+                }
+            });
+
+            for (const period of periodsList) {
+                const slotKey = `${day}-${period}`;
+                const classSlotKey = `${slotKey}-${classId}`;
+
+                if (timetableSlots.has(classSlotKey)) {
+                    continue;
+                }
+
+                const bestSubjects = findBestSubjectForSlot(currentClassSubjects, assignedHoursMap, day, currentDayAssignments);
+
+                if (bestSubjects && bestSubjects.length > 0) {
+                    for (const bestSubject of bestSubjects) {
+                        const teacherId = bestSubject.teacher._id.toString();
+                        const teacherSlotKey = `${slotKey}-${teacherId}`;
+                        const hasTeacherConflict = teacherAssignments.has(teacherSlotKey);
+
+                        if (!hasTeacherConflict) {
+                            await new Period({
+                                timetableId: timetableId,
+                                classSubject: bestSubject._id,
+                                teacher: bestSubject.teacher,
+                                class: bestSubject.class,
+                                day: day,
+                                period: period,
+                                _id: new mongoose.Types.ObjectId(),
+                            }).save();
+
+                            // Update trackers
+                            const newAssignedCount = (assignedHoursMap.get(bestSubject._id.toString()) || 0) + 1;
+                            assignedHoursMap.set(bestSubject._id.toString(), newAssignedCount);
+                            timetableSlots.set(classSlotKey, classId);
+                            teacherAssignments.set(teacherSlotKey, teacherId);
+                            currentDayAssignments.add(bestSubject._id.toString());
+                            createRemark(timetableId.toString(), classId, bestSubject._id, `Assigned to general slot ${day} ${period}.`, 1);
+                            break;
+                        } else {
+                            console.log(`Teacher conflict for slot ${slotKey}. Skipping.`);
+                        }
+                    }
+                } else {
+                    console.log(`No suitable subject found for slot ${slotKey} for class ${clz.name}.`);
+                }
+            }
+        }
+    }
+    console.log("Timetable generation completed successfully.");
+};
+
+// =================================================================
+// REFACTORED EXPORT FUNCTIONS
+// =================================================================
 
 export const createPeriods = async (timetableId: string | Types.ObjectId) => {
     try {
         await Period.deleteMany({ timetableId });
         await Remark.deleteMany({ timetableId });
-        const classes: IClass[] = await Class.find({});
 
-        // Fetch ALL ClassSubjects once
+        const classes: IClass[] = await Class.find({});
         const classSubjects: IClassSubject[] = await ClassSubject.find()
             .populate('teacher')
             .populate('class')
             .populate('subject');
 
-        // Map for easy access and filtering by class ID
-        const classSubjectsMap = new Map<string, IClassSubject[]>();
-        classSubjects.forEach(clzSub => {
-            const classId = clzSub.class._id ? clzSub.class._id.toString() : clzSub.class.toString();
-            if (!classSubjectsMap.has(classId)) {
-                classSubjectsMap.set(classId, []);
-            }
-            classSubjectsMap.get(classId)!.push(clzSub);
-        });
-
-        // Global trackers for assignment state across all classes and phases
-        const assignedHoursMap = new Map<string, number>(
-            classSubjects.map(s => [s._id.toString(), 0])
-        );
-        const timetableSlots = new Map<string, string>(); // Key: 'Monday-1', Value: classId (Tracks class-slot conflict)
-        const teacherAssignments = new Map<string, string>(); // Key: 'Monday-1-teacherId', Value: teacherId (Tracks global teacher conflict)
-
-        // This set will only track subjects assigned on a given day for a class during PHASE 1.
-        // It will NOT persist across days in PHASE 2.
-        const phase1DayAssignments = new Set<string>();
-
-        // =================================================================
-        // PHASE 1: ASSIGN PREFERRED SLOTS (Iterate over all ClassSubjects)
-        // =================================================================
-        console.log("--- PHASE 1: Assigning Preferred Slots ---");
-
-        for (const clzSub of classSubjects) {
-            const assignedCount = assignedHoursMap.get(clzSub._id.toString()) || 0;
-            const teacherId = clzSub.teacher._id.toString();
-            const classId = clzSub.class._id ? clzSub.class._id.toString() : clzSub.class.toString();
-
-            for (const pref of clzSub.preferences) {
-                if (pref.preference === 1) {
-                    const slotKey = `${pref.day}-${pref.period}`;
-                    const classSlotKey = `${slotKey}-${classId}`;
-                    const teacherSlotKey = `${slotKey}-${teacherId}`;
-                    // The once-per-day key for Phase 1
-                    const daySubKey = `${pref.day}-${clzSub._id}`;
-
-                    if (timetableSlots.has(classSlotKey)) {
-                        createRemark(timetableId, clzSub.class.toString(), clzSub._id, `Preferred slot already taken for ${pref.day} ${pref.period}.`, -1);
-
-                    }
-                    else if (teacherAssignments.has(teacherSlotKey))
-                        createRemark(timetableId, clzSub.class.toString(), clzSub._id, `Preferred slot Teacher already assigned for ${pref.day} ${pref.period}.`, -1);
-                    else if (assignedCount >= clzSub.noOfHours)
-                        createRemark(timetableId, clzSub.class.toString(), clzSub._id, `Preferred slot unavailable as number of Hours exceeded.`, -1);
-                    // Check for all conflicts before assigning.
-                    else {
-                        await new Period({
-                            timetableId: timetableId,
-                            classSubject: clzSub._id,
-                            teacher: clzSub.teacher,
-                            class: clzSub.class,
-                            day: pref.day,
-                            period: pref.period,
-                            _id: new mongoose.Types.ObjectId(),
-                        }).save();
-
-                        // Update trackers
-                        timetableSlots.set(classSlotKey, classId); // Track class-slot
-                        teacherAssignments.set(teacherSlotKey, teacherId); // Track global teacher
-                        assignedHoursMap.set(clzSub._id.toString(), (assignedCount || 0) + 1);
-                        phase1DayAssignments.add(daySubKey);
-                        createRemark(timetableId, clzSub.class.toString(), clzSub._id, `Assigned preferred slot at ${pref.day} ${pref.period}.`, 1);
-                    }
-
-                }
-            }
-        }
-
-        // =================================================================
-        // PHASE 2: FILL REMAINING SLOTS (Iterate over all classes, then days/periods)
-        // =================================================================
-        console.log("--- PHASE 2: Filling Remaining Slots ---");
-
-        for (const clz of classes) {
-            console.log(`Starting Phase 2 for class: ${clz.name}`);
-            const classId = clz._id.toString();
-            const currentClassSubjects = classSubjectsMap.get(classId) || [];
-
-            // 2. Fill remaining slots with non-preferred subjects.
-            for (const day of daysList) {
-                // *** CRITICAL FIX ***: This set must be local to the day loop 
-                // to correctly enforce the "once-per-day" rule.
-                const currentDayAssignments = new Set<string>();
-
-                // Add subjects already assigned today in Phase 1 to this local tracker
-                currentClassSubjects.forEach(sub => {
-                    const phase1Key = `${day}-${sub._id}`;
-                    if (phase1DayAssignments.has(phase1Key)) {
-                        currentDayAssignments.add(sub._id.toString());
-                    }
-                });
-
-                for (const period of periodsList) {
-                    const slotKey = `${day}-${period}`;
-                    const classSlotKey = `${slotKey}-${classId}`;
-
-                    // Check if the slot is already filled for THIS CLASS (by Phase 1)
-                    if (timetableSlots.has(classSlotKey)) {
-                        continue;
-                    }
-                    // Get the best subject that needs hours and hasn't been assigned TODAY
-                    let bestSubjects = findBestSubjectForSlot(currentClassSubjects, assignedHoursMap, day, currentDayAssignments);
-
-                    if (bestSubjects && bestSubjects?.length > 0) {
-                        for (const bestSubject of bestSubjects) {
-                            const teacherId = bestSubject.teacher._id.toString();
-                            const teacherSlotKey = `${slotKey}-${teacherId}`;
-                            const hasTeacherConflict = teacherAssignments.has(teacherSlotKey);
-
-                            if (!hasTeacherConflict) {
-                                await new Period({
-                                    timetableId: timetableId,
-                                    classSubject: bestSubject._id,
-                                    teacher: bestSubject.teacher,
-                                    class: bestSubject.class,
-                                    day: day,
-                                    period: period,
-                                    _id: new mongoose.Types.ObjectId(),
-                                }).save();
-
-                                // Update trackers
-                                const newAssignedCount = (assignedHoursMap.get(bestSubject._id.toString()) || 0) + 1;
-                                assignedHoursMap.set(bestSubject._id.toString(), newAssignedCount);
-                                timetableSlots.set(classSlotKey, classId); // Track class-slot
-                                teacherAssignments.set(teacherSlotKey, teacherId); // Track global teacher
-                                currentDayAssignments.add(bestSubject._id.toString()); // Track for the current day
-
-                                createRemark(timetableId, bestSubject.class.toString(), bestSubject._id, `Assigned to general slot ${day} ${period}.`, 1);
-                                break;
-                            } else {
-                                // Teacher conflict found, need to skip or try next best subject
-                                console.log(`Teacher conflict for slot ${slotKey}. Skipping.`);
-                            }
-                        }
-                    } else {
-                        console.log(`No suitable subject found for slot ${slotKey} for class ${clz.name}.`);
-                    }
-                }
-            }
-        }
-
-        console.log("Timetable generation completed successfully.");
+        await generateTimetable(timetableId, classes, classSubjects);
     } catch (error: any) {
-        const errorMessage = `Error during timetable creation: ${error.message}`;
+        const errorMessage = `Error during bulk timetable creation: ${error.message}`;
         console.error(errorMessage, error);
         throw new Error(errorMessage);
     }
 };
 
-export const createPeriodForClass = async (timetableId: string | ObjectId, classId: string | ObjectId) => {
-    await Period.deleteMany({ timetableId, class: classId });
-    await Remark.deleteMany({ timetableId, class: classId });
-}
+export const shufflePeriods = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        const { timetableId, classId } = req.body;
+
+        await Period.deleteMany({ timetableId, class: classId });
+        await Remark.deleteMany({ timetableId, class: classId });
+
+        const clz: IClass | null = await Class.findById(classId);
+        if (!clz) {
+            throw new Error(`Class with ID ${classId} not found.`);
+        }
+
+        const currentClassSubjects: IClassSubject[] = await ClassSubject.find({ class: classId })
+            .populate('teacher')
+            .populate('class')
+            .populate('subject');
+
+        await generateTimetable(timetableId?.toString() ?? '', [clz], currentClassSubjects);
+        sendApiResponse(res, 'OK', null, 'Successfully shuffled class periods');
+
+    } catch (error) {
+        next(error);
+    }
+};
+
 
 export const getPeriods = async (req: Request, res: Response, next: NextFunction) => {
     try {
@@ -266,7 +297,7 @@ export const getPeriods = async (req: Request, res: Response, next: NextFunction
     }
 }
 
-export const shufflePeriods = async (req: Request, res: Response, next: NextFunction) => {
+export const shuffleAllPeriods = async (req: Request, res: Response, next: NextFunction) => {
     try {
         await createPeriods(req.params.id);
         sendApiResponse(res, 'OK', null, 'Successfully shuffled periods');
