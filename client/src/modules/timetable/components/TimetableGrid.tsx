@@ -8,7 +8,6 @@ import PeriodCard from './PeriodCard';
 import type { IClass } from '../../class/types/Class';
 import classList from '../../class/constants/ClassList.default';
 import { Repeat as RepeatIcon } from '@mui/icons-material';
-import { useShufflePeriodsByClz } from '../hooks/usePeriods';
 
 interface Props {
     class?: IClass;
