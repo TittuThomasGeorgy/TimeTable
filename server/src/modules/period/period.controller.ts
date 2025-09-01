@@ -11,6 +11,7 @@ import { daysList, periodsList } from "./period.constants";
 import { createRemark } from "../remarks/remarks.controller";
 import { ISubject } from "../subject/subject.types";
 import Remark from "../remarks/remarks.model";
+import classList from "../class/classList.defaut";
 
 
 const shuffleClassSubjects = (classSubjects: IClassSubject[]) => {
@@ -92,7 +93,9 @@ export const findBestSubjectForSlot = (
 const generateTimetable = async (
     timetableId: string | Types.ObjectId,
     classes: IClass[],
-    classSubjects: IClassSubject[]
+    classSubjects: IClassSubject[],
+    teacherAssignments: Map<string, string>
+
 ) => {
     // Map for easy access and filtering by class ID
     const classSubjectsMap = new Map<string, IClassSubject[]>();
@@ -109,7 +112,6 @@ const generateTimetable = async (
         classSubjects.map(s => [s._id.toString(), 0])
     );
     const timetableSlots = new Map<string, string>(); // Key: 'Monday-1-classId', Value: classId (Tracks class-slot conflict)
-    const teacherAssignments = new Map<string, string>(); // Key: 'Monday-1-teacherId', Value: teacherId (Tracks global teacher conflict)
 
     // This set will only track subjects assigned on a given day for a class during PHASE 1.
     const phase1DayAssignments = new Set<string>();
@@ -135,7 +137,8 @@ const generateTimetable = async (
                     createRemark(timetableId.toString(), classId, clzSub._id, `Preferred slot already taken for ${pref.day} ${pref.period}.`, -1);
                 }
                 else if (teacherAssignments.has(teacherSlotKey)) {
-                    createRemark(timetableId.toString(), classId, clzSub._id, `Preferred slot Teacher already assigned for ${pref.day} ${pref.period}.`, -1);
+                    const assignedClass:IClass = (await Period.findOne({ timetableId, day: pref.day, period: pref.period }).populate('class'))?.class as unknown as IClass
+                    createRemark(timetableId.toString(), classId, clzSub._id, `Preferred slot Teacher already assigned for ${pref.day} ${pref.period} for ${classList[assignedClass?.name ?? -1]} ${assignedClass?.div}.`, -1);
                 }
                 else if (assignedCount >= clzSub.noOfHours) {
                     createRemark(timetableId.toString(), classId, clzSub._id, `Preferred slot unavailable as number of Hours exceeded.`, -1);
@@ -243,8 +246,9 @@ export const createPeriods = async (timetableId: string | Types.ObjectId) => {
             .populate('teacher')
             .populate('class')
             .populate('subject');
+        const teacherAssignments = new Map<string, string>(); // Key: 'Monday-1-teacherId', Value: teacherId (Tracks global teacher conflict)
 
-        await generateTimetable(timetableId, classes, classSubjects);
+        await generateTimetable(timetableId, classes, classSubjects, teacherAssignments);
     } catch (error: any) {
         const errorMessage = `Error during bulk timetable creation: ${error.message}`;
         console.error(errorMessage, error);
@@ -268,8 +272,15 @@ export const shufflePeriods = async (req: Request, res: Response, next: NextFunc
             .populate('teacher')
             .populate('class')
             .populate('subject');
+        const periods = await Period.find({ timetableId });
+        const teacherAssignments = new Map<string, string>
+        periods.map(per => {
+            const teacherSlotKey = `${per.day}-${per.period}-${per.teacher}`;
+            teacherAssignments.set(teacherSlotKey, per.teacher.toString());
+        }); // Key: 'Monday-1-teacherId', Value: teacherId (Tracks global teacher conflict)
 
-        await generateTimetable(timetableId?.toString() ?? '', [clz], currentClassSubjects);
+
+        await generateTimetable(timetableId?.toString() ?? '', [clz], currentClassSubjects, teacherAssignments);
         sendApiResponse(res, 'OK', null, 'Successfully shuffled class periods');
 
     } catch (error) {
