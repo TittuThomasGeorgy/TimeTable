@@ -7,6 +7,8 @@ const HomePage = () => {
 
         <>
             <CommonPageLayout>
+            
+                
                 <div>HomePage</div>
                 <div>HomePage</div>
                 <div>HomePage</div>
@@ -14,6 +16,7 @@ const HomePage = () => {
                 <div>HomePage</div>
                 <div>HomePage</div>
                 <div>HomePage</div>
+                
                 
             </CommonPageLayout>
         </>
