@@ -15,7 +15,6 @@ const HomePage = () => {
                 <div>HomePage</div>
                 <div>HomePage</div>
                 <div>HomePage</div>
-                <div>HomePage</div>
                 
                 
             </CommonPageLayout>
