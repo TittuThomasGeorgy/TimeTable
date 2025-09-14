@@ -10,6 +10,10 @@ import { Delete as DeleteIcon, Edit as EditIcon } from '@mui/icons-material';
 import SubjectTab from '../components/SubjectTab';
 import TeacherChip from '../../teacher/components/TeacherChip';
 import classList from '../constants/ClassList.default';
+import TimetableGrid from '../../timetable/components/TimetableGrid';
+import { useGetClassSubjects } from '../hooks/useClassSubject';
+import type { ITeacher } from '../../teacher/types/Teacher';
+import type { ISubject } from '../../subject/types/Subject';
 
 const ViewClassPage = () => {
 
@@ -21,7 +25,8 @@ const ViewClassPage = () => {
     // Ensure id is present before making the API call
     const { data: res, isLoading, isError, error } = useGetClassById(id || ''); // Pass an empty string if id is undefined to satisfy type, or handle in hook
     const _class = res?.data;
-
+    const { data: classRes, isLoading: isClassSubjectLoading } = useGetClassSubjects(id || '', 'class');
+    const classSubjects = classRes?.data;
 
     const { data: res1, isLoading: isLoading1, isError: isError1, error: error1 } = useGetTeacherById(_class?.classTeacher || ''); // Pass an empty string if id is undefined to satisfy type, or handle in hook
     const teacher = res1?.data;
@@ -63,7 +68,7 @@ const ViewClassPage = () => {
             }
             <Grid container spacing={0}>
                 <Grid size={{ xs: 12, md: 6 }}>
-                    <Typography variant="h4">CLASS: {classList[_class?.name??-1]} {_class?.div}
+                    <Typography variant="h4">CLASS: {classList[_class?.name ?? -1]} {_class?.div}
                     </Typography>
                     {teacher &&
                         <Box sx={{ display: 'flex', flexDirection: 'row' }}>
@@ -88,7 +93,21 @@ const ViewClassPage = () => {
                         <Tab label="Subjects" {...a11yProps(0)} />
                         <Tab label="Timetable" {...a11yProps(1)} />
                     </Tabs>
-                    {value == 0 && <SubjectTab classId={id} />}
+                    {value == 0 && <SubjectTab classId={id} classSubjects={classSubjects??[]} isLoading={isClassSubjectLoading}/>}
+                    {value == 1 &&
+                        <TimetableGrid
+                            class={_class}
+                            classSubjects={classSubjects??[]}
+                            periods={[]}
+                            teachers={classSubjects?.map(clzSub=>clzSub.teacher as ITeacher)??[]}
+                            subjects={classSubjects?.map(clzSub=>clzSub.subject as ISubject)??[]}
+                            selectedClassSubject={''}
+                            onSelectClassSubject={function (selectedSub: string): void {
+                                throw new Error('Function not implemented.');
+                            }}
+                            onReshuffle={function (): void {
+                                throw new Error('Function not implemented.');
+                            }} />}
 
                 </Box>
 

@@ -14,11 +14,12 @@ import ImportClassSubjectDialog from './ImportClassSubjectDialog';
 
 interface Props {
     classId: string;
+    classSubjects: IClassSubject[];
+    isLoading:boolean
 }
 
 const SubjectTab = (props: Props) => {
-    const { data: res, isLoading } = useGetClassSubjects(props.classId, 'class');
-    const classSubjects = res?.data;
+
     const { mutate: deleteClassSubject } = useDeleteClassSubject()
 
     const [openAddTeacher, setOpenAddTeacher] = useState(false);
@@ -69,10 +70,10 @@ const SubjectTab = (props: Props) => {
             <Grid container spacing={1}>
 
                 {
-                    isLoading ? (
+                   props.isLoading ? (
                         <Typography>Loading Subjects...</Typography>
                     ) : (
-                        classSubjects?.map((sub, index) => (
+                        props.classSubjects?.map((sub, index) => (
                             <Grid
                                 size={{ xs: 6, md: 2 }}
                                 key={index}
@@ -82,8 +83,8 @@ const SubjectTab = (props: Props) => {
                                         value: { ...sub, subject: (sub.subject as ISubject)._id, teacher: (sub.teacher as ITeacher)._id }, open: true
                                     })}
                                     onDelete={() => setConfirmDelete(sub)}
-                                    type='class' 
-                                    options/>
+                                    type='class'
+                                    options />
 
                             </Grid>
 
@@ -124,8 +125,8 @@ const SubjectTab = (props: Props) => {
             <ImportClassSubjectDialog
                 classId={props.classId}
                 open={importSubjects}
-                onClose={()=>setImportSubjects(false)}
-               />
+                onClose={() => setImportSubjects(false)}
+            />
             {confirmDelete && <ConfirmationDialog open={!!confirmDelete} onClose={() => setConfirmDelete(null)}
                 onConfirm={() => handleDelete(confirmDelete?._id ?? '')} title={`Are You sure want to Delete Class Subject ${(confirmDelete?.subject as ISubject).name}?`} />}
         </>
