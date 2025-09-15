@@ -4,5 +4,4 @@ export interface ITimetable {
     name: string;
     isActive: boolean;
     createdAt: DayJs;
-
 }

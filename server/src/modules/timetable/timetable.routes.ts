@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { createTimetable, deleteTimetable, getTimetableByIdReq, getTimetables, updateTimetable } from './timetable.controller';
+import { createTimetable, deleteTimetable,  getTimetableByIdReq, getTimetables, updateTimetable } from './timetable.controller';
 
 const timetableRoutes = Router();
 

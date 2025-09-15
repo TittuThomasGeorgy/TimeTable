@@ -12,6 +12,7 @@ import { createRemark } from "../remarks/remarks.controller";
 import { ISubject } from "../subject/subject.types";
 import Remark from "../remarks/remarks.model";
 import classList from "../class/classList.defaut";
+import { getActiveTT } from "../timetable/timetable.controller";
 
 
 const shuffleClassSubjects = (classSubjects: IClassSubject[]) => {
@@ -137,7 +138,7 @@ const generateTimetable = async (
                     createRemark(timetableId.toString(), classId, clzSub._id, `Preferred slot already taken for ${pref.day} ${pref.period}.`, -1);
                 }
                 else if (teacherAssignments.has(teacherSlotKey)) {
-                    const assignedClass:IClass = (await Period.findOne({ timetableId, day: pref.day, period: pref.period }).populate('class'))?.class as unknown as IClass
+                    const assignedClass: IClass = (await Period.findOne({ timetableId, day: pref.day, period: pref.period }).populate('class'))?.class as unknown as IClass
                     createRemark(timetableId.toString(), classId, clzSub._id, `Preferred slot Teacher already assigned for ${pref.day} ${pref.period} for ${classList[assignedClass?.name ?? -1]} ${assignedClass?.div}.`, -1);
                 }
                 else if (assignedCount >= clzSub.noOfHours) {
@@ -315,6 +316,23 @@ export const shuffleAllPeriods = async (req: Request, res: Response, next: NextF
     } catch (error) {
         if ((error as any).message === 'PeriodNotFound') {
             sendApiResponse(res, 'NOT FOUND', null, 'Period Not Found');
+        } else {
+            next(error); // Pass the error to the error-handling middleware for unexpected errors
+        }
+    }
+};
+
+export const getPeriodByClzId = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        const activeTT = await getActiveTT();
+        console.log(req.params.classId);
+        
+        const data = await Period.find({ timetableId: activeTT._id, class: req.params.classId})
+
+        sendApiResponse(res, 'OK', data, 'Successfully fetched Periods by clz id');
+    } catch (error) {
+        if ((error as any).message === 'NoActiveTT') {
+            sendApiResponse(res, 'NOT FOUND', null, 'Timetable Not Found');
         } else {
             next(error); // Pass the error to the error-handling middleware for unexpected errors
         }

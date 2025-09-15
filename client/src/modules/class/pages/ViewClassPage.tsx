@@ -14,6 +14,7 @@ import TimetableGrid from '../../timetable/components/TimetableGrid';
 import { useGetClassSubjects } from '../hooks/useClassSubject';
 import type { ITeacher } from '../../teacher/types/Teacher';
 import type { ISubject } from '../../subject/types/Subject';
+import { useGetPeriodByClzId as useGetPeriodsByClzId } from '../../timetable/hooks/usePeriods';
 
 const ViewClassPage = () => {
 
@@ -30,6 +31,9 @@ const ViewClassPage = () => {
 
     const { data: res1, isLoading: isLoading1, isError: isError1, error: error1 } = useGetTeacherById(_class?.classTeacher || ''); // Pass an empty string if id is undefined to satisfy type, or handle in hook
     const teacher = res1?.data;
+
+    const { data: periodRes, isLoading: isLoadingPeriod, isError: isPeriodError, error: periodError } = useGetPeriodsByClzId(id || ''); // Pass an empty string if id is undefined to satisfy type, or handle in hook
+    const periods = periodRes?.data;
 
     const handleChange = (_: React.SyntheticEvent, newValue: number) => {
         setValue(newValue);
@@ -98,7 +102,7 @@ const ViewClassPage = () => {
                         <TimetableGrid
                             class={_class}
                             classSubjects={classSubjects??[]}
-                            periods={[]}
+                            periods={periods??[]}
                             teachers={classSubjects?.map(clzSub=>clzSub.teacher as ITeacher)??[]}
                             subjects={classSubjects?.map(clzSub=>clzSub.subject as ISubject)??[]}
                             selectedClassSubject={''}

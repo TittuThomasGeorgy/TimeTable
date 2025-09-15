@@ -13,7 +13,7 @@ const timetableNameExist = async (name: string) => {
 
 export const createTimetable = async (req: Request, res: Response, next: NextFunction) => {
     try {
-         const isNameExist = await timetableNameExist(req.body.name);
+        const isNameExist = await timetableNameExist(req.body.name);
         if (isNameExist.length > 0)
             return sendApiResponse(res, 'CONFLICT', null,
                 `TimeTable Already Exist`);
@@ -63,6 +63,21 @@ export const getTimetables = async (req: Request, res: Response, next: NextFunct
     } catch (error) {
         next(error);
     }
+}
+
+export const getActiveTT = async () => {
+    const _data = await Timetable.findOne({ isActive: true })
+
+    if (!_data) {
+        throw new Error('NoActiveTT'); // Throw an error if the class is not found
+    }
+
+    const data: ITimetable = {
+        ..._data.toObject(),
+    };
+
+    return data; // Return the data to the controller function
+
 }
 
 export const getTimetableByIdReq = async (req: Request, res: Response, next: NextFunction) => {
@@ -134,7 +149,7 @@ export const deleteTimetable = async (req: Request, res: Response, next: NextFun
         if (!updatedClass) {
             return sendApiResponse(res, 'CONFLICT', null, 'Timetable Not Deleted');
         }
-        await Period.deleteMany({timetableId:req.params.id})
+        await Period.deleteMany({ timetableId: req.params.id })
 
         sendApiResponse(res, 'OK', updatedClass,
             `Class Subject deleted successfully`);
