@@ -33,7 +33,7 @@ const ViewClassPage = () => {
     const { data: res1, isLoading: isLoading1, isError: isError1, error: error1 } = useGetTeacherById(_class?.classTeacher || ''); // Pass an empty string if id is undefined to satisfy type, or handle in hook
     const teacher = res1?.data;
 
-    const { data: periodRes, isLoading: isLoadingPeriod, isError: isPeriodError, error: periodError } = useGetPeriodsByClzId(id || ''); // Pass an empty string if id is undefined to satisfy type, or handle in hook
+    const { data: periodRes } = useGetPeriodsByClzId(id || ''); // Pass an empty string if id is undefined to satisfy type, or handle in hook
     const periods = periodRes?.data;
     const { mutate: shuffleClassTimetable } = useShufflePeriodsByClz()
 

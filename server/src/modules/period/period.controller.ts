@@ -11,8 +11,8 @@ import { daysList, periodsList } from "./period.constants";
 import { createRemark } from "../remarks/remarks.controller";
 import { ISubject } from "../subject/subject.types";
 import Remark from "../remarks/remarks.model";
-import classList from "../class/classList.defaut";
 import { getActiveTT } from "../timetable/timetable.controller";
+import classList from "../class/classList.default";
 
 
 const shuffleClassSubjects = (classSubjects: IClassSubject[]) => {
