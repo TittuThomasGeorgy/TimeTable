@@ -325,7 +325,6 @@ export const shuffleAllPeriods = async (req: Request, res: Response, next: NextF
 export const getPeriodByClzId = async (req: Request, res: Response, next: NextFunction) => {
     try {
         const activeTT = await getActiveTT();
-        console.log(req.params.classId);
         
         const data = await Period.find({ timetableId: activeTT._id, class: req.params.classId})
 

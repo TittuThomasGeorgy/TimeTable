@@ -14,7 +14,8 @@ import TimetableGrid from '../../timetable/components/TimetableGrid';
 import { useGetClassSubjects } from '../hooks/useClassSubject';
 import type { ITeacher } from '../../teacher/types/Teacher';
 import type { ISubject } from '../../subject/types/Subject';
-import { useGetPeriodByClzId as useGetPeriodsByClzId } from '../../timetable/hooks/usePeriods';
+import { useGetPeriodByClzId as useGetPeriodsByClzId, useShufflePeriodsByClz } from '../../timetable/hooks/usePeriods';
+import type { IClassSubject } from '../types/ClassSubject';
 
 const ViewClassPage = () => {
 
@@ -34,7 +35,13 @@ const ViewClassPage = () => {
 
     const { data: periodRes, isLoading: isLoadingPeriod, isError: isPeriodError, error: periodError } = useGetPeriodsByClzId(id || ''); // Pass an empty string if id is undefined to satisfy type, or handle in hook
     const periods = periodRes?.data;
+    const { mutate: shuffleClassTimetable } = useShufflePeriodsByClz()
 
+    const [selectedSubject, setSelectedSubject] = useState<IClassSubject | null>(null)
+    const reshuffleByClass = (classId: string) => {
+        const timetableId = periods && periods?.length > 0 ? periods[0].timetableId : ''
+        shuffleClassTimetable({ timetableId, classId });
+    }
     const handleChange = (_: React.SyntheticEvent, newValue: number) => {
         setValue(newValue);
     };
@@ -97,22 +104,18 @@ const ViewClassPage = () => {
                         <Tab label="Subjects" {...a11yProps(0)} />
                         <Tab label="Timetable" {...a11yProps(1)} />
                     </Tabs>
-                    {value == 0 && <SubjectTab classId={id} classSubjects={classSubjects??[]} isLoading={isClassSubjectLoading}/>}
+                    {value == 0 && <SubjectTab classId={id} classSubjects={classSubjects ?? []} isLoading={isClassSubjectLoading} />}
                     {value == 1 &&
                         <TimetableGrid
                             class={_class}
-                            classSubjects={classSubjects??[]}
-                            periods={periods??[]}
-                            teachers={classSubjects?.map(clzSub=>clzSub.teacher as ITeacher)??[]}
-                            subjects={classSubjects?.map(clzSub=>clzSub.subject as ISubject)??[]}
-                            selectedClassSubject={''}
-                            onSelectClassSubject={function (selectedSub: string): void {
-                                throw new Error('Function not implemented.');
-                            }}
-                            onReshuffle={function (): void {
-                                throw new Error('Function not implemented.');
-                            }} />}
-
+                            classSubjects={classSubjects ?? []}
+                            periods={periods ?? []}
+                            teachers={classSubjects?.map(clzSub => clzSub.teacher as ITeacher) ?? []}
+                            subjects={classSubjects?.map(clzSub => clzSub.subject as ISubject) ?? []}
+                            selectedClassSubject={selectedSubject?._id ?? ''}
+                            onSelectClassSubject={(selected) => setSelectedSubject(classSubjects?.find(clzSub => clzSub._id === selected) ?? null)}
+                            onReshuffle={() => reshuffleByClass(id)} />
+                    }
                 </Box>
 
             </Box>

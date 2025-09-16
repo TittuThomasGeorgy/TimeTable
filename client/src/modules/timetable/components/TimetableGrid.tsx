@@ -30,7 +30,9 @@ const TimetableGrid = (props: Props) => {
 
         const classSub = getClassSub(id);
         if (!classSub) return '-';
-        const subject = props.subjects?.find(sub => sub._id == classSub.subject);
+        const subId = typeof (classSub.subject) == 'string' ? classSub.subject : classSub.subject._id
+        const subject = props.subjects?.find(sub => sub._id == subId);
+
         return subject?.code ?? ''
     }
 
@@ -38,9 +40,12 @@ const TimetableGrid = (props: Props) => {
 
         const classSub = getClassSub(id);
         if (!classSub) return '-';
-        const teacher = props.teachers?.find(teacher => teacher._id == classSub.teacher);
+        const teacherId = typeof (classSub.teacher) == 'string' ? classSub.teacher : classSub.teacher._id
+
+        const teacher = props.teachers?.find(teacher => teacher._id == teacherId);
         return teacher?.code ?? ''
     }
+
 
     return (
 
@@ -96,7 +101,8 @@ const TimetableGrid = (props: Props) => {
                                     {day}
                                 </TableCell>
                                 {periodsList.map(period => {
-                                    const _period: IPeriod | null = props.periods?.find(per => per.day === day && per.period === period) ?? null
+                                    const _period: IPeriod | null = props.periods?.find(per => per.day === day && per.period === period) ?? null;
+
                                     return (
                                         <TableCell
                                             key={`${day}-${period}`}

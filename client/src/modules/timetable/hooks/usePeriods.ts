@@ -39,7 +39,7 @@ export const useShufflePeriodsByClz = () => {
 
 export const useGetPeriodByClzId = (id: string) => {
     return useQuery({
-        queryKey: ['TeacherPeriod', id], // Include id in the queryKey to re-fetch when id changes
+        queryKey: ['Periods', id], // Include id in the queryKey to re-fetch when id changes
         queryFn: () => getPeriodByClzId(id), // Pass the id to your queryFn
         enabled: !!id, // Optional: Only run the query if id is truthy
         staleTime: 5 * 60 * 1000, // Data considered fresh for 5 minutes (optional)
