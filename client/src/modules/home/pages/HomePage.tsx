@@ -6,13 +6,7 @@ const HomePage = () => {
     return (
 
         <>
-            <CommonPageLayout>
-                <div>HomePage</div>
-                <div>HomePage</div>
-                <div>HomePage</div>
-                <div>HomePage</div>
-                <div>HomePage</div>
-                <div>HomePage</div>
+            <CommonPageLayout> 
                 <div>HomePage</div>
                 <div>HomePage</div>
                 <div>HomePage</div>
