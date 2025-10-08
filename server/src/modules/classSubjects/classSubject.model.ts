@@ -27,6 +27,7 @@ export const ClassSubjectSchema = new Schema<IClassSubject>({
     class: { type: Schema.Types.ObjectId, required: true, ref: "classes" },
     teacher: { type: Schema.Types.ObjectId, required: true, ref: "teachers" },
     subject: { type: Schema.Types.ObjectId, required: true, ref: "subjects" },
+    shared: { type: Schema.Types.ObjectId,  ref: "subjects" },
     noOfHours: { type: Number, required: true },
     preferences: {
       type: [PreferencesSchema],

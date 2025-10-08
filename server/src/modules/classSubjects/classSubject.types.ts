@@ -11,7 +11,8 @@ export interface IClassSubject {
     teacher: Types.ObjectId | ITeacher;
     subject: Types.ObjectId | ISubject;
     noOfHours: number;
-    preferences:Preferences[];
+    shared?: Types.ObjectId;
+    preferences: Preferences[];
 }
 
 type PreferenceChoice = 0 | 1 | -1;

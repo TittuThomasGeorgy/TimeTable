@@ -10,5 +10,6 @@ export interface IClassSubject {
     subject: string | ISubject;
     teacher: string | ITeacher;
     noOfHours: number;
+    shared?:string;
     preferences:Preferences[];
 }
