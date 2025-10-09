@@ -1,4 +1,4 @@
-import { Dialog, DialogTitle, DialogContent, Container, Grid, TextField, DialogActions, Button, Autocomplete, Box, Avatar, Typography } from '@mui/material';
+import { Dialog, DialogTitle, DialogContent, Container, Grid, TextField, DialogActions, Button, Autocomplete, Box, Avatar, Typography, FormControlLabel, Checkbox } from '@mui/material';
 // import { enqueueSnackbar } from 'notistack';
 import { useEffect, useState } from 'react'
 import { useGetTeachers } from '../../teacher/hooks/useTeacher';
@@ -23,6 +23,7 @@ interface Props {
 const AddClassSubjectDialog = (props: Props) => {
     const isEdit = !!props.value;
     const [form, setForm] = useState<IClassSubject>({ ...defClassSubject, class: props.classId });
+    const [isShared, setIsShared] = useState(false)
     const { data: teacherRes, isLoading: isTeachersLoading } = useGetTeachers();
     const teachers = teacherRes?.data;
     const { data: subRes, isLoading: isSubjectsLoading } = useGetSubjects();
@@ -141,6 +142,22 @@ const AddClassSubjectDialog = (props: Props) => {
                                 <CustomIconButton icon={<Add />} onClick={props.onAddTeacher} title='Add Teacher' />
 
                             </Grid>
+                            <Grid size={{ xs: 12, md: 6 }}>
+                                <FormControlLabel
+                                  label="Shared"
+                                  labelPlacement="end"
+                                  control={
+                                    <Checkbox
+                                      value=""
+                                      checked={isShared}
+                                      onChange={()=>setIsShared(s=>!s)}
+                                      color="primary"
+                                    />
+                                  }
+                                />
+                            </Grid>
+                            <Grid size={{ xs: 12, md: 6 }}>
+                            </Grid>
                             <Grid size={{ xs: 12 }}>
                                 <TextField
                                     label="Number of hours"
@@ -156,8 +173,8 @@ const AddClassSubjectDialog = (props: Props) => {
                             </Grid>
                         </Grid>
                         <PreferenceGrid value={form.preferences} onChange={(newVal) => {
-                                        setForm(Teacher => ({ ...Teacher, preferences:newVal }))
-                                    }}/>
+                            setForm(Teacher => ({ ...Teacher, preferences: newVal }))
+                        }} />
 
                     </Container>
                 </DialogContent>
