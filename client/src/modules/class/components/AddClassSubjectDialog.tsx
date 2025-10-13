@@ -5,10 +5,11 @@ import { useGetTeachers } from '../../teacher/hooks/useTeacher';
 import type { IClassSubject } from '../types/ClassSubject';
 import { defClassSubject } from '../constants/ClassSubject.default';
 import { useGetSubjects } from '../../subject/hooks/useSubject';
-import { useCreateClassSubject, useUpdateClassSubject } from '../hooks/useClassSubject';
+import { useCreateClassSubject, useGetClassSubjects, useUpdateClassSubject } from '../hooks/useClassSubject';
 import { Add } from '@mui/icons-material';
 import CustomIconButton from '../../../components/CustomIconButton';
 import PreferenceGrid from './PreferenceGrid';
+import type { ISubject } from '../../subject/types/Subject';
 
 interface Props {
     open: boolean;
@@ -30,9 +31,11 @@ const AddClassSubjectDialog = (props: Props) => {
     const subjects = subRes?.data;
     const { mutate, isPending: isCreating } = useCreateClassSubject();
     const { mutate: update, isPending: updating } = useUpdateClassSubject();
-
+    const { data: resClassSubjects, isLoading: isLoadingClassSubjects } = useGetClassSubjects(props.classId || '', 'class');
+    const classSubjects = resClassSubjects?.data;
     const handleClose = () => {
         setForm({ ...defClassSubject, class: props.classId });
+        setIsShared(false)
         props.onClose();
     }
     const handleSubmit = () => {
@@ -43,8 +46,10 @@ const AddClassSubjectDialog = (props: Props) => {
     };
 
     useEffect(() => {
-        if (props.value)
+        if (props.value) {
             setForm(props.value)
+            if (props.value.shared) setIsShared(true)
+        }
         else
             setForm({ ...defClassSubject, class: props.classId })
     }, [props.classId, props.value])
@@ -142,22 +147,65 @@ const AddClassSubjectDialog = (props: Props) => {
                                 <CustomIconButton icon={<Add />} onClick={props.onAddTeacher} title='Add Teacher' />
 
                             </Grid>
-                            <Grid size={{ xs: 12, md: 6 }}>
-                                <FormControlLabel
-                                  label="Shared"
-                                  labelPlacement="end"
-                                  control={
-                                    <Checkbox
-                                      value=""
-                                      checked={isShared}
-                                      onChange={()=>setIsShared(s=>!s)}
-                                      color="primary"
-                                    />
-                                  }
+                            <Grid size={{ xs: 12, md: 8 }} >
+                                <Autocomplete
+                                    options={classSubjects ?? []}
+                                    fullWidth
+                                    getOptionLabel={(option) => (option.subject as ISubject).name}
+                                    renderOption={(props, option) => {
+                                        const { key, ...optionProps } = props;
+                                        return (
+                                            isLoadingClassSubjects ? <Typography variant="body1" color="initial">Loading...</Typography> :
+                                                <Box
+                                                    key={key}
+                                                    component="li"
+
+                                                    {...optionProps}
+                                                >
+                                                    {(option.subject as ISubject).name}
+                                                </Box>
+                                        );
+                                    }}
+                                    renderInput={(params) => (
+                                        <TextField
+                                            {...params}
+                                            label="Shared Subject"
+
+                                        />
+                                    )}
+                                    disabled={!isShared}
+                                    value={classSubjects?.find(subject => subject._id === form.shared) ?? null}
+                                    onChange={(_, newValue) => {
+                                        if (newValue)
+                                            setForm(_class => ({ ..._class, shared: newValue?._id }))
+                                        else
+                                            setForm(_class => ({ ..._class, shared: '' }))
+
+                                    }}
+                                    sx={{ mt: .5 }}
+
                                 />
                             </Grid>
-                            <Grid size={{ xs: 12, md: 6 }}>
+                            <Grid size={{ xs: 12, md: 4 }}>
+                                <FormControlLabel
+                                    label="Shared"
+                                    labelPlacement="end"
+                                    control={
+                                        <Checkbox
+                                            value=""
+                                            checked={isShared}
+                                            onChange={(e) => {
+                                                setIsShared(e.target.checked);
+                                                if (!e.target.checked)
+                                                    setForm(_class => ({ ..._class, shared: '' }))
+
+                                            }}
+                                            color="primary"
+                                        />
+                                    }
+                                />
                             </Grid>
+
                             <Grid size={{ xs: 12 }}>
                                 <TextField
                                     label="Number of hours"

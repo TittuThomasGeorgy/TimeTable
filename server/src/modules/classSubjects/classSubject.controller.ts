@@ -17,6 +17,7 @@ export const createClassSubject = async (req: Request, res: Response, next: Next
             class: new mongoose.Types.ObjectId(req.body.class as string),
             teacher: new mongoose.Types.ObjectId(req.body.teacher as string),
             subject: new mongoose.Types.ObjectId(req.body.subject as string),
+            shared: req.body.shared?new mongoose.Types.ObjectId(req.body.shared as string):undefined,
         });
         newClassSub.save();
         if (!newClassSub) {
