@@ -135,11 +135,16 @@ export const updateClassSubject = async (req: Request, res: Response, next: Next
             return sendApiResponse(res, 'NOT FOUND', null, 'Class Subject Not Found');
         }
 
-
         const updatedClass = await ClassSubject.findByIdAndUpdate(req.params.id, _updatedClass);
-        if (!updatedClass) {
-            return sendApiResponse(res, 'CONFLICT', null, 'Class Subject Not Updated');
+
+        if (prevClass.shared !== _updatedClass.shared){
+            const sharedSubId = _updatedClass.shared
+            await ClassSubject.findByIdAndUpdate(sharedSubId, { shared: _updatedClass._id })
+            await ClassSubject.findByIdAndUpdate(prevClass._id, { shared: undefined })
         }
+            if (!updatedClass) {
+                return sendApiResponse(res, 'CONFLICT', null, 'Class Subject Not Updated');
+            }
 
         sendApiResponse(res, 'OK', _updatedClass,
             `Class Subject updated successfully`);
