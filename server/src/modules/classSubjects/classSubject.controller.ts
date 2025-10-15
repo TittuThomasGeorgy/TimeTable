@@ -10,15 +10,19 @@ import { ITeacher } from "../teacher/teacher.types";
 
 export const createClassSubject = async (req: Request, res: Response, next: NextFunction) => {
     try {
-
+        const newClassId = new mongoose.Types.ObjectId();
         const newClassSub = new ClassSubject({
             ...req.body,
-            _id: new mongoose.Types.ObjectId(),
+            _id: newClassId,
             class: new mongoose.Types.ObjectId(req.body.class as string),
             teacher: new mongoose.Types.ObjectId(req.body.teacher as string),
             subject: new mongoose.Types.ObjectId(req.body.subject as string),
-            shared: req.body.shared?new mongoose.Types.ObjectId(req.body.shared as string):undefined,
         });
+        if (req.body.shared) {
+            const sharedSubId = req.body.shared as string
+            newClassSub.shared = new mongoose.Types.ObjectId(sharedSubId);
+            await ClassSubject.findByIdAndUpdate(sharedSubId, { shared: newClassId })
+        }
         newClassSub.save();
         if (!newClassSub) {
             return sendApiResponse(res, 'CONFLICT', null, ' Class Subject Not Created');
