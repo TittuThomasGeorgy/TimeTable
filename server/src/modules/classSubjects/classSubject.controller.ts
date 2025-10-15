@@ -125,33 +125,54 @@ export const getClassSubjects = async (req: Request, res: Response, next: NextFu
 };
 
 
+// Assuming your other imports are here (ClassSubject, sendApiResponse)
 
 export const updateClassSubject = async (req: Request, res: Response, next: NextFunction) => {
     try {
-        const _updatedClass = req.body;
-        const prevClass = await ClassSubject.findById(req.params.id)
-        // .populate('logo').populate('manager.img');
+        const { id } = req.params;
+        const updatePayload = req.body;
+
+        // 1. Sanitize the input to prevent the CastError
+        // If the incoming 'shared' value is an empty string, convert it to null.
+        if (updatePayload.shared === '') {
+            updatePayload.shared = null;
+        }
+
+        // 2. Get the document's state *before* any updates
+        const prevClass = await ClassSubject.findById(id);
         if (!prevClass) {
             return sendApiResponse(res, 'NOT FOUND', null, 'Class Subject Not Found');
         }
 
-        const updatedClass = await ClassSubject.findByIdAndUpdate(req.params.id, _updatedClass);
+        const oldSharedId = prevClass.shared;
+        const newSharedId = updatePayload.shared;
 
-        if (prevClass.shared !== _updatedClass.shared){
-            const sharedSubId = _updatedClass.shared
-            await ClassSubject.findByIdAndUpdate(sharedSubId, { shared: _updatedClass._id })
-            await ClassSubject.findByIdAndUpdate(prevClass._id, { shared: undefined })
-        }
-            if (!updatedClass) {
-                return sendApiResponse(res, 'CONFLICT', null, 'Class Subject Not Updated');
+        // 3. If the link has changed, update the related documents
+        if (String(oldSharedId) !== String(newSharedId)) {
+            // a. If there was a previous link, break it from the other document
+            if (oldSharedId) {
+                await ClassSubject.findByIdAndUpdate(oldSharedId, { shared: null });
             }
+            // b. If a new link is being created, establish the two-way connection
+            if (newSharedId) {
+                await ClassSubject.findByIdAndUpdate(newSharedId, { shared: id });
+            }
+        }
 
-        sendApiResponse(res, 'OK', _updatedClass,
-            `Class Subject updated successfully`);
+        // 4. Perform the main update on the current document
+        // Using { new: true } returns the document *after* the update
+        const updatedClass = await ClassSubject.findByIdAndUpdate(id, updatePayload, { new: true });
+
+        if (!updatedClass) {
+            return sendApiResponse(res, 'CONFLICT', null, 'Class Subject Not Updated');
+        }
+
+        sendApiResponse(res, 'OK', updatedClass, 'Class Subject updated successfully');
+
     } catch (error) {
         next(error);
     }
-}
+};
 export const deleteClassSubject = async (req: Request, res: Response, next: NextFunction) => {
     try {
         const prevClass = await ClassSubject.findById(req.params.id)
