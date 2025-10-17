@@ -11,7 +11,8 @@ export interface IClassSubject {
     teacher: Types.ObjectId | ITeacher;
     subject: Types.ObjectId | ISubject;
     noOfHours: number;
-    shared?: Types.ObjectId;
+    sharedClz?: Types.ObjectId;
+    sharedSub?: Types.ObjectId;
     preferences: Preferences[];
 }
 

@@ -20,7 +20,7 @@ export const createClassSubject = async (req: Request, res: Response, next: Next
         });
         if (req.body.shared) {
             const sharedSubId = req.body.shared as string
-            newClassSub.shared = new mongoose.Types.ObjectId(sharedSubId);
+            newClassSub.sharedSub = new mongoose.Types.ObjectId(sharedSubId);
             await ClassSubject.findByIdAndUpdate(sharedSubId, { shared: newClassId })
         }
         newClassSub.save();
@@ -144,7 +144,7 @@ export const updateClassSubject = async (req: Request, res: Response, next: Next
             return sendApiResponse(res, 'NOT FOUND', null, 'Class Subject Not Found');
         }
 
-        const oldSharedId = prevClass.shared;
+        const oldSharedId = prevClass.sharedSub;
         const newSharedId = updatePayload.shared;
 
         // 3. If the link has changed, update the related documents

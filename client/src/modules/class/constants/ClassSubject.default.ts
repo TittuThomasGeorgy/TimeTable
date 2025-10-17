@@ -5,5 +5,6 @@ export const defClassSubject: IClassSubject = {
     class: '',
     subject: '',
     teacher: '',
-    noOfHours:0
+    noOfHours: 0,
+    preferences: []
 }

@@ -48,7 +48,7 @@ const AddClassSubjectDialog = (props: Props) => {
     useEffect(() => {
         if (props.value) {
             setForm(props.value)
-            if (props.value.shared) setIsShared(true)
+            if (props.value.sharedSub||props.value.sharedClz) setIsShared(true)
         }
         else
             setForm({ ...defClassSubject, class: props.classId })
@@ -174,7 +174,7 @@ const AddClassSubjectDialog = (props: Props) => {
                                         />
                                     )}
                                     disabled={!isShared}
-                                    value={classSubjects?.find(subject => subject._id === form.shared) ?? null}
+                                    value={classSubjects?.find(subject => subject._id === form.sharedClz) ?? null}
                                     onChange={(_, newValue) => {
                                         if (newValue)
                                             setForm(_class => ({ ..._class, shared: newValue?._id }))
