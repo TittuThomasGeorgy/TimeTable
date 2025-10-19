@@ -167,11 +167,12 @@ const AddClassSubjectDialog = (props: Props) => {
                                     renderInput={(params) => (
                                         <TextField
                                             {...params}
-                                            label=" Class"
-                                            required
+                                            label="Shared Class"
                                         />
                                     )}
                                     sx={{ mt: .5, mb: .5 }}
+                                    disabled={!isShared}
+
                                 // fullWidth
                                 />
                             </Grid>
