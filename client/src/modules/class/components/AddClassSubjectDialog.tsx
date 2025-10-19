@@ -10,6 +10,8 @@ import { Add } from '@mui/icons-material';
 import CustomIconButton from '../../../components/CustomIconButton';
 import PreferenceGrid from './PreferenceGrid';
 import type { ISubject } from '../../subject/types/Subject';
+import { useGetClasses } from '../hooks/useClass';
+import classList from '../constants/ClassList.default';
 
 interface Props {
     open: boolean;
@@ -33,6 +35,9 @@ const AddClassSubjectDialog = (props: Props) => {
     const { mutate: update, isPending: updating } = useUpdateClassSubject();
     const { data: resClassSubjects, isLoading: isLoadingClassSubjects } = useGetClassSubjects(props.classId || '', 'class');
     const classSubjects = resClassSubjects?.data;
+    const { data: resClasses } = useGetClasses();
+    const classes = resClasses?.data;
+
     const handleClose = () => {
         setForm({ ...defClassSubject, class: props.classId });
         setIsShared(false)
@@ -48,7 +53,7 @@ const AddClassSubjectDialog = (props: Props) => {
     useEffect(() => {
         if (props.value) {
             setForm(props.value)
-            if (props.value.sharedSub||props.value.sharedClz) setIsShared(true)
+            if (props.value.sharedSub || props.value.sharedClz) setIsShared(true)
         }
         else
             setForm({ ...defClassSubject, class: props.classId })
@@ -149,6 +154,29 @@ const AddClassSubjectDialog = (props: Props) => {
                             </Grid>
                             <Grid size={{ xs: 12, md: 8 }} >
                                 <Autocomplete
+                                    options={classes?.filter(cls => cls._id != props.classId) || []}
+                                    getOptionLabel={(options) => `${classList[options.name]} ${options.div}`}
+                                    value={classes?.find(cls => cls._id === form.sharedClz) || null}
+                                    onChange={(_, newVal) => {
+                                        if (newVal)
+                                            setForm(_class => ({ ..._class, teacher: newVal?._id }))
+                                        else
+                                            setForm(_class => ({ ..._class, teacher: '' }))
+
+                         }}
+                                    renderInput={(params) => (
+                                        <TextField
+                                            {...params}
+                                            label=" Class"
+                                            required
+                                        />
+                                    )}
+                                    sx={{ mt: .5, mb: .5 }}
+                                // fullWidth
+                                />
+                            </Grid>
+                            <Grid size={{ xs: 12, md: 8 }} >
+                                <Autocomplete
                                     options={classSubjects ?? []}
                                     fullWidth
                                     getOptionLabel={(option) => (option.subject as ISubject).name}
@@ -174,7 +202,7 @@ const AddClassSubjectDialog = (props: Props) => {
                                         />
                                     )}
                                     disabled={!isShared}
-                                    value={classSubjects?.find(subject => subject._id === form.sharedClz) ?? null}
+                                    value={classSubjects?.find(subject => subject._id === form.sharedSub  ) ?? null}
                                     onChange={(_, newValue) => {
                                         if (newValue)
                                             setForm(_class => ({ ..._class, shared: newValue?._id }))

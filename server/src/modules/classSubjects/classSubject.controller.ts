@@ -87,6 +87,7 @@ export const getClassSubjects = async (req: Request, res: Response, next: NextFu
         }
 
         const sortedData = classSubjects.map((subject) => subject.toObject()).sort((a, b) => {
+console.log(a,b);
 
             if (type === 'subject' || type == 'teacher') {
                 const classA = a.class as unknown as IClass;
@@ -106,6 +107,8 @@ export const getClassSubjects = async (req: Request, res: Response, next: NextFu
             if (type === 'teacher' || type == 'class' && (b.noOfHours - a.noOfHours == 0)) {
                 const subjectA = a.subject as ISubject;
                 const subjectB = b.subject as ISubject;
+                console.log(subjectA._id,subjectB._id,subjectA.name,subjectB.name);
+                
                 return subjectA.name.localeCompare(subjectB.name);
             }
             if (type === 'subject') {
