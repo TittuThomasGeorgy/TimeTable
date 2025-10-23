@@ -159,9 +159,9 @@ const AddClassSubjectDialog = (props: Props) => {
                                     value={classes?.find(cls => cls._id === form.sharedClz) || null}
                                     onChange={(_, newVal) => {
                                         if (newVal)
-                                            setForm(_class => ({ ..._class, teacher: newVal?._id }))
+                                            setForm(_class => ({ ..._class, sharedClz: newVal?._id }))
                                         else
-                                            setForm(_class => ({ ..._class, teacher: '' }))
+                                            setForm(_class => ({ ..._class, sharedClz: '' }))
 
                          }}
                                     renderInput={(params) => (
@@ -206,9 +206,9 @@ const AddClassSubjectDialog = (props: Props) => {
                                     value={classSubjects?.find(subject => subject._id === form.sharedSub  ) ?? null}
                                     onChange={(_, newValue) => {
                                         if (newValue)
-                                            setForm(_class => ({ ..._class, shared: newValue?._id }))
+                                            setForm(_class => ({ ..._class, sharedSub: newValue?._id }))
                                         else
-                                            setForm(_class => ({ ..._class, shared: '' }))
+                                            setForm(_class => ({ ..._class, sharedSub: '' }))
 
                                     }}
                                     sx={{ mt: .5 }}

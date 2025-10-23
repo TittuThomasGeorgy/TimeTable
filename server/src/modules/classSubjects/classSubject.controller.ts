@@ -10,18 +10,21 @@ import { ITeacher } from "../teacher/teacher.types";
 
 export const createClassSubject = async (req: Request, res: Response, next: NextFunction) => {
     try {
-        const newClassId = new mongoose.Types.ObjectId();
+        const newClassSubId = new mongoose.Types.ObjectId();
         const newClassSub = new ClassSubject({
             ...req.body,
-            _id: newClassId,
+            _id: newClassSubId,
             class: new mongoose.Types.ObjectId(req.body.class as string),
             teacher: new mongoose.Types.ObjectId(req.body.teacher as string),
             subject: new mongoose.Types.ObjectId(req.body.subject as string),
         });
-        if (req.body.shared) {
-            const sharedSubId = req.body.shared as string
+        if (req.body.sharedSub) {
+            const sharedSubId = req.body.sharedSub as string
             newClassSub.sharedSub = new mongoose.Types.ObjectId(sharedSubId);
-            await ClassSubject.findByIdAndUpdate(sharedSubId, { shared: newClassId })
+            await ClassSubject.findByIdAndUpdate(sharedSubId, { sharedSub: newClassSubId })
+        }
+        if (req.body.sharedClz) {
+             
         }
         newClassSub.save();
         if (!newClassSub) {
@@ -137,8 +140,8 @@ export const updateClassSubject = async (req: Request, res: Response, next: Next
 
         // 1. Sanitize the input to prevent the CastError
         // If the incoming 'shared' value is an empty string, convert it to null.
-        if (updatePayload.shared === '') {
-            updatePayload.shared = null;
+        if (updatePayload.sharedSub === '') {
+            updatePayload.sharedSub = null;
         }
 
         // 2. Get the document's state *before* any updates
@@ -148,17 +151,17 @@ export const updateClassSubject = async (req: Request, res: Response, next: Next
         }
 
         const oldSharedId = prevClass.sharedSub;
-        const newSharedId = updatePayload.shared;
+        const newSharedId = updatePayload.sharedSub;
 
         // 3. If the link has changed, update the related documents
         if (String(oldSharedId) !== String(newSharedId)) {
             // a. If there was a previous link, break it from the other document
             if (oldSharedId) {
-                await ClassSubject.findByIdAndUpdate(oldSharedId, { shared: null });
+                await ClassSubject.findByIdAndUpdate(oldSharedId, { sharedSub: null });
             }
             // b. If a new link is being created, establish the two-way connection
             if (newSharedId) {
-                await ClassSubject.findByIdAndUpdate(newSharedId, { shared: id });
+                await ClassSubject.findByIdAndUpdate(newSharedId, { sharedSub: id });
             }
         }
 
