@@ -24,7 +24,9 @@ export const createClassSubject = async (req: Request, res: Response, next: Next
             await ClassSubject.findByIdAndUpdate(sharedSubId, { sharedSub: newClassSubId })
         }
         if (req.body.sharedClz) {
-            
+             // add multiple classses
+             // if subject matched make it also shared
+             // else create new subject
              
         }
         newClassSub.save();
