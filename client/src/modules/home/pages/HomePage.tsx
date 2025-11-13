@@ -8,7 +8,7 @@ const HomePage = () => {
         <>
             <CommonPageLayout>
                 
-                <div>HomePage</div>
+                
                 <div>HomePage</div>
                 <div>HomePage</div>
                 <div>HomePage</div>
