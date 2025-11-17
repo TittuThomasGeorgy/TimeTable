@@ -6,11 +6,8 @@ const HomePage = () => {
     return (
 
         <>
-            <CommonPageLayout>
-                
-                
-                
-                
+            <CommonPageLayout> 
+             
                 <div>HomePage</div>
                 <div>HomePage</div>
                 <div>HomePage</div>
