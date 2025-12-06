@@ -8,7 +8,7 @@ const HomePage = () => {
         <>
             <CommonPageLayout>
             
-                
+                in complete 
             </CommonPageLayout>
         </>
     )
