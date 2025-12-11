@@ -12,6 +12,7 @@ const HomePage = () => {
                 still not
                 what are u doing
                 nyc day
+                tht unopened book has a great story
             </CommonPageLayout>
         </>
     )
