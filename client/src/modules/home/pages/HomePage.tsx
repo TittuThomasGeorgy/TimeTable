@@ -1,3 +1,4 @@
+
 // import React from 'react'
 import CommonPageLayout from '../../../layouts/CommonPageLayout'
 
@@ -17,6 +18,7 @@ const HomePage = () => {
                 life is great
                 great
                 great
+                good
             </CommonPageLayout>
         </>
     )
