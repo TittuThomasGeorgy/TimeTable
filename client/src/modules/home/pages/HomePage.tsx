@@ -20,6 +20,7 @@ const HomePage = () => {
                 great
                 good
                 race
+                hi
             </CommonPageLayout>
         </>
     )
