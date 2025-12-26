@@ -9,6 +9,7 @@ import { useGetClasses } from '../hooks/useClass';
 import ClassCard from '../components/ClassCard';
 
 
+
 const ClassPage = () => {
     const [open, setOpen] = useState(false);
     const { data: res, isLoading } = useGetClasses();
