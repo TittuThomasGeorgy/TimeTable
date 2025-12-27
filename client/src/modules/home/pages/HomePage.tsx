@@ -22,6 +22,7 @@ const HomePage = () => {
                 race
                 hi
                 christmas
+                good
             </CommonPageLayout>
         </>
     )
