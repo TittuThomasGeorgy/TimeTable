@@ -23,6 +23,7 @@ const HomePage = () => {
                 hi
                 christmas
                 good
+                confused 
             </CommonPageLayout>
         </>
     )
