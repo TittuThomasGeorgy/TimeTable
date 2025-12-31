@@ -26,6 +26,7 @@ const HomePage = () => {
                 confused 
                 Live 
                 good 
+                great
             </CommonPageLayout>
         </>
     )
