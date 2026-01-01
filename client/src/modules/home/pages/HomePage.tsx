@@ -27,6 +27,7 @@ const HomePage = () => {
                 Live 
                 good 
                 great
+                nice 
             </CommonPageLayout>
         </>
     )
