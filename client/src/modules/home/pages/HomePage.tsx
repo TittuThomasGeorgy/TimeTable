@@ -29,6 +29,7 @@ const HomePage = () => {
                 great
                 nice 
                 good
+                fine
             </CommonPageLayout>
         </>
     )
