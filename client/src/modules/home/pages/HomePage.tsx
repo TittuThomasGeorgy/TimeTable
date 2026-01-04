@@ -30,6 +30,7 @@ const HomePage = () => {
                 nice 
                 good
                 fine
+                good
             </CommonPageLayout>
         </>
     )
