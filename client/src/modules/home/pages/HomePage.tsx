@@ -16,21 +16,7 @@ const HomePage = () => {
                 tht unopened book has a great story
                 it was so perfect even it ended
                 life is great
-                great
-                great
-                good
-                race
-                hi
-                christmas
-                good
-                confused 
-                Live 
-                good 
-                great
-                nice 
-                good
-                fine
-                good
+                
                 nice
             </CommonPageLayout>
         </>
