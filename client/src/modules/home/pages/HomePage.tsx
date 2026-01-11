@@ -17,6 +17,7 @@ const HomePage = () => {
                 it was so perfect even it ended
                 life is grea
                 ti
+                nice
             </CommonPageLayout>
         </>
     )
