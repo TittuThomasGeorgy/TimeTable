@@ -8,15 +8,7 @@ const HomePage = () => {
 
         <>
             <CommonPageLayout>
-            
-                in complete 
-                still not
-                what are u doing
-                nyc day
-                tht unopened book has a great story
-                it was so perfect even it ended
-                life is gre
-                nice
+            this is not we planed
             </CommonPageLayout>
         </>
     )
