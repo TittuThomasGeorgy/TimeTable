@@ -10,6 +10,7 @@ const HomePage = () => {
             <CommonPageLayout>
             this is not we planed
                 
+                
             </CommonPageLayout>
         </>
     )
