@@ -9,6 +9,5 @@ nthalla
 good
 😂😂
 
-kk
 hi
 
