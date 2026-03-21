@@ -1,1 +1,1 @@
-next fun hi
+good next fun hi
