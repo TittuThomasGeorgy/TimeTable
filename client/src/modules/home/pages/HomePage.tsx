@@ -1,1 +1,1 @@
-fun hi
+next fun hi
