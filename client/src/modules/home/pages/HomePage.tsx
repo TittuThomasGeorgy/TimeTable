@@ -1,3 +1,1 @@
-hi oii
-.
-  
+import react from react
