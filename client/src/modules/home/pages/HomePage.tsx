@@ -1,2 +1,4 @@
 import react from react
-return ()
+const homepage=()=>return (
+  <Homepage></Homepage>
+)
