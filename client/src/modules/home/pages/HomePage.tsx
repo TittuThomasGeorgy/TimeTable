@@ -3,6 +3,4 @@ const homepage=()=>return (
   <Homepage>
   </Homepage>
 )
-
-
 fire 
